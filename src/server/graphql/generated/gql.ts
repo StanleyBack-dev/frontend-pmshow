@@ -36,6 +36,18 @@ type Documents = {
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": typeof types.RequestPasswordRecoveryDocument,
     "\n  mutation VerifyPasswordRecoveryCode($input: VerifyRecoveryCodeInput!) {\n    verifyPasswordRecoveryCode(input: $input)\n  }\n": typeof types.VerifyPasswordRecoveryCodeDocument,
     "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n": typeof types.ResetPasswordWithRecoveryDocument,
+    "\n  fragment EventFields on Event {\n    id\n    title\n    type\n    status\n    callTime\n    startsAt\n    endsAt\n    venueId\n    uniform\n    requester\n    documentRef\n    notes\n    cancellationReason\n    venue {\n      ...VenueFields\n    }\n  }\n": typeof types.EventFieldsFragmentDoc,
+    "\n  fragment VenueFields on Venue {\n    id\n    name\n    address\n    city\n    mapsUrl\n    notes\n    archived\n  }\n": typeof types.VenueFieldsFragmentDoc,
+    "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n    }\n  }\n": typeof types.EventsDocument,
+    "\n  query UpcomingEvents($limit: Int!) {\n    upcomingEvents(limit: $limit) {\n      ...EventFields\n    }\n  }\n": typeof types.UpcomingEventsDocument,
+    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n": typeof types.EventDocument,
+    "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n": typeof types.CreateEventDocument,
+    "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n": typeof types.UpdateEventDocument,
+    "\n  mutation ChangeEventStatus($id: ID!, $status: EventStatus!, $reason: String) {\n    changeEventStatus(id: $id, status: $status, reason: $reason) {\n      ...EventFields\n    }\n  }\n": typeof types.ChangeEventStatusDocument,
+    "\n  mutation SetEventSetlist($id: ID!, $input: SetlistInput!) {\n    setEventSetlist(id: $id, input: $input) {\n      position\n      songId\n    }\n  }\n": typeof types.SetEventSetlistDocument,
+    "\n  query Venues($includeArchived: Boolean!) {\n    venues(includeArchived: $includeArchived) {\n      ...VenueFields\n    }\n  }\n": typeof types.VenuesDocument,
+    "\n  mutation CreateVenue($input: VenueInput!) {\n    createVenue(input: $input) {\n      ...VenueFields\n    }\n  }\n": typeof types.CreateVenueDocument,
+    "\n  mutation UpdateVenue($id: ID!, $input: VenueInput!) {\n    updateVenue(id: $id, input: $input) {\n      ...VenueFields\n    }\n  }\n": typeof types.UpdateVenueDocument,
     "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n  }\n": typeof types.MemberProfileFieldsFragmentDoc,
     "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": typeof types.RosterDocument,
     "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.MemberProfileDocument,
@@ -81,6 +93,18 @@ const documents: Documents = {
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": types.RequestPasswordRecoveryDocument,
     "\n  mutation VerifyPasswordRecoveryCode($input: VerifyRecoveryCodeInput!) {\n    verifyPasswordRecoveryCode(input: $input)\n  }\n": types.VerifyPasswordRecoveryCodeDocument,
     "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n": types.ResetPasswordWithRecoveryDocument,
+    "\n  fragment EventFields on Event {\n    id\n    title\n    type\n    status\n    callTime\n    startsAt\n    endsAt\n    venueId\n    uniform\n    requester\n    documentRef\n    notes\n    cancellationReason\n    venue {\n      ...VenueFields\n    }\n  }\n": types.EventFieldsFragmentDoc,
+    "\n  fragment VenueFields on Venue {\n    id\n    name\n    address\n    city\n    mapsUrl\n    notes\n    archived\n  }\n": types.VenueFieldsFragmentDoc,
+    "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n    }\n  }\n": types.EventsDocument,
+    "\n  query UpcomingEvents($limit: Int!) {\n    upcomingEvents(limit: $limit) {\n      ...EventFields\n    }\n  }\n": types.UpcomingEventsDocument,
+    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n": types.EventDocument,
+    "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n": types.CreateEventDocument,
+    "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n": types.UpdateEventDocument,
+    "\n  mutation ChangeEventStatus($id: ID!, $status: EventStatus!, $reason: String) {\n    changeEventStatus(id: $id, status: $status, reason: $reason) {\n      ...EventFields\n    }\n  }\n": types.ChangeEventStatusDocument,
+    "\n  mutation SetEventSetlist($id: ID!, $input: SetlistInput!) {\n    setEventSetlist(id: $id, input: $input) {\n      position\n      songId\n    }\n  }\n": types.SetEventSetlistDocument,
+    "\n  query Venues($includeArchived: Boolean!) {\n    venues(includeArchived: $includeArchived) {\n      ...VenueFields\n    }\n  }\n": types.VenuesDocument,
+    "\n  mutation CreateVenue($input: VenueInput!) {\n    createVenue(input: $input) {\n      ...VenueFields\n    }\n  }\n": types.CreateVenueDocument,
+    "\n  mutation UpdateVenue($id: ID!, $input: VenueInput!) {\n    updateVenue(id: $id, input: $input) {\n      ...VenueFields\n    }\n  }\n": types.UpdateVenueDocument,
     "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n  }\n": types.MemberProfileFieldsFragmentDoc,
     "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": types.RosterDocument,
     "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n": types.MemberProfileDocument,
@@ -189,6 +213,54 @@ export function graphql(source: "\n  mutation VerifyPasswordRecoveryCode($input:
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n"): typeof import('./graphql').ResetPasswordWithRecoveryDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment EventFields on Event {\n    id\n    title\n    type\n    status\n    callTime\n    startsAt\n    endsAt\n    venueId\n    uniform\n    requester\n    documentRef\n    notes\n    cancellationReason\n    venue {\n      ...VenueFields\n    }\n  }\n"): typeof import('./graphql').EventFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment VenueFields on Venue {\n    id\n    name\n    address\n    city\n    mapsUrl\n    notes\n    archived\n  }\n"): typeof import('./graphql').VenueFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n    }\n  }\n"): typeof import('./graphql').EventsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query UpcomingEvents($limit: Int!) {\n    upcomingEvents(limit: $limit) {\n      ...EventFields\n    }\n  }\n"): typeof import('./graphql').UpcomingEventsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EventDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n"): typeof import('./graphql').CreateEventDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n"): typeof import('./graphql').UpdateEventDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ChangeEventStatus($id: ID!, $status: EventStatus!, $reason: String) {\n    changeEventStatus(id: $id, status: $status, reason: $reason) {\n      ...EventFields\n    }\n  }\n"): typeof import('./graphql').ChangeEventStatusDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetEventSetlist($id: ID!, $input: SetlistInput!) {\n    setEventSetlist(id: $id, input: $input) {\n      position\n      songId\n    }\n  }\n"): typeof import('./graphql').SetEventSetlistDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Venues($includeArchived: Boolean!) {\n    venues(includeArchived: $includeArchived) {\n      ...VenueFields\n    }\n  }\n"): typeof import('./graphql').VenuesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateVenue($input: VenueInput!) {\n    createVenue(input: $input) {\n      ...VenueFields\n    }\n  }\n"): typeof import('./graphql').CreateVenueDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateVenue($id: ID!, $input: VenueInput!) {\n    updateVenue(id: $id, input: $input) {\n      ...VenueFields\n    }\n  }\n"): typeof import('./graphql').UpdateVenueDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
