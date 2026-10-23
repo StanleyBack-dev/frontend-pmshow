@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * PM SHOW design tokens — azul-marinho institucional + dourado da banda.
+ * PM SHOW design tokens — institutional navy blue + the band's gold.
  * Semantic CSS variables (the source of truth) are exposed to Tailwind via
  * @theme, so components use intent-based classes (bg-surface, text-muted,
  * text-danger...) and never raw colors. Dark mode only swaps the variables.

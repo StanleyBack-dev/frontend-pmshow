@@ -13,11 +13,11 @@ const source = resolve(
 const target = resolve(root, "schema/schema.gql");
 
 if (!existsSync(source)) {
-  console.error(`Schema do backend não encontrado em ${source}.`);
+  console.error(`Backend schema not found at ${source}.`);
   console.error(
-    "Defina BACKEND_DIR ou rode `npm run schema:generate` no backend.",
+    "Set BACKEND_DIR or run `npm run schema:generate` in the backend.",
   );
   process.exit(1);
 }
 copyFileSync(source, target);
-console.log(`schema.gql sincronizado de ${source}`);
+console.log(`schema.gql synced from ${source}`);

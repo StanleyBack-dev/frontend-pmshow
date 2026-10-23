@@ -1,3 +1,4 @@
 .next
 src/server/graphql/generated
 schema
+src/shared/graphql/schema-enums.ts

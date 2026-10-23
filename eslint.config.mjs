@@ -5,8 +5,8 @@ import nextTs from "eslint-config-next/typescript";
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Camadas: componentes de cliente e design system nunca importam o BFF
-  // (código server-only com segredos).
+  // Layers: client components and the design system never import the BFF
+  // (server-only code that holds secrets).
   {
     files: [
       "src/design-system/**/*.{ts,tsx}",
@@ -19,7 +19,7 @@ export default defineConfig([
           patterns: [
             {
               group: ["@/server/*", "@/server/**"],
-              message: "Componentes não podem importar a camada server (BFF).",
+              message: "Components must not import the server (BFF) layer.",
             },
           ],
         },
@@ -35,7 +35,7 @@ export default defineConfig([
           patterns: [
             {
               group: ["@/features/*", "@/features/**", "@/server/**"],
-              message: "O design system é agnóstico ao domínio.",
+              message: "The design system is domain-agnostic.",
             },
           ],
         },
@@ -48,5 +48,6 @@ export default defineConfig([
     "build/**",
     "next-env.d.ts",
     "src/server/graphql/generated/**",
+    "src/shared/graphql/schema-enums.ts",
   ]),
 ]);
