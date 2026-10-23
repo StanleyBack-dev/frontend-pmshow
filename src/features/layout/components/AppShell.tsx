@@ -6,12 +6,14 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   CircleUserRound,
   House,
+  ListMusic,
   LogOut,
   type LucideIcon,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
   ShieldCheck,
+  Users,
   X,
 } from "lucide-react";
 import { Button, cn, Modal, Spinner } from "@/design-system";
@@ -20,7 +22,7 @@ import { Logo } from "@/features/layout/components/Logo";
 import { LogoMark } from "@/features/layout/components/LogoMark";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { authClient } from "@/features/auth/api/auth.client";
-import type { SessionUser } from "@/shared/contracts/api";
+import type { Permission, SessionUser } from "@/shared/contracts/api";
 
 type NavItem = {
   href: string;
@@ -28,11 +30,27 @@ type NavItem = {
   icon: LucideIcon;
   /** Other paths that belong to this entry (pages shown under its tabs). */
   also?: string[];
+  /** Shown only with this permission (the page and the API check again). */
+  permission?: Permission;
 };
 
-// Only pages that exist: repertoire, agenda, rosters and notifications join
-// as their phases ship.
-const BASE_NAV: NavItem[] = [{ href: "/inicio", label: "Início", icon: House }];
+// Only pages that exist: agenda, rosters and notifications join as their
+// phases ship.
+const BASE_NAV: NavItem[] = [
+  { href: "/inicio", label: "Início", icon: House },
+  {
+    href: "/repertorio",
+    label: "Repertório",
+    icon: ListMusic,
+    permission: "REPERTOIRE_READ",
+  },
+  {
+    href: "/musicos",
+    label: "Músicos",
+    icon: Users,
+    permission: "MEMBERS_READ",
+  },
+];
 
 const ACCOUNT_NAV: NavItem[] = [
   { href: "/perfil", label: "Meu perfil", icon: CircleUserRound },
@@ -134,10 +152,13 @@ export function AppShell({
   showAdmin,
   children,
 }: {
-  user: Pick<SessionUser, "name" | "group">;
+  user: Pick<SessionUser, "name" | "group" | "permissions">;
   showAdmin: boolean;
   children: ReactNode;
 }) {
+  const navItems = BASE_NAV.filter(
+    (item) => !item.permission || user.permissions.includes(item.permission),
+  );
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -165,7 +186,7 @@ export function AppShell({
   function renderNav(rail: boolean) {
     return (
       <nav aria-label="Principal" className="flex flex-col gap-1">
-        {BASE_NAV.map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.href}
             item={item}

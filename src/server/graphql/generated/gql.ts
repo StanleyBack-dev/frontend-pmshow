@@ -36,6 +36,28 @@ type Documents = {
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": typeof types.RequestPasswordRecoveryDocument,
     "\n  mutation VerifyPasswordRecoveryCode($input: VerifyRecoveryCodeInput!) {\n    verifyPasswordRecoveryCode(input: $input)\n  }\n": typeof types.VerifyPasswordRecoveryCodeDocument,
     "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n": typeof types.ResetPasswordWithRecoveryDocument,
+    "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n  }\n": typeof types.MemberProfileFieldsFragmentDoc,
+    "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": typeof types.RosterDocument,
+    "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.MemberProfileDocument,
+    "\n  query MyMemberProfile {\n    myMemberProfile {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.MyMemberProfileDocument,
+    "\n  mutation SaveMemberProfile($userId: ID!, $input: MemberProfileInput!) {\n    saveMemberProfile(userId: $userId, input: $input) {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.SaveMemberProfileDocument,
+    "\n  query Instruments($includeArchived: Boolean!) {\n    instruments(includeArchived: $includeArchived) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": typeof types.InstrumentsDocument,
+    "\n  mutation CreateInstrument($input: CreateInstrumentInput!) {\n    createInstrument(input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": typeof types.CreateInstrumentDocument,
+    "\n  mutation UpdateInstrument($id: ID!, $input: UpdateInstrumentInput!) {\n    updateInstrument(id: $id, input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": typeof types.UpdateInstrumentDocument,
+    "\n  fragment SongFields on Song {\n    id\n    title\n    artist\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": typeof types.SongFieldsFragmentDoc,
+    "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n": typeof types.MediaAssetFieldsFragmentDoc,
+    "\n  query Songs($filter: SongFilterInput, $page: PageInput) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n      }\n    }\n    songTags\n  }\n": typeof types.SongsDocument,
+    "\n  query Song($id: ID!) {\n    song(id: $id) {\n      ...SongFields\n      media {\n        ...MediaAssetFields\n      }\n    }\n  }\n": typeof types.SongDocument,
+    "\n  mutation CreateSong($input: SongInput!) {\n    createSong(input: $input) {\n      ...SongFields\n    }\n  }\n": typeof types.CreateSongDocument,
+    "\n  mutation UpdateSong($id: ID!, $input: SongInput!) {\n    updateSong(id: $id, input: $input) {\n      ...SongFields\n    }\n  }\n": typeof types.UpdateSongDocument,
+    "\n  mutation SetSongArchived($id: ID!, $archived: Boolean!) {\n    setSongArchived(id: $id, archived: $archived) {\n      ...SongFields\n    }\n  }\n": typeof types.SetSongArchivedDocument,
+    "\n  mutation AddYoutubeVideo($input: AddYoutubeVideoInput!) {\n    addYoutubeVideo(input: $input) {\n      ...MediaAssetFields\n    }\n  }\n": typeof types.AddYoutubeVideoDocument,
+    "\n  mutation RequestAudioUpload($input: RequestAudioUploadInput!) {\n    requestAudioUpload(input: $input) {\n      asset {\n        ...MediaAssetFields\n      }\n      upload {\n        url\n        fields\n        expiresAt\n      }\n    }\n  }\n": typeof types.RequestAudioUploadDocument,
+    "\n  mutation ConfirmAudioUpload($input: ConfirmAudioUploadInput!) {\n    confirmAudioUpload(input: $input) {\n      ...MediaAssetFields\n    }\n  }\n": typeof types.ConfirmAudioUploadDocument,
+    "\n  mutation RenameMedia($id: ID!, $title: String!) {\n    renameMedia(id: $id, title: $title) {\n      ...MediaAssetFields\n    }\n  }\n": typeof types.RenameMediaDocument,
+    "\n  mutation RemoveMedia($id: ID!) {\n    removeMedia(id: $id)\n  }\n": typeof types.RemoveMediaDocument,
+    "\n  query AudioPlaybackUrl($assetId: ID!) {\n    audioPlaybackUrl(assetId: $assetId)\n  }\n": typeof types.AudioPlaybackUrlDocument,
+    "\n  query AudioDownloadUrl($assetId: ID!) {\n    audioDownloadUrl(assetId: $assetId)\n  }\n": typeof types.AudioDownloadUrlDocument,
 };
 const documents: Documents = {
     "\n  query Users($filter: UserFilterInput, $page: PageInput) {\n    users(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...UserAccountFields\n      }\n    }\n  }\n": types.UsersDocument,
@@ -59,6 +81,28 @@ const documents: Documents = {
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": types.RequestPasswordRecoveryDocument,
     "\n  mutation VerifyPasswordRecoveryCode($input: VerifyRecoveryCodeInput!) {\n    verifyPasswordRecoveryCode(input: $input)\n  }\n": types.VerifyPasswordRecoveryCodeDocument,
     "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n": types.ResetPasswordWithRecoveryDocument,
+    "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n  }\n": types.MemberProfileFieldsFragmentDoc,
+    "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": types.RosterDocument,
+    "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n": types.MemberProfileDocument,
+    "\n  query MyMemberProfile {\n    myMemberProfile {\n      ...MemberProfileFields\n    }\n  }\n": types.MyMemberProfileDocument,
+    "\n  mutation SaveMemberProfile($userId: ID!, $input: MemberProfileInput!) {\n    saveMemberProfile(userId: $userId, input: $input) {\n      ...MemberProfileFields\n    }\n  }\n": types.SaveMemberProfileDocument,
+    "\n  query Instruments($includeArchived: Boolean!) {\n    instruments(includeArchived: $includeArchived) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": types.InstrumentsDocument,
+    "\n  mutation CreateInstrument($input: CreateInstrumentInput!) {\n    createInstrument(input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": types.CreateInstrumentDocument,
+    "\n  mutation UpdateInstrument($id: ID!, $input: UpdateInstrumentInput!) {\n    updateInstrument(id: $id, input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": types.UpdateInstrumentDocument,
+    "\n  fragment SongFields on Song {\n    id\n    title\n    artist\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": types.SongFieldsFragmentDoc,
+    "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n": types.MediaAssetFieldsFragmentDoc,
+    "\n  query Songs($filter: SongFilterInput, $page: PageInput) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n      }\n    }\n    songTags\n  }\n": types.SongsDocument,
+    "\n  query Song($id: ID!) {\n    song(id: $id) {\n      ...SongFields\n      media {\n        ...MediaAssetFields\n      }\n    }\n  }\n": types.SongDocument,
+    "\n  mutation CreateSong($input: SongInput!) {\n    createSong(input: $input) {\n      ...SongFields\n    }\n  }\n": types.CreateSongDocument,
+    "\n  mutation UpdateSong($id: ID!, $input: SongInput!) {\n    updateSong(id: $id, input: $input) {\n      ...SongFields\n    }\n  }\n": types.UpdateSongDocument,
+    "\n  mutation SetSongArchived($id: ID!, $archived: Boolean!) {\n    setSongArchived(id: $id, archived: $archived) {\n      ...SongFields\n    }\n  }\n": types.SetSongArchivedDocument,
+    "\n  mutation AddYoutubeVideo($input: AddYoutubeVideoInput!) {\n    addYoutubeVideo(input: $input) {\n      ...MediaAssetFields\n    }\n  }\n": types.AddYoutubeVideoDocument,
+    "\n  mutation RequestAudioUpload($input: RequestAudioUploadInput!) {\n    requestAudioUpload(input: $input) {\n      asset {\n        ...MediaAssetFields\n      }\n      upload {\n        url\n        fields\n        expiresAt\n      }\n    }\n  }\n": types.RequestAudioUploadDocument,
+    "\n  mutation ConfirmAudioUpload($input: ConfirmAudioUploadInput!) {\n    confirmAudioUpload(input: $input) {\n      ...MediaAssetFields\n    }\n  }\n": types.ConfirmAudioUploadDocument,
+    "\n  mutation RenameMedia($id: ID!, $title: String!) {\n    renameMedia(id: $id, title: $title) {\n      ...MediaAssetFields\n    }\n  }\n": types.RenameMediaDocument,
+    "\n  mutation RemoveMedia($id: ID!) {\n    removeMedia(id: $id)\n  }\n": types.RemoveMediaDocument,
+    "\n  query AudioPlaybackUrl($assetId: ID!) {\n    audioPlaybackUrl(assetId: $assetId)\n  }\n": types.AudioPlaybackUrlDocument,
+    "\n  query AudioDownloadUrl($assetId: ID!) {\n    audioDownloadUrl(assetId: $assetId)\n  }\n": types.AudioDownloadUrlDocument,
 };
 
 /**
@@ -145,6 +189,94 @@ export function graphql(source: "\n  mutation VerifyPasswordRecoveryCode($input:
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n"): typeof import('./graphql').ResetPasswordWithRecoveryDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n  }\n"): typeof import('./graphql').MemberProfileFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').RosterDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n"): typeof import('./graphql').MemberProfileDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MyMemberProfile {\n    myMemberProfile {\n      ...MemberProfileFields\n    }\n  }\n"): typeof import('./graphql').MyMemberProfileDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SaveMemberProfile($userId: ID!, $input: MemberProfileInput!) {\n    saveMemberProfile(userId: $userId, input: $input) {\n      ...MemberProfileFields\n    }\n  }\n"): typeof import('./graphql').SaveMemberProfileDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Instruments($includeArchived: Boolean!) {\n    instruments(includeArchived: $includeArchived) {\n      id\n      name\n      section\n      archived\n    }\n  }\n"): typeof import('./graphql').InstrumentsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateInstrument($input: CreateInstrumentInput!) {\n    createInstrument(input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n"): typeof import('./graphql').CreateInstrumentDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateInstrument($id: ID!, $input: UpdateInstrumentInput!) {\n    updateInstrument(id: $id, input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n"): typeof import('./graphql').UpdateInstrumentDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment SongFields on Song {\n    id\n    title\n    artist\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n"): typeof import('./graphql').SongFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n"): typeof import('./graphql').MediaAssetFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Songs($filter: SongFilterInput, $page: PageInput) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n      }\n    }\n    songTags\n  }\n"): typeof import('./graphql').SongsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Song($id: ID!) {\n    song(id: $id) {\n      ...SongFields\n      media {\n        ...MediaAssetFields\n      }\n    }\n  }\n"): typeof import('./graphql').SongDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateSong($input: SongInput!) {\n    createSong(input: $input) {\n      ...SongFields\n    }\n  }\n"): typeof import('./graphql').CreateSongDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateSong($id: ID!, $input: SongInput!) {\n    updateSong(id: $id, input: $input) {\n      ...SongFields\n    }\n  }\n"): typeof import('./graphql').UpdateSongDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetSongArchived($id: ID!, $archived: Boolean!) {\n    setSongArchived(id: $id, archived: $archived) {\n      ...SongFields\n    }\n  }\n"): typeof import('./graphql').SetSongArchivedDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AddYoutubeVideo($input: AddYoutubeVideoInput!) {\n    addYoutubeVideo(input: $input) {\n      ...MediaAssetFields\n    }\n  }\n"): typeof import('./graphql').AddYoutubeVideoDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RequestAudioUpload($input: RequestAudioUploadInput!) {\n    requestAudioUpload(input: $input) {\n      asset {\n        ...MediaAssetFields\n      }\n      upload {\n        url\n        fields\n        expiresAt\n      }\n    }\n  }\n"): typeof import('./graphql').RequestAudioUploadDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ConfirmAudioUpload($input: ConfirmAudioUploadInput!) {\n    confirmAudioUpload(input: $input) {\n      ...MediaAssetFields\n    }\n  }\n"): typeof import('./graphql').ConfirmAudioUploadDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RenameMedia($id: ID!, $title: String!) {\n    renameMedia(id: $id, title: $title) {\n      ...MediaAssetFields\n    }\n  }\n"): typeof import('./graphql').RenameMediaDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveMedia($id: ID!) {\n    removeMedia(id: $id)\n  }\n"): typeof import('./graphql').RemoveMediaDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AudioPlaybackUrl($assetId: ID!) {\n    audioPlaybackUrl(assetId: $assetId)\n  }\n"): typeof import('./graphql').AudioPlaybackUrlDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AudioDownloadUrl($assetId: ID!) {\n    audioDownloadUrl(assetId: $assetId)\n  }\n"): typeof import('./graphql').AudioDownloadUrlDocument;
 
 
 export function graphql(source: string) {

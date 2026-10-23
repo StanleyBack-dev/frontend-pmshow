@@ -19,6 +19,10 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  images: {
+    // YouTube video thumbnails on the song page.
+    remotePatterns: [new URL("https://i.ytimg.com/vi/**")],
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

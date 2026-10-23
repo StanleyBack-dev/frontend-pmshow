@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/features/layout/components/AppShell";
+import { MiniPlayer } from "@/features/player/components/MiniPlayer";
+import { PlayerProvider } from "@/features/player/components/PlayerProvider";
 import { getSessionUser } from "@/server/auth/current-user";
 import { ADMIN_AREA_PERMISSIONS, canAny } from "@/shared/lib/access";
 
@@ -13,9 +15,14 @@ export default async function AppLayout({
   const user = await getSessionUser();
   if (user.mustChangePassword) redirect("/primeiro-acesso");
 
+  // The player wraps the whole signed-in area so audio keeps playing while
+  // the user moves between pages.
   return (
-    <AppShell user={user} showAdmin={canAny(user, ...ADMIN_AREA_PERMISSIONS)}>
-      {children}
-    </AppShell>
+    <PlayerProvider>
+      <AppShell user={user} showAdmin={canAny(user, ...ADMIN_AREA_PERMISSIONS)}>
+        {children}
+      </AppShell>
+      <MiniPlayer />
+    </PlayerProvider>
   );
 }
