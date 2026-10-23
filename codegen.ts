@@ -1,8 +1,10 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
-// Types for every GraphQL operation the BFF sends. Operations are written
-// with `graphql(...)` inside src/server/graphql; the schema is the copy in
-// schema/schema.gql (npm run schema:sync).
+// Two outputs from schema/schema.gql (npm run schema:sync):
+// - server/graphql/generated: typed documents for every operation the BFF
+//   sends (written with `graphql(...)` in src/server/graphql/operations);
+// - shared/graphql/schema-enums.ts: only the schema's enums as string unions,
+//   so UI code can use Permission/UserGroup without touching the server layer.
 const config: CodegenConfig = {
   schema: "schema/schema.gql",
   documents: ["src/server/graphql/**/*.ts", "!src/server/graphql/generated/**"],
@@ -16,8 +18,12 @@ const config: CodegenConfig = {
         documentMode: "string",
         enumsAsTypes: true,
         useTypeImports: true,
-        scalars: { DateTime: "string" },
+        scalars: { DateTime: "string", JSON: "Record<string, unknown>" },
       },
+    },
+    "src/shared/graphql/schema-enums.ts": {
+      plugins: ["typescript"],
+      config: { onlyEnums: true, enumsAsTypes: true },
     },
   },
 };

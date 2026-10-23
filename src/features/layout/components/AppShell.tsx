@@ -4,12 +4,8 @@ import { useState, useSyncExternalStore, type ReactNode } from "react";
 import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Bell,
-  CalendarDays,
   CircleUserRound,
-  ClipboardList,
   House,
-  ListMusic,
   LogOut,
   type LucideIcon,
   Menu,
@@ -22,7 +18,9 @@ import { Button, cn, Modal, Spinner } from "@/design-system";
 import { InstallAppInvite } from "@/features/install/components/InstallAppInvite";
 import { Logo } from "@/features/layout/components/Logo";
 import { LogoMark } from "@/features/layout/components/LogoMark";
-import { apiRequest } from "@/shared/lib/api-client";
+import { GROUP_LABELS } from "@/features/access/model/access-labels";
+import { authClient } from "@/features/auth/api/auth.client";
+import type { SessionUser } from "@/shared/contracts/api";
 
 type NavItem = {
   href: string;
@@ -32,13 +30,9 @@ type NavItem = {
   also?: string[];
 };
 
-const BASE_NAV: NavItem[] = [
-  { href: "/inicio", label: "Início", icon: House },
-  { href: "/repertorio", label: "Repertório", icon: ListMusic },
-  { href: "/agenda", label: "Agenda", icon: CalendarDays },
-  { href: "/escalas", label: "Escalas", icon: ClipboardList },
-  { href: "/notificacoes", label: "Notificações", icon: Bell },
-];
+// Only pages that exist: repertoire, agenda, rosters and notifications join
+// as their phases ship.
+const BASE_NAV: NavItem[] = [{ href: "/inicio", label: "Início", icon: House }];
 
 const ACCOUNT_NAV: NavItem[] = [
   { href: "/perfil", label: "Meu perfil", icon: CircleUserRound },
@@ -136,9 +130,11 @@ function NavLink({
 }
 
 export function AppShell({
+  user,
   showAdmin,
   children,
 }: {
+  user: Pick<SessionUser, "name" | "group">;
   showAdmin: boolean;
   children: ReactNode;
 }) {
@@ -159,7 +155,7 @@ export function AppShell({
 
   async function logout() {
     setLeaving(true);
-    await apiRequest("/auth/logout", { method: "POST" }).catch(() => undefined);
+    await authClient.logout().catch(() => undefined);
     router.replace("/entrar");
     router.refresh();
   }
@@ -224,7 +220,15 @@ export function AppShell({
 
   function renderFooter(rail: boolean) {
     return (
-      <div className="border-t border-border pt-4">{renderAccount(rail)}</div>
+      <div className="border-t border-border pt-4">
+        {!rail && (
+          <div className="mb-3 px-3">
+            <p className="truncate text-sm font-medium text-fg">{user.name}</p>
+            <p className="text-xs text-soft">{GROUP_LABELS[user.group]}</p>
+          </div>
+        )}
+        {renderAccount(rail)}
+      </div>
     );
   }
 

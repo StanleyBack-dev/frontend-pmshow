@@ -1,4 +1,5 @@
 import "server-only";
+import { headers } from "next/headers";
 import type { TypedDocumentString } from "@/server/graphql/generated/graphql";
 import { serverEnv } from "@/server/config/env";
 import { BackendError } from "@/server/http/backend-error";
@@ -6,7 +7,7 @@ import { BackendError } from "@/server/http/backend-error";
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 type GraphqlRequest<TVariables> = {
-  /** User session token (omitted for login and recovery). */
+  /** User access token (omitted for login, refresh and recovery). */
   token?: string | null;
   timeoutMs?: number;
 } & (TVariables extends Record<string, never>
@@ -23,6 +24,25 @@ type GraphqlResponse<TResult> = {
   errors?: GraphqlErrorPayload[];
 };
 
+// The API sees only this server; the end user's address and browser are
+// forwarded for the audit trail and the session list. Outside a request
+// scope (e.g. the proxy) there is nothing to forward.
+async function clientHeaders(): Promise<Record<string, string>> {
+  try {
+    const incoming = await headers();
+    const forwarded: Record<string, string> = {};
+    const ip =
+      incoming.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      incoming.get("x-real-ip");
+    if (ip) forwarded["x-client-ip"] = ip;
+    const agent = incoming.get("user-agent");
+    if (agent) forwarded["x-client-user-agent"] = agent.slice(0, 512);
+    return forwarded;
+  } catch {
+    return {};
+  }
+}
+
 // Single gateway from the BFF to the NestJS GraphQL API: attaches the
 // internal key and the user's token, and turns every failure — network,
 // HTTP or a GraphQL `errors` entry — into a BackendError carrying the
@@ -32,18 +52,19 @@ export async function backendGraphql<TResult, TVariables>(
   request: GraphqlRequest<TVariables>,
 ): Promise<TResult> {
   const env = serverEnv();
-  const headers: Record<string, string> = {
+  const requestHeaders: Record<string, string> = {
     accept: "application/json",
     "content-type": "application/json",
     "x-internal-api-key": env.INTERNAL_API_KEY,
+    ...(await clientHeaders()),
   };
-  if (request.token) headers.authorization = `Bearer ${request.token}`;
+  if (request.token) requestHeaders.authorization = `Bearer ${request.token}`;
 
   let response: Response;
   try {
     response = await fetch(new URL("/graphql", env.BACKEND_URL), {
       method: "POST",
-      headers,
+      headers: requestHeaders,
       body: JSON.stringify({
         query: document.toString(),
         variables: request.variables ?? {},
