@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore, type ReactNode } from "react";
 import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  CalendarDays,
   CircleUserRound,
   House,
   ListMusic,
@@ -34,10 +35,16 @@ type NavItem = {
   permission?: Permission;
 };
 
-// Only pages that exist: agenda, rosters and notifications join as their
-// phases ship.
+// Only pages that exist: rosters and notifications join as their phases
+// ship.
 const BASE_NAV: NavItem[] = [
   { href: "/inicio", label: "Início", icon: House },
+  {
+    href: "/agenda",
+    label: "Agenda",
+    icon: CalendarDays,
+    permission: "EVENTS_READ",
+  },
   {
     href: "/repertorio",
     label: "Repertório",

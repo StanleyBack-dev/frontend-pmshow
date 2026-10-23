@@ -1,3 +1,19 @@
+export type EventStatus =
+  | 'CANCELADO'
+  | 'CONFIRMADO'
+  | 'PLANEJADO'
+  | 'REALIZADO';
+
+/** Tipo de apresentação ou compromisso. */
+export type EventType =
+  | 'CULTO_MISSA'
+  | 'DESFILE'
+  | 'ENSAIO'
+  | 'FORMATURA'
+  | 'OUTRO'
+  | 'SHOW'
+  | 'SOLENIDADE';
+
 export type MediaKind =
   | 'AUDIO'
   | 'VIDEO';

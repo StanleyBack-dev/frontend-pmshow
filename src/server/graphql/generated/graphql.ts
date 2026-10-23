@@ -42,6 +42,44 @@ export type CreateUserInput = {
   username: string;
 };
 
+export type EventFilterInput = {
+  /** Início a partir de. */
+  from?: string | null | undefined;
+  statuses?: Array<EventStatus> | null | undefined;
+  /** Início antes de. */
+  to?: string | null | undefined;
+  type?: EventType | null | undefined;
+};
+
+export type EventInput = {
+  callTime?: string | null | undefined;
+  documentRef?: string | null | undefined;
+  endsAt?: string | null | undefined;
+  notes?: string | null | undefined;
+  requester?: string | null | undefined;
+  startsAt: string;
+  title: string;
+  type: EventType;
+  uniform?: string | null | undefined;
+  venueId?: string | number | null | undefined;
+};
+
+export type EventStatus =
+  | 'CANCELADO'
+  | 'CONFIRMADO'
+  | 'PLANEJADO'
+  | 'REALIZADO';
+
+/** Tipo de apresentação ou compromisso. */
+export type EventType =
+  | 'CULTO_MISSA'
+  | 'DESFILE'
+  | 'ENSAIO'
+  | 'FORMATURA'
+  | 'OUTRO'
+  | 'SHOW'
+  | 'SOLENIDADE';
+
 export type LoginInput = {
   /** Usuário ou e-mail. */
   login: string;
@@ -162,6 +200,15 @@ export type SetUserPermissionsInput = {
   userId: string | number;
 };
 
+export type SetlistInput = {
+  items: Array<SetlistItemInput>;
+};
+
+export type SetlistItemInput = {
+  notes?: string | null | undefined;
+  songId: string | number;
+};
+
 /** Categoria da música no repertório. */
 export type SongCategory =
   | 'DOBRADO'
@@ -230,6 +277,16 @@ export type UserGroup =
   | 'ADMIN_MASTER'
   /** Músico */
   | 'USER';
+
+export type VenueInput = {
+  address?: string | null | undefined;
+  archived?: boolean | null | undefined;
+  /** Padrão: Goiânia. */
+  city?: string | null | undefined;
+  mapsUrl?: string | null | undefined;
+  name: string;
+  notes?: string | null | undefined;
+};
 
 export type VerifyRecoveryCodeInput = {
   code: string;
@@ -377,6 +434,85 @@ export type ResetPasswordWithRecoveryMutationVariables = Exact<{
 
 
 export type ResetPasswordWithRecoveryMutation = { resetPasswordWithRecovery: boolean };
+
+export type EventFieldsFragment = { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null };
+
+export type VenueFieldsFragment = { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean };
+
+export type EventsQueryVariables = Exact<{
+  filter?: EventFilterInput | null | undefined;
+}>;
+
+
+export type EventsQuery = { events: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
+
+export type UpcomingEventsQueryVariables = Exact<{
+  limit: number;
+}>;
+
+
+export type UpcomingEventsQuery = { upcomingEvents: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
+
+export type EventQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type EventQuery = { event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, setlist: Array<{ position: number, songId: string, notes: string | null, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string }> } | null }>, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+
+export type CreateEventMutationVariables = Exact<{
+  input: EventInput;
+}>;
+
+
+export type CreateEventMutation = { createEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+
+export type UpdateEventMutationVariables = Exact<{
+  id: string | number;
+  input: EventInput;
+}>;
+
+
+export type UpdateEventMutation = { updateEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+
+export type ChangeEventStatusMutationVariables = Exact<{
+  id: string | number;
+  status: EventStatus;
+  reason?: string | null | undefined;
+}>;
+
+
+export type ChangeEventStatusMutation = { changeEventStatus: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+
+export type SetEventSetlistMutationVariables = Exact<{
+  id: string | number;
+  input: SetlistInput;
+}>;
+
+
+export type SetEventSetlistMutation = { setEventSetlist: Array<{ position: number, songId: string }> };
+
+export type VenuesQueryVariables = Exact<{
+  includeArchived: boolean;
+}>;
+
+
+export type VenuesQuery = { venues: Array<{ id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean }> };
+
+export type CreateVenueMutationVariables = Exact<{
+  input: VenueInput;
+}>;
+
+
+export type CreateVenueMutation = { createVenue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } };
+
+export type UpdateVenueMutationVariables = Exact<{
+  id: string | number;
+  input: VenueInput;
+}>;
+
+
+export type UpdateVenueMutation = { updateVenue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } };
 
 export type MemberProfileFieldsFragment = { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }> };
 
@@ -556,6 +692,45 @@ export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"UserAccountFields"}) as unknown as TypedDocumentString<UserAccountFieldsFragment, unknown>;
+export const VenueFieldsFragmentDoc = new TypedDocumentString(`
+    fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}
+    `, {"fragmentName":"VenueFields"}) as unknown as TypedDocumentString<VenueFieldsFragment, unknown>;
+export const EventFieldsFragmentDoc = new TypedDocumentString(`
+    fragment EventFields on Event {
+  id
+  title
+  type
+  status
+  callTime
+  startsAt
+  endsAt
+  venueId
+  uniform
+  requester
+  documentRef
+  notes
+  cancellationReason
+  venue {
+    ...VenueFields
+  }
+}
+    fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`, {"fragmentName":"EventFields"}) as unknown as TypedDocumentString<EventFieldsFragment, unknown>;
 export const MemberProfileFieldsFragmentDoc = new TypedDocumentString(`
     fragment MemberProfileFields on MemberProfile {
   userId
@@ -907,6 +1082,274 @@ export const ResetPasswordWithRecoveryDocument = new TypedDocumentString(`
   resetPasswordWithRecovery(input: $input)
 }
     `) as unknown as TypedDocumentString<ResetPasswordWithRecoveryMutation, ResetPasswordWithRecoveryMutationVariables>;
+export const EventsDocument = new TypedDocumentString(`
+    query Events($filter: EventFilterInput) {
+  events(filter: $filter) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  type
+  status
+  callTime
+  startsAt
+  endsAt
+  venueId
+  uniform
+  requester
+  documentRef
+  notes
+  cancellationReason
+  venue {
+    ...VenueFields
+  }
+}
+fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<EventsQuery, EventsQueryVariables>;
+export const UpcomingEventsDocument = new TypedDocumentString(`
+    query UpcomingEvents($limit: Int!) {
+  upcomingEvents(limit: $limit) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  type
+  status
+  callTime
+  startsAt
+  endsAt
+  venueId
+  uniform
+  requester
+  documentRef
+  notes
+  cancellationReason
+  venue {
+    ...VenueFields
+  }
+}
+fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<UpcomingEventsQuery, UpcomingEventsQueryVariables>;
+export const EventDocument = new TypedDocumentString(`
+    query Event($id: ID!) {
+  event(id: $id) {
+    ...EventFields
+    setlist {
+      position
+      songId
+      notes
+      song {
+        id
+        title
+        musicalKey
+        durationSeconds
+        archivedAt
+        media {
+          id
+          kind
+          title
+        }
+      }
+    }
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  type
+  status
+  callTime
+  startsAt
+  endsAt
+  venueId
+  uniform
+  requester
+  documentRef
+  notes
+  cancellationReason
+  venue {
+    ...VenueFields
+  }
+}
+fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<EventQuery, EventQueryVariables>;
+export const CreateEventDocument = new TypedDocumentString(`
+    mutation CreateEvent($input: EventInput!) {
+  createEvent(input: $input) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  type
+  status
+  callTime
+  startsAt
+  endsAt
+  venueId
+  uniform
+  requester
+  documentRef
+  notes
+  cancellationReason
+  venue {
+    ...VenueFields
+  }
+}
+fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<CreateEventMutation, CreateEventMutationVariables>;
+export const UpdateEventDocument = new TypedDocumentString(`
+    mutation UpdateEvent($id: ID!, $input: EventInput!) {
+  updateEvent(id: $id, input: $input) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  type
+  status
+  callTime
+  startsAt
+  endsAt
+  venueId
+  uniform
+  requester
+  documentRef
+  notes
+  cancellationReason
+  venue {
+    ...VenueFields
+  }
+}
+fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<UpdateEventMutation, UpdateEventMutationVariables>;
+export const ChangeEventStatusDocument = new TypedDocumentString(`
+    mutation ChangeEventStatus($id: ID!, $status: EventStatus!, $reason: String) {
+  changeEventStatus(id: $id, status: $status, reason: $reason) {
+    ...EventFields
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  type
+  status
+  callTime
+  startsAt
+  endsAt
+  venueId
+  uniform
+  requester
+  documentRef
+  notes
+  cancellationReason
+  venue {
+    ...VenueFields
+  }
+}
+fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<ChangeEventStatusMutation, ChangeEventStatusMutationVariables>;
+export const SetEventSetlistDocument = new TypedDocumentString(`
+    mutation SetEventSetlist($id: ID!, $input: SetlistInput!) {
+  setEventSetlist(id: $id, input: $input) {
+    position
+    songId
+  }
+}
+    `) as unknown as TypedDocumentString<SetEventSetlistMutation, SetEventSetlistMutationVariables>;
+export const VenuesDocument = new TypedDocumentString(`
+    query Venues($includeArchived: Boolean!) {
+  venues(includeArchived: $includeArchived) {
+    ...VenueFields
+  }
+}
+    fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<VenuesQuery, VenuesQueryVariables>;
+export const CreateVenueDocument = new TypedDocumentString(`
+    mutation CreateVenue($input: VenueInput!) {
+  createVenue(input: $input) {
+    ...VenueFields
+  }
+}
+    fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<CreateVenueMutation, CreateVenueMutationVariables>;
+export const UpdateVenueDocument = new TypedDocumentString(`
+    mutation UpdateVenue($id: ID!, $input: VenueInput!) {
+  updateVenue(id: $id, input: $input) {
+    ...VenueFields
+  }
+}
+    fragment VenueFields on Venue {
+  id
+  name
+  address
+  city
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<UpdateVenueMutation, UpdateVenueMutationVariables>;
 export const RosterDocument = new TypedDocumentString(`
     query Roster($filter: RosterFilterInput, $page: PageInput) {
   roster(filter: $filter, page: $page) {
