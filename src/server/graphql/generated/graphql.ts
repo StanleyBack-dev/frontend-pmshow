@@ -4,6 +4,14 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
+export type AddYoutubeVideoInput = {
+  /** Link do vídeo (youtube.com, youtu.be, shorts…). */
+  link: string;
+  songId: string | number;
+  /** Título; sem ele, usa o do YouTube. */
+  title?: string | null | undefined;
+};
+
 export type AuditFilterInput = {
   actorId?: string | number | null | undefined;
   entity?: string | null | undefined;
@@ -13,6 +21,17 @@ export type AuditFilterInput = {
 export type ChangePasswordInput = {
   currentPassword: string;
   newPassword: string;
+};
+
+export type ConfirmAudioUploadInput = {
+  assetId: string | number;
+  /** Duração lida pelo navegador, em segundos. */
+  durationSeconds?: number | null | undefined;
+};
+
+export type CreateInstrumentInput = {
+  name: string;
+  section: Section;
 };
 
 export type CreateUserInput = {
@@ -28,6 +47,36 @@ export type LoginInput = {
   login: string;
   password: string;
 };
+
+export type MediaKind =
+  | 'AUDIO'
+  | 'VIDEO';
+
+export type MediaStatus =
+  | 'PENDING'
+  | 'READY';
+
+export type MemberInstrumentInput = {
+  instrumentId: string | number;
+  primary?: boolean;
+};
+
+export type MemberProfileInput = {
+  instruments: Array<MemberInstrumentInput>;
+  notes?: string | null | undefined;
+  phone?: string | null | undefined;
+  rank: Rank;
+  registration?: string | null | undefined;
+  section: Section;
+  status: MemberStatus;
+  warName: string;
+};
+
+/** Situação do integrante na banda. */
+export type MemberStatus =
+  | 'AFASTADO'
+  | 'ATIVO'
+  | 'INATIVO';
 
 export type PageInput = {
   limit?: number;
@@ -55,10 +104,55 @@ export type Permission =
   | 'ROSTERS_READ_OWN'
   | 'USERS_MANAGE';
 
+/** Posto/graduação. */
+export type Rank =
+  | 'ASPIRANTE'
+  | 'CABO'
+  | 'CADETE'
+  | 'CAPITAO'
+  | 'CIVIL'
+  | 'CORONEL'
+  | 'MAJOR'
+  | 'PRIMEIRO_SARGENTO'
+  | 'PRIMEIRO_TENENTE'
+  | 'SEGUNDO_SARGENTO'
+  | 'SEGUNDO_TENENTE'
+  | 'SOLDADO'
+  | 'SUBTENENTE'
+  | 'TENENTE_CORONEL'
+  | 'TERCEIRO_SARGENTO';
+
+export type RequestAudioUploadInput = {
+  /** Ex.: audio/mpeg. */
+  mimeType: string;
+  sizeBytes: number;
+  songId: string | number;
+  title: string;
+};
+
 export type ResetPasswordInput = {
   newPassword: string;
   resetToken: string;
 };
+
+export type RosterFilterInput = {
+  instrumentId?: string | number | null | undefined;
+  search?: string | null | undefined;
+  section?: Section | null | undefined;
+  status?: MemberStatus | null | undefined;
+  /** false = só quem ainda não tem cadastro. */
+  withProfile?: boolean | null | undefined;
+};
+
+/** Naipe da banda. */
+export type Section =
+  | 'APOIO'
+  | 'CORDAS_BASE'
+  | 'MADEIRAS'
+  | 'METAIS'
+  | 'PERCUSSAO'
+  | 'TECNICA'
+  | 'VOCAL';
 
 export type SetUserPermissionsInput = {
   /** Conjunto completo desejado (ignorado com useGroupDefaults). */
@@ -66,6 +160,48 @@ export type SetUserPermissionsInput = {
   /** true descarta as exceções e volta ao padrão do grupo. */
   useGroupDefaults: boolean;
   userId: string | number;
+};
+
+/** Categoria da música no repertório. */
+export type SongCategory =
+  | 'DOBRADO'
+  | 'FORRO'
+  | 'GOSPEL'
+  | 'HINO'
+  | 'INFANTIL'
+  | 'INSTRUMENTAL'
+  | 'MARCHA'
+  | 'MPB'
+  | 'OUTRO'
+  | 'POP_ROCK'
+  | 'SAMBA_PAGODE'
+  | 'SERTANEJO';
+
+export type SongFilterInput = {
+  /** Arquivadas (exige REPERTOIRE_MANAGE). */
+  archived?: boolean;
+  category?: SongCategory | null | undefined;
+  search?: string | null | undefined;
+  tag?: string | null | undefined;
+};
+
+export type SongInput = {
+  arranger?: string | null | undefined;
+  artist?: string | null | undefined;
+  bpm?: number | null | undefined;
+  category: SongCategory;
+  durationSeconds?: number | null | undefined;
+  lyrics?: string | null | undefined;
+  musicalKey?: string | null | undefined;
+  notes?: string | null | undefined;
+  tags?: Array<string>;
+  title: string;
+};
+
+export type UpdateInstrumentInput = {
+  archived?: boolean | null | undefined;
+  name?: string | null | undefined;
+  section?: Section | null | undefined;
 };
 
 export type UpdateMyProfileInput = {
@@ -242,6 +378,150 @@ export type ResetPasswordWithRecoveryMutationVariables = Exact<{
 
 export type ResetPasswordWithRecoveryMutation = { resetPasswordWithRecovery: boolean };
 
+export type MemberProfileFieldsFragment = { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }> };
+
+export type RosterQueryVariables = Exact<{
+  filter?: RosterFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type RosterQuery = { roster: { total: number, page: number, limit: number, totalPages: number, items: Array<{ userId: string, name: string, username: string, active: boolean, profile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }> } | null }> } };
+
+export type MemberProfileQueryVariables = Exact<{
+  userId: string | number;
+}>;
+
+
+export type MemberProfileQuery = { memberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }> } | null };
+
+export type MyMemberProfileQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyMemberProfileQuery = { myMemberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }> } | null };
+
+export type SaveMemberProfileMutationVariables = Exact<{
+  userId: string | number;
+  input: MemberProfileInput;
+}>;
+
+
+export type SaveMemberProfileMutation = { saveMemberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }> } };
+
+export type InstrumentsQueryVariables = Exact<{
+  includeArchived: boolean;
+}>;
+
+
+export type InstrumentsQuery = { instruments: Array<{ id: string, name: string, section: Section, archived: boolean }> };
+
+export type CreateInstrumentMutationVariables = Exact<{
+  input: CreateInstrumentInput;
+}>;
+
+
+export type CreateInstrumentMutation = { createInstrument: { id: string, name: string, section: Section, archived: boolean } };
+
+export type UpdateInstrumentMutationVariables = Exact<{
+  id: string | number;
+  input: UpdateInstrumentInput;
+}>;
+
+
+export type UpdateInstrumentMutation = { updateInstrument: { id: string, name: string, section: Section, archived: boolean } };
+
+export type SongFieldsFragment = { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string };
+
+export type MediaAssetFieldsFragment = { id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string };
+
+export type SongsQueryVariables = Exact<{
+  filter?: SongFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type SongsQuery = { songTags: Array<string>, songs: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string }> } };
+
+export type SongQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type SongQuery = { song: { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, media: Array<{ id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string }> } };
+
+export type CreateSongMutationVariables = Exact<{
+  input: SongInput;
+}>;
+
+
+export type CreateSongMutation = { createSong: { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string } };
+
+export type UpdateSongMutationVariables = Exact<{
+  id: string | number;
+  input: SongInput;
+}>;
+
+
+export type UpdateSongMutation = { updateSong: { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string } };
+
+export type SetSongArchivedMutationVariables = Exact<{
+  id: string | number;
+  archived: boolean;
+}>;
+
+
+export type SetSongArchivedMutation = { setSongArchived: { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string } };
+
+export type AddYoutubeVideoMutationVariables = Exact<{
+  input: AddYoutubeVideoInput;
+}>;
+
+
+export type AddYoutubeVideoMutation = { addYoutubeVideo: { id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string } };
+
+export type RequestAudioUploadMutationVariables = Exact<{
+  input: RequestAudioUploadInput;
+}>;
+
+
+export type RequestAudioUploadMutation = { requestAudioUpload: { asset: { id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string }, upload: { url: string, fields: Record<string, unknown>, expiresAt: string } } };
+
+export type ConfirmAudioUploadMutationVariables = Exact<{
+  input: ConfirmAudioUploadInput;
+}>;
+
+
+export type ConfirmAudioUploadMutation = { confirmAudioUpload: { id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string } };
+
+export type RenameMediaMutationVariables = Exact<{
+  id: string | number;
+  title: string;
+}>;
+
+
+export type RenameMediaMutation = { renameMedia: { id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string } };
+
+export type RemoveMediaMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type RemoveMediaMutation = { removeMedia: boolean };
+
+export type AudioPlaybackUrlQueryVariables = Exact<{
+  assetId: string | number;
+}>;
+
+
+export type AudioPlaybackUrlQuery = { audioPlaybackUrl: string };
+
+export type AudioDownloadUrlQueryVariables = Exact<{
+  assetId: string | number;
+}>;
+
+
+export type AudioDownloadUrlQuery = { audioDownloadUrl: string };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -276,6 +556,57 @@ export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"UserAccountFields"}) as unknown as TypedDocumentString<UserAccountFieldsFragment, unknown>;
+export const MemberProfileFieldsFragmentDoc = new TypedDocumentString(`
+    fragment MemberProfileFields on MemberProfile {
+  userId
+  warName
+  rank
+  registration
+  phone
+  section
+  status
+  notes
+  updatedAt
+  instruments {
+    instrumentId
+    name
+    primary
+  }
+}
+    `, {"fragmentName":"MemberProfileFields"}) as unknown as TypedDocumentString<MemberProfileFieldsFragment, unknown>;
+export const SongFieldsFragmentDoc = new TypedDocumentString(`
+    fragment SongFields on Song {
+  id
+  title
+  artist
+  arranger
+  category
+  musicalKey
+  bpm
+  durationSeconds
+  lyrics
+  notes
+  tags
+  archivedAt
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"SongFields"}) as unknown as TypedDocumentString<SongFieldsFragment, unknown>;
+export const MediaAssetFieldsFragmentDoc = new TypedDocumentString(`
+    fragment MediaAssetFields on MediaAsset {
+  id
+  songId
+  kind
+  status
+  title
+  mimeType
+  sizeBytes
+  durationSeconds
+  youtubeVideoId
+  thumbnailUrl
+  createdAt
+}
+    `, {"fragmentName":"MediaAssetFields"}) as unknown as TypedDocumentString<MediaAssetFieldsFragment, unknown>;
 export const UsersDocument = new TypedDocumentString(`
     query Users($filter: UserFilterInput, $page: PageInput) {
   users(filter: $filter, page: $page) {
@@ -576,3 +907,364 @@ export const ResetPasswordWithRecoveryDocument = new TypedDocumentString(`
   resetPasswordWithRecovery(input: $input)
 }
     `) as unknown as TypedDocumentString<ResetPasswordWithRecoveryMutation, ResetPasswordWithRecoveryMutationVariables>;
+export const RosterDocument = new TypedDocumentString(`
+    query Roster($filter: RosterFilterInput, $page: PageInput) {
+  roster(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      userId
+      name
+      username
+      active
+      profile {
+        ...MemberProfileFields
+      }
+    }
+  }
+}
+    fragment MemberProfileFields on MemberProfile {
+  userId
+  warName
+  rank
+  registration
+  phone
+  section
+  status
+  notes
+  updatedAt
+  instruments {
+    instrumentId
+    name
+    primary
+  }
+}`) as unknown as TypedDocumentString<RosterQuery, RosterQueryVariables>;
+export const MemberProfileDocument = new TypedDocumentString(`
+    query MemberProfile($userId: ID!) {
+  memberProfile(userId: $userId) {
+    ...MemberProfileFields
+  }
+}
+    fragment MemberProfileFields on MemberProfile {
+  userId
+  warName
+  rank
+  registration
+  phone
+  section
+  status
+  notes
+  updatedAt
+  instruments {
+    instrumentId
+    name
+    primary
+  }
+}`) as unknown as TypedDocumentString<MemberProfileQuery, MemberProfileQueryVariables>;
+export const MyMemberProfileDocument = new TypedDocumentString(`
+    query MyMemberProfile {
+  myMemberProfile {
+    ...MemberProfileFields
+  }
+}
+    fragment MemberProfileFields on MemberProfile {
+  userId
+  warName
+  rank
+  registration
+  phone
+  section
+  status
+  notes
+  updatedAt
+  instruments {
+    instrumentId
+    name
+    primary
+  }
+}`) as unknown as TypedDocumentString<MyMemberProfileQuery, MyMemberProfileQueryVariables>;
+export const SaveMemberProfileDocument = new TypedDocumentString(`
+    mutation SaveMemberProfile($userId: ID!, $input: MemberProfileInput!) {
+  saveMemberProfile(userId: $userId, input: $input) {
+    ...MemberProfileFields
+  }
+}
+    fragment MemberProfileFields on MemberProfile {
+  userId
+  warName
+  rank
+  registration
+  phone
+  section
+  status
+  notes
+  updatedAt
+  instruments {
+    instrumentId
+    name
+    primary
+  }
+}`) as unknown as TypedDocumentString<SaveMemberProfileMutation, SaveMemberProfileMutationVariables>;
+export const InstrumentsDocument = new TypedDocumentString(`
+    query Instruments($includeArchived: Boolean!) {
+  instruments(includeArchived: $includeArchived) {
+    id
+    name
+    section
+    archived
+  }
+}
+    `) as unknown as TypedDocumentString<InstrumentsQuery, InstrumentsQueryVariables>;
+export const CreateInstrumentDocument = new TypedDocumentString(`
+    mutation CreateInstrument($input: CreateInstrumentInput!) {
+  createInstrument(input: $input) {
+    id
+    name
+    section
+    archived
+  }
+}
+    `) as unknown as TypedDocumentString<CreateInstrumentMutation, CreateInstrumentMutationVariables>;
+export const UpdateInstrumentDocument = new TypedDocumentString(`
+    mutation UpdateInstrument($id: ID!, $input: UpdateInstrumentInput!) {
+  updateInstrument(id: $id, input: $input) {
+    id
+    name
+    section
+    archived
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateInstrumentMutation, UpdateInstrumentMutationVariables>;
+export const SongsDocument = new TypedDocumentString(`
+    query Songs($filter: SongFilterInput, $page: PageInput) {
+  songs(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      ...SongFields
+    }
+  }
+  songTags
+}
+    fragment SongFields on Song {
+  id
+  title
+  artist
+  arranger
+  category
+  musicalKey
+  bpm
+  durationSeconds
+  lyrics
+  notes
+  tags
+  archivedAt
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<SongsQuery, SongsQueryVariables>;
+export const SongDocument = new TypedDocumentString(`
+    query Song($id: ID!) {
+  song(id: $id) {
+    ...SongFields
+    media {
+      ...MediaAssetFields
+    }
+  }
+}
+    fragment SongFields on Song {
+  id
+  title
+  artist
+  arranger
+  category
+  musicalKey
+  bpm
+  durationSeconds
+  lyrics
+  notes
+  tags
+  archivedAt
+  createdAt
+  updatedAt
+}
+fragment MediaAssetFields on MediaAsset {
+  id
+  songId
+  kind
+  status
+  title
+  mimeType
+  sizeBytes
+  durationSeconds
+  youtubeVideoId
+  thumbnailUrl
+  createdAt
+}`) as unknown as TypedDocumentString<SongQuery, SongQueryVariables>;
+export const CreateSongDocument = new TypedDocumentString(`
+    mutation CreateSong($input: SongInput!) {
+  createSong(input: $input) {
+    ...SongFields
+  }
+}
+    fragment SongFields on Song {
+  id
+  title
+  artist
+  arranger
+  category
+  musicalKey
+  bpm
+  durationSeconds
+  lyrics
+  notes
+  tags
+  archivedAt
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CreateSongMutation, CreateSongMutationVariables>;
+export const UpdateSongDocument = new TypedDocumentString(`
+    mutation UpdateSong($id: ID!, $input: SongInput!) {
+  updateSong(id: $id, input: $input) {
+    ...SongFields
+  }
+}
+    fragment SongFields on Song {
+  id
+  title
+  artist
+  arranger
+  category
+  musicalKey
+  bpm
+  durationSeconds
+  lyrics
+  notes
+  tags
+  archivedAt
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<UpdateSongMutation, UpdateSongMutationVariables>;
+export const SetSongArchivedDocument = new TypedDocumentString(`
+    mutation SetSongArchived($id: ID!, $archived: Boolean!) {
+  setSongArchived(id: $id, archived: $archived) {
+    ...SongFields
+  }
+}
+    fragment SongFields on Song {
+  id
+  title
+  artist
+  arranger
+  category
+  musicalKey
+  bpm
+  durationSeconds
+  lyrics
+  notes
+  tags
+  archivedAt
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<SetSongArchivedMutation, SetSongArchivedMutationVariables>;
+export const AddYoutubeVideoDocument = new TypedDocumentString(`
+    mutation AddYoutubeVideo($input: AddYoutubeVideoInput!) {
+  addYoutubeVideo(input: $input) {
+    ...MediaAssetFields
+  }
+}
+    fragment MediaAssetFields on MediaAsset {
+  id
+  songId
+  kind
+  status
+  title
+  mimeType
+  sizeBytes
+  durationSeconds
+  youtubeVideoId
+  thumbnailUrl
+  createdAt
+}`) as unknown as TypedDocumentString<AddYoutubeVideoMutation, AddYoutubeVideoMutationVariables>;
+export const RequestAudioUploadDocument = new TypedDocumentString(`
+    mutation RequestAudioUpload($input: RequestAudioUploadInput!) {
+  requestAudioUpload(input: $input) {
+    asset {
+      ...MediaAssetFields
+    }
+    upload {
+      url
+      fields
+      expiresAt
+    }
+  }
+}
+    fragment MediaAssetFields on MediaAsset {
+  id
+  songId
+  kind
+  status
+  title
+  mimeType
+  sizeBytes
+  durationSeconds
+  youtubeVideoId
+  thumbnailUrl
+  createdAt
+}`) as unknown as TypedDocumentString<RequestAudioUploadMutation, RequestAudioUploadMutationVariables>;
+export const ConfirmAudioUploadDocument = new TypedDocumentString(`
+    mutation ConfirmAudioUpload($input: ConfirmAudioUploadInput!) {
+  confirmAudioUpload(input: $input) {
+    ...MediaAssetFields
+  }
+}
+    fragment MediaAssetFields on MediaAsset {
+  id
+  songId
+  kind
+  status
+  title
+  mimeType
+  sizeBytes
+  durationSeconds
+  youtubeVideoId
+  thumbnailUrl
+  createdAt
+}`) as unknown as TypedDocumentString<ConfirmAudioUploadMutation, ConfirmAudioUploadMutationVariables>;
+export const RenameMediaDocument = new TypedDocumentString(`
+    mutation RenameMedia($id: ID!, $title: String!) {
+  renameMedia(id: $id, title: $title) {
+    ...MediaAssetFields
+  }
+}
+    fragment MediaAssetFields on MediaAsset {
+  id
+  songId
+  kind
+  status
+  title
+  mimeType
+  sizeBytes
+  durationSeconds
+  youtubeVideoId
+  thumbnailUrl
+  createdAt
+}`) as unknown as TypedDocumentString<RenameMediaMutation, RenameMediaMutationVariables>;
+export const RemoveMediaDocument = new TypedDocumentString(`
+    mutation RemoveMedia($id: ID!) {
+  removeMedia(id: $id)
+}
+    `) as unknown as TypedDocumentString<RemoveMediaMutation, RemoveMediaMutationVariables>;
+export const AudioPlaybackUrlDocument = new TypedDocumentString(`
+    query AudioPlaybackUrl($assetId: ID!) {
+  audioPlaybackUrl(assetId: $assetId)
+}
+    `) as unknown as TypedDocumentString<AudioPlaybackUrlQuery, AudioPlaybackUrlQueryVariables>;
+export const AudioDownloadUrlDocument = new TypedDocumentString(`
+    query AudioDownloadUrl($assetId: ID!) {
+  audioDownloadUrl(assetId: $assetId)
+}
+    `) as unknown as TypedDocumentString<AudioDownloadUrlQuery, AudioDownloadUrlQueryVariables>;

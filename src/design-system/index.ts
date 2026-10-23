@@ -18,4 +18,5 @@ export { Select, type SelectOption } from "./components/Select";
 export { SegmentedNav, type SegmentedNavItem } from "./components/SegmentedNav";
 export { Spinner } from "./components/Spinner";
 export { StatCard } from "./components/StatCard";
+export { TextArea } from "./components/TextArea";
 export { cn } from "./utils/cn";

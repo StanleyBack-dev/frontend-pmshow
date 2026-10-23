@@ -3,12 +3,15 @@ import { Card, CardBody, CardHeader, PageHeader } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { ChangePasswordForm } from "@/features/auth/components/ChangePasswordForm";
 import { ProfileForm } from "@/features/auth/components/ProfileForm";
-import { getSessionUser } from "@/server/auth/current-user";
+import { MyBandProfileCard } from "@/features/members/components/MyBandProfileCard";
+import { authed, getSessionUser } from "@/server/auth/current-user";
+import { membersService } from "@/server/services/members.service";
 
 export const metadata: Metadata = { title: "Meu perfil" };
 
 export default async function ProfilePage() {
   const user = await getSessionUser();
+  const bandProfile = await authed((token) => membersService.myProfile(token));
 
   return (
     <>
@@ -35,6 +38,9 @@ export default async function ProfilePage() {
             <ChangePasswordForm />
           </CardBody>
         </Card>
+        <div className="lg:col-span-2">
+          <MyBandProfileCard profile={bandProfile} />
+        </div>
       </div>
     </>
   );
