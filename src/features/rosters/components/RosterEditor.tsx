@@ -52,7 +52,10 @@ const fromRoster = (roster: Roster | null): Record<string, Line> =>
   );
 
 const normalize = (value: string) =>
-  value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
 
 // Building a roster: pick people by section, set role and instrument. People
 // who can't go (inactive, away, approved absence) are shown but locked;

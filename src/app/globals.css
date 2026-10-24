@@ -1,81 +1,73 @@
 @import "tailwindcss";
 
 /*
- * PM SHOW design tokens — institutional navy blue + the band's gold.
- * Semantic CSS variables (the source of truth) are exposed to Tailwind via
+ * PM SHOW design tokens: military dark green chrome around a light paper
+ * content area (the layout of the amoremio app).
+ *   - chrome:  green-black of the field uniform (sidebar, panel headers);
+ *   - accent:  dark green of the PM and of the Goiás flag (main actions);
+ *   - gold:    the band's brass and the flag's yellow (highlights, logo);
+ *   - brown:   leather and wood of the instruments (secondary accents);
+ *   - info:    the flag's blue, for neutral information only.
+ * Semantic CSS variables are the source of truth, exposed to Tailwind via
  * @theme, so components use intent-based classes (bg-surface, text-muted,
- * text-danger...) and never raw colors. Dark mode only swaps the variables.
+ * bg-chrome...) and never raw colors.
  */
 
 :root {
-  --bg: #f5f6f9;
+  /* Content (light paper) */
+  --bg: #f3f0e8;
   --surface: #ffffff;
-  --surface-muted: #eff1f6;
-  --surface-sunken: #e8ebf2;
-  --border: #dfe3ec;
-  --border-strong: #cbd1de;
-  --fg: #111a2b;
-  --muted: #56607a;
-  --soft: #8790a6;
+  --surface-muted: #f8f5ee;
+  --surface-sunken: #ece7dc;
+  --border: #e2dccf;
+  --border-strong: #cfc6b4;
+  --fg: #1b1c17;
+  --muted: #5c5547;
+  --soft: #8f8775;
 
-  --accent: #1f4f9a;
-  --accent-hover: #183f7c;
+  /* Main action: PM / Goiás green */
+  --accent: #1e5235;
+  --accent-hover: #163f28;
   --accent-fg: #ffffff;
-  --accent-soft: #e4ecf8;
+  --accent-soft: #e5efe7;
+  --accent-border: #bcd5c3;
 
-  /* Brand gold: logo and highlights only — too light for body text. */
-  --brand-navy: #0b1f3a;
-  --brand-gold: #c9982f;
+  /* Brand */
+  --brand-gold: #d1a12a;
+  --brand-gold-soft: #f6ecd0;
+  --brand-gold-border: #e6cf8f;
+  --brand-gold-ink: #7a5a12;
+  --brand-brown: #6e4724;
+  --brand-brown-soft: #f1e7dc;
 
-  --success: #18794e;
-  --success-soft: #e6f6ee;
-  --danger: #d93036;
-  --danger-soft: #fdecec;
-  --warning: #a35c00;
-  --warning-soft: #fdf3e2;
-  --info: #2563eb;
-  --info-soft: #e8f0fe;
+  /* Chrome (sidebar, drawer and dialog headers) */
+  --chrome: #0e1610;
+  --chrome-top: #152219;
+  --chrome-bottom: #0a100b;
+  --chrome-line: #263428;
+  --chrome-hover: rgb(255 255 255 / 0.06);
+  --chrome-fg: #f2ecdd;
+  --chrome-muted: #bdb7a5;
+  --chrome-subtle: #858071;
 
-  --ring: rgb(31 79 154 / 0.45);
-  --shadow-card:
-    0 1px 2px rgb(20 20 31 / 0.04), 0 8px 24px -12px rgb(20 20 31 / 0.12);
+  /* Status (light-surface friendly) */
+  --success: #1e7a45;
+  --success-soft: #e7f3eb;
+  --success-border: #bfe0cb;
+  --danger: #b03a30;
+  --danger-soft: #fbeae7;
+  --danger-border: #eec5bf;
+  --warning: #8a6220;
+  --warning-soft: #f8efd9;
+  --warning-border: #eadab0;
+  --info: #2c5a85;
+  --info-soft: #e8eff6;
+  --info-border: #c9d8e8;
+
+  --ring: rgb(209 161 42 / 0.4);
+  --shadow-card: 0 10px 26px -16px rgb(27 28 23 / 0.25);
+  --shadow-pop: 0 24px 60px -20px rgb(10 16 11 / 0.45);
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #070f1d;
-    --surface: #0e1829;
-    --surface-muted: #142036;
-    --surface-sunken: #0a1322;
-    --border: #1f2c45;
-    --border-strong: #2c3c5c;
-    --fg: #e9eef7;
-    --muted: #a0aac0;
-    --soft: #6d7893;
-
-    --accent: #7ea8ec;
-    --accent-hover: #9cbcf2;
-    --accent-fg: #07122a;
-    --accent-soft: rgb(126 168 236 / 0.16);
-
-    --brand-navy: #0b1f3a;
-    --brand-gold: #ddb352;
-
-    --success: #3dd68c;
-    --success-soft: rgb(61 214 140 / 0.12);
-    --danger: #ff6369;
-    --danger-soft: rgb(255 99 105 / 0.12);
-    --warning: #ffb224;
-    --warning-soft: rgb(255 178 36 / 0.12);
-    --info: #70a7ff;
-    --info-soft: rgb(112 167 255 / 0.12);
-
-    --ring: rgb(126 168 236 / 0.5);
-    --shadow-card:
-      0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
-    color-scheme: dark;
-  }
 }
 
 @theme inline {
@@ -92,27 +84,45 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-border: var(--accent-border);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-soft: var(--brand-gold-soft);
+  --color-brand-gold-border: var(--brand-gold-border);
+  --color-brand-gold-ink: var(--brand-gold-ink);
+  --color-brand-brown: var(--brand-brown);
+  --color-brand-brown-soft: var(--brand-brown-soft);
+  --color-chrome: var(--chrome);
+  --color-chrome-top: var(--chrome-top);
+  --color-chrome-bottom: var(--chrome-bottom);
+  --color-chrome-line: var(--chrome-line);
+  --color-chrome-hover: var(--chrome-hover);
+  --color-chrome-fg: var(--chrome-fg);
+  --color-chrome-muted: var(--chrome-muted);
+  --color-chrome-subtle: var(--chrome-subtle);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
+  --color-success-border: var(--success-border);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-danger-border: var(--danger-border);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
+  --color-warning-border: var(--warning-border);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
+  --color-info-border: var(--info-border);
   --color-ring: var(--ring);
-  --color-brand-navy: var(--brand-navy);
-  --color-brand-gold: var(--brand-gold);
 
   --font-sans:
     var(--font-inter), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
 
   --radius-sm: 0.375rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 0.875rem;
-  --radius-xl: 1.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 
   --shadow-card: var(--shadow-card);
+  --shadow-pop: var(--shadow-pop);
 }
 
 html,
@@ -124,11 +134,32 @@ body {
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(209 161 42 / 0.28);
+  color: var(--fg);
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--brand-gold);
   outline-offset: 2px;
+}
+
+/* Sidebar scroll track blends into the dark chrome. */
+.chrome-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--chrome-line) transparent;
+}
+
+/* Autofilled fields keep the light field look (Chrome overrides styles). */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--fg);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+  caret-color: var(--fg);
 }
 
 @media (prefers-reduced-motion: reduce) {

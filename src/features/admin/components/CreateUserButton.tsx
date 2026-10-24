@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
-import { Alert, Button, Modal } from "@/design-system";
+import { Alert, Button, Drawer } from "@/design-system";
 import { adminClient } from "@/features/admin/api/admin.client";
 import { TemporaryAccessPanel } from "@/features/admin/components/TemporaryAccessPanel";
 import { UserFormFields } from "@/features/admin/components/UserFormFields";
@@ -61,11 +61,10 @@ export function CreateUserButton({
       >
         Novo usuário
       </Button>
-      <Modal
+      <Drawer
         open={open}
         onClose={close}
         title={created ? "Usuário criado" : "Novo usuário"}
-        icon={<UserPlus className="size-5" />}
         busy={pending}
         footer={
           created ? (
@@ -97,7 +96,7 @@ export function CreateUserButton({
             </p>
           </div>
         )}
-      </Modal>
+      </Drawer>
     </>
   );
 }

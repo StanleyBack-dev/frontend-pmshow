@@ -26,10 +26,13 @@ import {
 
 const A4 = { width: 595.28, height: 841.89 };
 const MARGIN = 40;
-const NAVY = rgb(0.043, 0.122, 0.227);
-const GOLD = rgb(0.722, 0.537, 0.169);
-const MUTED = rgb(0.36, 0.36, 0.43);
-const LINE = rgb(0.89, 0.89, 0.92);
+// The app palette (app/globals.css): chrome green, brass gold, ink.
+const CHROME = rgb(0.055, 0.086, 0.063);
+const GOLD = rgb(0.82, 0.631, 0.165);
+const INK = rgb(0.106, 0.11, 0.09);
+const MUTED = rgb(0.361, 0.333, 0.278);
+const LINE = rgb(0.886, 0.863, 0.812);
+const LIGHT = rgb(0.949, 0.925, 0.867);
 
 const COLUMNS = [
   { label: "Nº", width: 26 },
@@ -116,7 +119,7 @@ export async function buildRosterPdf(
         y: y - 13,
         size: 9,
         font: column === 2 ? fonts.bold : fonts.regular,
-        color: NAVY,
+        color: INK,
       });
       x += width;
     });
@@ -167,14 +170,14 @@ function newPage(
     y: A4.height - 34,
     width: A4.width,
     height: 34,
-    color: NAVY,
+    color: CHROME,
   });
   page.drawText("PM", {
     x: MARGIN,
     y: A4.height - 22,
     size: 12,
     font: fonts.bold,
-    color: rgb(1, 1, 1),
+    color: LIGHT,
   });
   page.drawText("SHOW", {
     x: MARGIN + 21,
@@ -195,7 +198,7 @@ function newPage(
       y: A4.height - 21,
       size: 9,
       font: fonts.regular,
-      color: rgb(1, 1, 1),
+      color: LIGHT,
     },
   );
   if (roster.status === "RASCUNHO") {
@@ -204,7 +207,7 @@ function newPage(
       y: A4.height / 2 - 40,
       size: 72,
       font: fonts.bold,
-      color: rgb(0.9, 0.9, 0.93),
+      color: rgb(0.925, 0.906, 0.863),
       rotate: degrees(30),
     });
   }
@@ -223,7 +226,7 @@ function drawEventHeader(
     y,
     size: 18,
     font: fonts.bold,
-    color: NAVY,
+    color: INK,
   });
   y -= 22;
 
@@ -273,7 +276,7 @@ function drawEventHeader(
       y,
       size: 10,
       font: fonts.bold,
-      color: NAVY,
+      color: INK,
     });
     y -= 15;
   }
@@ -286,7 +289,7 @@ function drawTableHeader(page: PDFPage, fonts: Fonts, y: number): number {
     y: y - ROW_HEIGHT,
     width: A4.width - 2 * MARGIN,
     height: ROW_HEIGHT,
-    color: rgb(0.965, 0.933, 0.859),
+    color: rgb(0.965, 0.925, 0.816),
   });
   let x = MARGIN;
   for (const column of COLUMNS) {
@@ -295,7 +298,7 @@ function drawTableHeader(page: PDFPage, fonts: Fonts, y: number): number {
       y: y - 13,
       size: 8,
       font: fonts.bold,
-      color: NAVY,
+      color: INK,
     });
     x += column.width;
   }

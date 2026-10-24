@@ -1,5 +1,5 @@
 import { useId, type TextareaHTMLAttributes } from "react";
-import { inputClasses } from "@/design-system/components/Field";
+import { inputClasses, labelClasses } from "@/design-system/components/Field";
 import { cn } from "@/design-system/utils/cn";
 
 type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
@@ -21,10 +21,7 @@ export function TextArea({
 
   return (
     <div className={className}>
-      <label
-        htmlFor={textareaId}
-        className="mb-1.5 block text-sm font-medium text-fg"
-      >
+      <label htmlFor={textareaId} className={labelClasses}>
         {label}
       </label>
       <textarea
@@ -35,7 +32,7 @@ export function TextArea({
         {...props}
       />
       {hint && (
-        <p id={hintId} className="mt-1.5 text-xs text-soft">
+        <p id={hintId} className="mt-1 text-[11px] text-soft">
           {hint}
         </p>
       )}

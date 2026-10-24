@@ -123,10 +123,17 @@ export default function TermsPage() {
               <Link href="/perfil" className="text-accent hover:underline">
                 Meu perfil
               </Link>
-              , escolher quais avisos recebe por e-mail e desativar as
-              notificações em cada aparelho. Para corrigir o cadastro na banda,
-              saber o que está guardado ou pedir a exclusão dos seus dados, fale
-              com um gestor da banda.
+              , e escolher em{" "}
+              <Link
+                href="/configuracoes"
+                className="text-accent hover:underline"
+              >
+                Configurações
+              </Link>{" "}
+              quais avisos recebe por e-mail e em quais aparelhos recebe
+              notificações. Para corrigir o cadastro na banda, saber o que está
+              guardado ou pedir a exclusão dos seus dados, fale com um gestor da
+              banda.
             </p>
           </Section>
 

@@ -9,6 +9,7 @@ export {
 } from "./components/Button";
 export { Card, CardBody, CardHeader } from "./components/Card";
 export { Combobox, type ComboboxOption } from "./components/Combobox";
+export { Drawer } from "./components/Drawer";
 export { EmptyState } from "./components/EmptyState";
 export { Field, inputClasses } from "./components/Field";
 export { Modal } from "./components/Modal";

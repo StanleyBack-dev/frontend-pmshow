@@ -1,7 +1,7 @@
 import { BRAND_MARK } from "@/features/layout/model/brand-mark";
 
 // The shield follows currentColor and the note uses the brand-gold token, so
-// the mark adapts to light/dark themes.
+// the same mark works on the dark chrome and on light pages.
 export function LogoMark({ className }: { className?: string }) {
   const { shield, noteStem, noteFlag, noteHead } = BRAND_MARK;
   return (

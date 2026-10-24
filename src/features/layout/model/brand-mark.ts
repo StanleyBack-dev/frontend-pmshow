@@ -8,5 +8,6 @@ export const BRAND_MARK = {
   noteStem: "M18.2 9v10.6",
   noteFlag: "M18.2 9c2.6.8 4.2 2.4 4.2 5",
   noteHead: { cx: 15.6, cy: 19.9, rx: 2.9, ry: 2.2, rotate: -20 },
-  colors: { navy: "#0b1f3a", gold: "#c9982f", white: "#ffffff" },
+  // Mirrors the chrome and brand-gold tokens (app/globals.css).
+  colors: { tile: "#0e1610", gold: "#d1a12a", white: "#f2ecdd" },
 } as const;

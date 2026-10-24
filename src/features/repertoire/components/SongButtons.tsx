@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Archive, ArchiveRestore, Pencil, Plus } from "lucide-react";
 import { Alert, Button, Modal } from "@/design-system";
 import { repertoireClient } from "@/features/repertoire/api/repertoire.client";
-import { SongFormModal } from "@/features/repertoire/components/SongFormModal";
+import { SongFormDrawer } from "@/features/repertoire/components/SongFormDrawer";
 import type { Song } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
 
@@ -17,7 +17,7 @@ export function NewSongButton() {
         Nova música
       </Button>
       {/* Remounted on each open, so the form starts empty. */}
-      {open && <SongFormModal open onClose={() => setOpen(false)} />}
+      {open && <SongFormDrawer open onClose={() => setOpen(false)} />}
     </>
   );
 }
@@ -35,7 +35,7 @@ export function EditSongButton({ song }: { song: Song }) {
         Editar
       </Button>
       {open && (
-        <SongFormModal open song={song} onClose={() => setOpen(false)} />
+        <SongFormDrawer open song={song} onClose={() => setOpen(false)} />
       )}
     </>
   );

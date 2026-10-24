@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
-import { inputClasses } from "@/design-system/components/Field";
+import { inputClasses, labelClasses } from "@/design-system/components/Field";
 import { Spinner } from "@/design-system/components/Spinner";
 import { cn } from "@/design-system/utils/cn";
 
@@ -125,13 +125,7 @@ export function Combobox({
 
   return (
     <div ref={rootRef} className={cn("relative", className)}>
-      <label
-        htmlFor={id}
-        className={cn(
-          "mb-1.5 block text-sm font-medium text-fg",
-          hideLabel && "sr-only",
-        )}
-      >
+      <label htmlFor={id} className={cn(labelClasses, hideLabel && "sr-only")}>
         {label}
       </label>
       <div className="relative">

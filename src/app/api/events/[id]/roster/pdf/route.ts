@@ -10,7 +10,7 @@ import { localDay } from "@/shared/lib/datetime";
 const slug = (value: string) =>
   value
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")

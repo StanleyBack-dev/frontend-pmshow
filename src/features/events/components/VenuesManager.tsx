@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Archive, ArchiveRestore, MapPin, Pencil, Plus } from "lucide-react";
-import { Alert, Badge, Button, Field, Modal, TextArea } from "@/design-system";
+import { Alert, Badge, Button, Field, Drawer, TextArea } from "@/design-system";
 import { eventsClient } from "@/features/events/api/events.client";
 import type { Venue, VenueInput } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
@@ -146,11 +146,10 @@ export function VenuesManager({ venues }: { venues: Venue[] }) {
         </ul>
       )}
 
-      <Modal
+      <Drawer
         open={editing !== null}
         onClose={() => setEditing(null)}
         title={editing === "new" ? "Novo local" : "Editar local"}
-        icon={<MapPin className="size-5" />}
         busy={pending === "save"}
         footer={
           <>
@@ -202,7 +201,7 @@ export function VenuesManager({ venues }: { venues: Venue[] }) {
             onChange={(e) => set("notes", e.target.value)}
           />
         </div>
-      </Modal>
+      </Drawer>
     </div>
   );
 }

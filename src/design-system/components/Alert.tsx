@@ -5,17 +5,20 @@ import { cn } from "@/design-system/utils/cn";
 type AlertTone = "info" | "success" | "warning" | "danger";
 
 const styles: Record<AlertTone, { box: string; icon: ReactNode }> = {
-  info: { box: "bg-info-soft text-info", icon: <Info className="size-4" /> },
+  info: {
+    box: "border-info-border bg-info-soft text-info",
+    icon: <Info className="size-4" />,
+  },
   success: {
-    box: "bg-success-soft text-success",
+    box: "border-success-border bg-success-soft text-success",
     icon: <CheckCircle2 className="size-4" />,
   },
   warning: {
-    box: "bg-warning-soft text-warning",
+    box: "border-warning-border bg-warning-soft text-warning",
     icon: <AlertTriangle className="size-4" />,
   },
   danger: {
-    box: "bg-danger-soft text-danger",
+    box: "border-danger-border bg-danger-soft text-danger",
     icon: <XCircle className="size-4" />,
   },
 };
@@ -38,7 +41,7 @@ export function Alert({
     <div
       role={tone === "danger" ? "alert" : "status"}
       className={cn(
-        "flex gap-3 rounded-md px-4 py-3 text-sm",
+        "flex gap-3 rounded-md border px-4 py-3 text-[13px]",
         style.box,
         className,
       )}
