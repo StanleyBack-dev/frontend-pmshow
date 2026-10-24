@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink } from "lucide-react";
-import { Alert, Badge, Card, CardBody, CardHeader } from "@/design-system";
+import { ArrowLeft, ClipboardList, ExternalLink } from "lucide-react";
+import {
+  Alert,
+  Badge,
+  Card,
+  CardBody,
+  CardHeader,
+  buttonClasses,
+} from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EditEventButton } from "@/features/events/components/EventFormModal";
 import { EventStatusActions } from "@/features/events/components/EventStatusActions";
@@ -11,9 +18,12 @@ import {
   EVENT_STATUS,
   EVENT_TYPE_LABELS,
 } from "@/features/events/model/event-labels";
+import { AckActions } from "@/features/rosters/components/AckActions";
+import { RosterList } from "@/features/rosters/components/RosterList";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { BackendError } from "@/server/http/backend-error";
 import { eventsService } from "@/server/services/events.service";
+import { rostersService } from "@/server/services/rosters.service";
 import { can } from "@/shared/lib/access";
 import { formatLongDay, formatTime } from "@/shared/lib/datetime";
 
@@ -29,14 +39,17 @@ export default async function EventPage({
   const user = await getSessionUser();
   if (!can(user, "EVENTS_READ")) return <AccessDenied />;
   const canManage = can(user, "EVENTS_MANAGE");
+  const canSeeRoster = can(user, "ROSTERS_READ_OWN");
+  const canBuildRoster = can(user, "ROSTERS_MANAGE");
 
   const { id } = await params;
   if (!UUID.test(id)) notFound();
-  const [event, venues] = await authed(async (token) => {
+  const [event, venues, roster] = await authed(async (token) => {
     try {
       return await Promise.all([
         eventsService.get(token, id),
         canManage ? eventsService.venues(token, true) : Promise.resolve([]),
+        canSeeRoster ? rostersService.get(token, id) : Promise.resolve(null),
       ]);
     } catch (error) {
       if (error instanceof BackendError && error.code === "EVENT_NOT_FOUND") {
@@ -47,6 +60,9 @@ export default async function EventPage({
   });
 
   const editable = canManage && event.status !== "REALIZADO";
+  const open = event.status === "PLANEJADO" || event.status === "CONFIRMADO";
+  const myLine = roster?.assignments.find((line) => line.userId === user.id);
+  const canAnswer = roster?.status === "PUBLICADA" && myLine && open;
   const status = EVENT_STATUS[event.status];
   const schedule: [string, string][] = [
     ["Data", formatLongDay(event.startsAt)],
@@ -160,6 +176,50 @@ export default async function EventPage({
           )}
         </CardBody>
       </Card>
+
+      {canSeeRoster && (roster || (canBuildRoster && open)) && (
+        <Card>
+          <CardHeader
+            title="Escala"
+            description={
+              roster?.status === "RASCUNHO"
+                ? "Rascunho: só gestores veem até a publicação."
+                : roster
+                  ? "Publicada. Os escalados foram avisados."
+                  : "Ninguém escalado ainda."
+            }
+            action={
+              canBuildRoster && open ? (
+                <Link
+                  href={`/agenda/${event.id}/escala`}
+                  className={buttonClasses("secondary", "sm")}
+                >
+                  <ClipboardList className="size-4" />
+                  {roster ? "Editar escala" : "Montar escala"}
+                </Link>
+              ) : undefined
+            }
+          />
+          {roster && (
+            <CardBody className="space-y-4">
+              {canAnswer && (
+                <div className="rounded-lg border border-border p-3">
+                  <p className="mb-2 text-sm text-fg">
+                    Você está nesta escala. Confirme que está ciente ou peça
+                    troca.
+                  </p>
+                  <AckActions eventId={event.id} status={myLine.ackStatus} />
+                </div>
+              )}
+              <RosterList
+                roster={roster}
+                viewerId={user.id}
+                showManagerInfo={can(user, "ROSTERS_READ_ALL")}
+              />
+            </CardBody>
+          )}
+        </Card>
+      )}
 
       <Card>
         <CardHeader title="Setlist" />

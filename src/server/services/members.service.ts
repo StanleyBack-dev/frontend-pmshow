@@ -49,6 +49,20 @@ export const membersService = {
     return roster;
   },
 
+  /** Everyone with a band profile (all pages; the band is small). */
+  async bandMembers(token: string): Promise<RosterEntry[]> {
+    const first = await membersService.roster(token, {
+      withProfile: true,
+      page: 1,
+    });
+    const rest = await Promise.all(
+      Array.from({ length: first.totalPages - 1 }, (_, index) =>
+        membersService.roster(token, { withProfile: true, page: index + 2 }),
+      ),
+    );
+    return [first, ...rest].flatMap((page) => page.items);
+  },
+
   async profile(token: string, userId: string): Promise<MemberProfile | null> {
     const { memberProfile } = await backendGraphql(memberProfileDocument, {
       token,
