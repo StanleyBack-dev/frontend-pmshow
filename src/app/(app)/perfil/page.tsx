@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Card, CardBody, CardHeader, PageHeader } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { ChangePasswordForm } from "@/features/auth/components/ChangePasswordForm";
@@ -26,7 +27,14 @@ export default async function ProfilePage() {
     <>
       <PageHeader
         title="Meu perfil"
-        description={`Usuário ${user.username} · ${GROUP_LABELS[user.group]}`}
+        description={
+          <>
+            Usuário {user.username} · {GROUP_LABELS[user.group]} ·{" "}
+            <Link href="/termos" className="text-accent hover:underline">
+              Termos e privacidade
+            </Link>
+          </>
+        }
       />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

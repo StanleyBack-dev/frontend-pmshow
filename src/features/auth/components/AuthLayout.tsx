@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { Card } from "@/design-system";
 import { Logo } from "@/features/layout/components/Logo";
 
@@ -29,7 +30,10 @@ export function AuthLayout({
           <div className="mt-5">{children}</div>
         </Card>
         <p className="mt-6 text-center text-xs text-soft">
-          Acesso restrito aos integrantes da banda.
+          Acesso restrito aos integrantes da banda ·{" "}
+          <Link href="/termos" className="hover:text-fg hover:underline">
+            Termos e privacidade
+          </Link>
         </p>
       </div>
     </main>
