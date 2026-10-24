@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LinkPending } from "@/design-system/components/LinkPending";
 import { cn } from "@/design-system/utils/cn";
 
 export type SegmentedNavItem = {
@@ -35,6 +36,7 @@ export function SegmentedNav({
           )}
         >
           {item.label}
+          <LinkPending />
           {item.count !== undefined && (
             <span
               className={cn(

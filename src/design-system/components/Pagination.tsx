@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { buttonClasses } from "@/design-system/components/Button";
+import { LinkPending } from "@/design-system/components/LinkPending";
 import { cn } from "@/design-system/utils/cn";
 
 type PaginationProps = {
@@ -40,6 +41,7 @@ export function Pagination({
       <Link href={hrefFor(target)} className={buttonClasses("secondary", "sm")}>
         {icon}
         <span className="sr-only sm:not-sr-only">{label}</span>
+        <LinkPending />
       </Link>
     );
 

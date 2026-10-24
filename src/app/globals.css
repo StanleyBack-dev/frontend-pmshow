@@ -123,6 +123,18 @@
 
   --shadow-card: var(--shadow-card);
   --shadow-pop: var(--shadow-pop);
+
+  /* Loading states appear only if the wait is noticeable. */
+  --animate-fade-in-delayed: pms-fade-in 0.25s ease-out 0.15s both;
+
+  @keyframes pms-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 html,
@@ -151,6 +163,11 @@ body {
 .chrome-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--chrome-line) transparent;
+}
+
+/* Filter panels sit on the dark chrome: their field labels go light. */
+.filter-panel label {
+  color: var(--chrome-muted);
 }
 
 /* Autofilled fields keep the light field look (Chrome overrides styles). */
