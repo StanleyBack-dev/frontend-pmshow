@@ -1,6 +1,6 @@
 "use client";
 
-import { Field } from "@/design-system";
+import { PasswordField } from "@/design-system";
 import { PASSWORD_HINT } from "@/features/auth/model/password-rules";
 
 // "New password" + "confirm" pair shared by first access, profile and
@@ -19,9 +19,8 @@ export function NewPasswordFields({
   return (
     <>
       <div>
-        <Field
+        <PasswordField
           label="Nova senha"
-          type="password"
           autoComplete="new-password"
           required
           value={password}
@@ -29,9 +28,8 @@ export function NewPasswordFields({
         />
         <p className="mt-1.5 text-xs text-soft">{PASSWORD_HINT}</p>
       </div>
-      <Field
+      <PasswordField
         label="Repita a nova senha"
-        type="password"
         autoComplete="new-password"
         required
         value={confirmation}

@@ -15,6 +15,7 @@ export { Field, inputClasses } from "./components/Field";
 export { Modal } from "./components/Modal";
 export { PageHeader } from "./components/PageHeader";
 export { Pagination } from "./components/Pagination";
+export { PasswordField } from "./components/PasswordField";
 export { Select, type SelectOption } from "./components/Select";
 export { SegmentedNav, type SegmentedNavItem } from "./components/SegmentedNav";
 export { Spinner } from "./components/Spinner";
