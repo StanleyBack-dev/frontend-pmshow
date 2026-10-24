@@ -6,16 +6,21 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-accent text-accent-fg hover:bg-accent-hover shadow-sm",
-  secondary: "bg-surface text-fg border border-border hover:bg-surface-muted",
-  ghost: "text-muted hover:text-fg hover:bg-surface-muted",
-  danger: "bg-danger text-white hover:opacity-90",
+  // Solid PM green: the main action.
+  primary:
+    "border border-accent-hover bg-accent text-accent-fg hover:bg-accent-hover",
+  // Light, with a gold edge on hover.
+  secondary:
+    "border border-border-strong bg-surface text-fg hover:border-brand-gold hover:bg-surface-muted",
+  ghost:
+    "border border-transparent text-muted hover:bg-surface-muted hover:text-fg",
+  danger: "border border-danger bg-danger text-white hover:opacity-90",
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-sm gap-1.5",
-  md: "h-10 px-4 text-sm gap-2",
-  lg: "h-11 px-5 text-base gap-2",
+  sm: "h-8 px-3 text-xs gap-1.5",
+  md: "h-9 px-4 text-[13px] gap-2",
+  lg: "h-11 px-6 text-sm gap-2",
 };
 
 export function buttonClasses(
@@ -23,8 +28,8 @@ export function buttonClasses(
   size: ButtonSize = "md",
 ) {
   return cn(
-    "inline-flex items-center justify-center rounded-md font-medium transition-colors",
-    "disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors",
+    "disabled:cursor-not-allowed disabled:opacity-55",
     variants[variant],
     sizes[size],
   );

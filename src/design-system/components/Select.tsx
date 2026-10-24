@@ -1,6 +1,6 @@
 import { useId, type SelectHTMLAttributes } from "react";
 import { ChevronDown } from "lucide-react";
-import { inputClasses } from "@/design-system/components/Field";
+import { inputClasses, labelClasses } from "@/design-system/components/Field";
 import { cn } from "@/design-system/utils/cn";
 
 export type SelectOption = { value: string; label: string };
@@ -32,10 +32,7 @@ export function Select({
     <div className={className}>
       <label
         htmlFor={selectId}
-        className={cn(
-          "mb-1.5 block text-sm font-medium text-fg",
-          hideLabel && "sr-only",
-        )}
+        className={cn(labelClasses, hideLabel && "sr-only")}
       >
         {label}
       </label>

@@ -11,7 +11,7 @@ import {
   buttonClasses,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
-import { EditEventButton } from "@/features/events/components/EventFormModal";
+import { EditEventButton } from "@/features/events/components/EventFormDrawer";
 import { EventStatusActions } from "@/features/events/components/EventStatusActions";
 import { Setlist } from "@/features/events/components/Setlist";
 import {

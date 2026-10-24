@@ -10,7 +10,7 @@ import {
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { EventList } from "@/features/events/components/EventList";
-import { NewEventButton } from "@/features/events/components/EventFormModal";
+import { NewEventButton } from "@/features/events/components/EventFormDrawer";
 import { MonthGrid } from "@/features/events/components/MonthGrid";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { requestTime } from "@/server/request-time";

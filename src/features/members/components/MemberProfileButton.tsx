@@ -7,7 +7,7 @@ import {
   Alert,
   Button,
   Field,
-  Modal,
+  Drawer,
   Select,
   TextArea,
   cn,
@@ -141,10 +141,12 @@ export function MemberProfileButton({
       >
         {profile ? "Editar" : "Cadastrar"}
       </Button>
-      <Modal
+      <Drawer
         open={open}
         onClose={() => setOpen(false)}
-        title={`Cadastro na banda — ${name}`}
+        title="Cadastro na banda"
+        subtitle={name}
+        width="lg"
         busy={pending}
         footer={
           <>
@@ -264,7 +266,7 @@ export function MemberProfileButton({
                         className={cn(
                           "text-base leading-none",
                           primary
-                            ? "text-brand-gold"
+                            ? "text-brand-gold-ink"
                             : "text-soft hover:text-fg",
                         )}
                       >
@@ -284,7 +286,7 @@ export function MemberProfileButton({
             onChange={(event) => set("notes", event.target.value)}
           />
         </div>
-      </Modal>
+      </Drawer>
     </>
   );
 }

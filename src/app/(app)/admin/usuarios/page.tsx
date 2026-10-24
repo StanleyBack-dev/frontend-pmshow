@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Search, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import {
-  Button,
   Card,
   EmptyState,
+  Field,
+  FilterActions,
+  FilterPanel,
   Pagination,
-  inputClasses,
+  Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { GROUP_LABELS, GROUPS } from "@/features/access/model/access-labels";
@@ -51,133 +53,129 @@ export default async function UsersPage({
     }),
   );
   const filtered = Boolean(search || group || status);
-  const selectClasses = `${inputClasses} sm:w-44`;
 
   return (
-    <Card>
-      <div className="flex flex-col gap-3 border-b border-border p-4 lg:flex-row lg:items-end lg:justify-between">
-        <form className="flex flex-1 flex-col gap-2 sm:flex-row" role="search">
-          <label className="sr-only" htmlFor="busca">
-            Buscar
-          </label>
-          <input
-            id="busca"
+    <>
+      <div className="mb-4 flex justify-end">
+        <CreateUserButton assignableGroups={assignableGroups(user.group)} />
+      </div>
+      <FilterPanel hasActiveFilters={filtered}>
+        <form
+          role="search"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <Field
+            label="Buscar"
             name="busca"
             defaultValue={search}
             placeholder="Nome, usuário ou e-mail"
-            className={`${inputClasses} sm:max-w-xs`}
           />
-          <select
+          <Select
+            label="Grupo"
             name="grupo"
             defaultValue={group ?? ""}
-            className={selectClasses}
-            aria-label="Grupo"
-          >
-            <option value="">Todos os grupos</option>
-            {GROUPS.map((value) => (
-              <option key={value} value={value}>
-                {GROUP_LABELS[value]}
-              </option>
-            ))}
-          </select>
-          <select
+            placeholder="Todos"
+            options={GROUPS.map((value) => ({
+              value,
+              label: GROUP_LABELS[value],
+            }))}
+          />
+          <Select
+            label="Situação"
             name="status"
             defaultValue={status ?? ""}
-            className={selectClasses}
-            aria-label="Situação"
-          >
-            <option value="">Todas as situações</option>
-            <option value="ativos">Ativos</option>
-            <option value="desativados">Desativados</option>
-          </select>
-          <Button
-            type="submit"
-            variant="secondary"
-            icon={<Search className="size-4" />}
-          >
-            Filtrar
-          </Button>
+            placeholder="Todas"
+            options={[
+              { value: "ativos", label: "Ativos" },
+              { value: "desativados", label: "Desativados" },
+            ]}
+          />
+          <FilterActions
+            clearHref="/admin/usuarios"
+            hasActiveFilters={filtered}
+          />
         </form>
-        <CreateUserButton assignableGroups={assignableGroups(user.group)} />
-      </div>
+      </FilterPanel>
 
-      {users.items.length === 0 ? (
-        <EmptyState
-          icon={<Users className="size-5" />}
-          title={
-            filtered ? "Nenhum usuário encontrado" : "Nenhum usuário ainda"
-          }
-          description={
-            filtered
-              ? "Tente outros filtros."
-              : "Crie o acesso dos integrantes da banda."
-          }
-        />
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="text-xs text-soft uppercase">
-              <tr className="border-b border-border">
-                <th className="px-4 py-3 font-medium">Nome</th>
-                <th className="px-4 py-3 font-medium">Grupo</th>
-                <th className="px-4 py-3 font-medium">Situação</th>
-                <th className="hidden px-4 py-3 font-medium md:table-cell">
-                  Último acesso
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.items.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b border-border last:border-0 hover:bg-surface-muted"
-                >
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/usuarios/${item.id}`}
-                      className="font-medium text-fg hover:text-accent"
-                    >
-                      {item.name}
-                    </Link>
-                    <p className="text-xs text-soft">
-                      {item.username} · {item.email}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3 text-muted">
-                    {GROUP_LABELS[item.group]}
-                  </td>
-                  <td className="px-4 py-3">
-                    <UserStatusBadges user={item} />
-                  </td>
-                  <td className="hidden px-4 py-3 text-muted md:table-cell">
-                    {item.lastLoginAt
-                      ? formatDateTime(item.lastLoginAt)
-                      : "Nunca"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {users.totalPages > 1 && (
-        <div className="border-t border-border p-4">
-          <Pagination
-            page={users.page}
-            totalPages={users.totalPages}
-            total={users.total}
-            hrefFor={(target) =>
-              buildHref("/admin/usuarios", {
-                busca: search,
-                grupo: group,
-                status,
-                page: target,
-              })
+      <Card>
+        {users.items.length === 0 ? (
+          <EmptyState
+            icon={<Users className="size-5" />}
+            title={
+              filtered ? "Nenhum usuário encontrado" : "Nenhum usuário ainda"
+            }
+            description={
+              filtered
+                ? "Tente outros filtros."
+                : "Crie o acesso dos integrantes da banda."
             }
           />
-        </div>
-      )}
-    </Card>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-xs text-soft uppercase">
+                <tr className="border-b border-border">
+                  <th className="px-4 py-3 font-medium">Nome</th>
+                  <th className="px-4 py-3 font-medium">Grupo</th>
+                  <th className="px-4 py-3 font-medium">Situação</th>
+                  <th className="hidden px-4 py-3 font-medium md:table-cell">
+                    Último acesso
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.items.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-b border-border last:border-0 hover:bg-surface-muted"
+                  >
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/admin/usuarios/${item.id}`}
+                        className="font-medium text-fg hover:text-accent"
+                      >
+                        {item.name}
+                      </Link>
+                      <p className="text-xs text-soft">
+                        {item.username} · {item.email}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3 text-muted">
+                      {GROUP_LABELS[item.group]}
+                    </td>
+                    <td className="px-4 py-3">
+                      <UserStatusBadges user={item} />
+                    </td>
+                    <td className="hidden px-4 py-3 text-muted md:table-cell">
+                      {item.lastLoginAt
+                        ? formatDateTime(item.lastLoginAt)
+                        : "Nunca"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {users.totalPages > 1 && (
+          <div className="border-t border-border p-4">
+            <Pagination
+              page={users.page}
+              totalPages={users.totalPages}
+              total={users.total}
+              hrefFor={(target) =>
+                buildHref("/admin/usuarios", {
+                  busca: search,
+                  grupo: group,
+                  status,
+                  page: target,
+                })
+              }
+            />
+          </div>
+        )}
+      </Card>
+    </>
   );
 }

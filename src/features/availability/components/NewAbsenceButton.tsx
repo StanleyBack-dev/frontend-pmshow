@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarOff, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   Alert,
   Button,
   Field,
-  Modal,
+  Drawer,
   Select,
   TextArea,
   type ButtonVariant,
@@ -88,13 +88,12 @@ export function NewAbsenceButton({
       >
         {label}
       </Button>
-      <Modal
+      <Drawer
         open={open}
         onClose={() => setOpen(false)}
         title={
           forSomeone ? "Lançar indisponibilidade" : "Pedir indisponibilidade"
         }
-        icon={<CalendarOff className="size-5" />}
         busy={pending}
         footer={
           <>
@@ -173,7 +172,7 @@ export function NewAbsenceButton({
             onChange={(e) => setReason(e.target.value)}
           />
         </div>
-      </Modal>
+      </Drawer>
     </>
   );
 }

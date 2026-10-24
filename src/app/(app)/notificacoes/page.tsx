@@ -36,8 +36,11 @@ export default async function NotificationsPage({
           <>
             Escalas, mudanças em eventos e respostas aos seus pedidos. Escolha o
             que chega por e-mail em{" "}
-            <Link href="/perfil" className="text-accent hover:underline">
-              Meu perfil
+            <Link
+              href="/configuracoes/notificacoes"
+              className="text-accent hover:underline"
+            >
+              Configurações
             </Link>
             .
           </>

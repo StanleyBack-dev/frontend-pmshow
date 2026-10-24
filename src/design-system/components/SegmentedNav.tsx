@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LinkPending } from "@/design-system/components/LinkPending";
 import { cn } from "@/design-system/utils/cn";
 
 export type SegmentedNavItem = {
@@ -20,7 +21,7 @@ export function SegmentedNav({
   return (
     <nav
       aria-label={label}
-      className="inline-flex rounded-md border border-border bg-surface-muted p-1"
+      className="inline-flex max-w-full overflow-x-auto rounded-md border border-border-strong bg-surface p-1"
     >
       {items.map((item) => (
         <Link
@@ -28,15 +29,23 @@ export function SegmentedNav({
           href={item.href}
           aria-current={item.active ? "page" : undefined}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-sm font-medium transition-colors",
+            "inline-flex shrink-0 items-center gap-1.5 rounded-sm px-3 py-1.5 text-[13px] font-semibold transition-colors",
             item.active
-              ? "bg-surface text-fg shadow-sm"
-              : "text-muted hover:text-fg",
+              ? "bg-chrome text-chrome-fg"
+              : "text-muted hover:bg-surface-muted hover:text-fg",
           )}
         >
           {item.label}
+          <LinkPending />
           {item.count !== undefined && (
-            <span className="text-xs tabular-nums text-soft">{item.count}</span>
+            <span
+              className={cn(
+                "text-xs tabular-nums",
+                item.active ? "text-brand-gold" : "text-soft",
+              )}
+            >
+              {item.count}
+            </span>
           )}
         </Link>
       ))}

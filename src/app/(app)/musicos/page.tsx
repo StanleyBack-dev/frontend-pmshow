@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Guitar, Search, Users } from "lucide-react";
+import { Guitar, Users } from "lucide-react";
 import {
   Badge,
-  Button,
   Card,
   EmptyState,
+  Field,
+  FilterActions,
+  FilterPanel,
   PageHeader,
   Pagination,
+  Select,
   buttonClasses,
-  inputClasses,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { MemberProfileButton } from "@/features/members/components/MemberProfileButton";
@@ -88,79 +90,67 @@ export default async function MembersPage({
           ) : undefined
         }
       />
-      <Card>
+      <FilterPanel hasActiveFilters={filtered}>
         <form
-          className="flex flex-col flex-wrap gap-2 border-b border-border p-4 lg:flex-row"
           role="search"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
         >
-          <label className="sr-only" htmlFor="busca">
-            Buscar
-          </label>
-          <input
-            id="busca"
+          <Field
+            label="Buscar"
             name="busca"
             defaultValue={search}
             placeholder="Nome, nome de guerra ou matrícula"
-            className={`${inputClasses} lg:max-w-xs`}
+            className="sm:col-span-2"
           />
-          <select
+          <Select
+            label="Naipe"
             name="naipe"
             defaultValue={section ?? ""}
-            className={`${inputClasses} lg:w-40`}
-            aria-label="Naipe"
-          >
-            <option value="">Todos os naipes</option>
-            {SECTIONS.map((value) => (
-              <option key={value} value={value}>
-                {SECTION_LABELS[value]}
-              </option>
-            ))}
-          </select>
-          <select
+            placeholder="Todos"
+            options={SECTIONS.map((value) => ({
+              value,
+              label: SECTION_LABELS[value],
+            }))}
+          />
+          <Select
+            label="Instrumento"
             name="instrumento"
             defaultValue={instrumentId ?? ""}
-            className={`${inputClasses} lg:w-44`}
-            aria-label="Instrumento"
-          >
-            <option value="">Todos os instrumentos</option>
-            {instruments.map((instrument) => (
-              <option key={instrument.id} value={instrument.id}>
-                {instrument.name}
-              </option>
-            ))}
-          </select>
-          <select
+            placeholder="Todos"
+            options={instruments.map((instrument) => ({
+              value: instrument.id,
+              label: instrument.name,
+            }))}
+          />
+          <Select
+            label="Situação"
             name="situacao"
             defaultValue={status ?? ""}
-            className={`${inputClasses} lg:w-36`}
-            aria-label="Situação"
-          >
-            <option value="">Todas as situações</option>
-            {STATUSES.map((value) => (
-              <option key={value} value={value}>
-                {STATUS_LABELS[value]}
-              </option>
-            ))}
-          </select>
-          <label className="flex items-center gap-2 px-1 text-sm text-muted">
+            placeholder="Todas"
+            options={STATUSES.map((value) => ({
+              value,
+              label: STATUS_LABELS[value],
+            }))}
+          />
+          <label className="flex items-end gap-2 pb-2 text-[13px] text-chrome-muted">
             <input
               type="checkbox"
               name="sem-cadastro"
               value="1"
               defaultChecked={pending}
-              className="size-4 accent-[var(--accent)]"
+              className="size-4 accent-[var(--brand-gold)]"
             />
             Só sem cadastro
           </label>
-          <Button
-            type="submit"
-            variant="secondary"
-            icon={<Search className="size-4" />}
-          >
-            Filtrar
-          </Button>
+          <FilterActions
+            clearHref="/musicos"
+            hasActiveFilters={filtered}
+            className="sm:col-span-2 lg:col-span-3 xl:col-span-6 xl:justify-end"
+          />
         </form>
+      </FilterPanel>
 
+      <Card>
         {roster.items.length === 0 ? (
           <EmptyState
             icon={<Users className="size-5" />}

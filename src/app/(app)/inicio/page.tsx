@@ -78,7 +78,7 @@ export default async function HomePage() {
           {can(user, "REPERTOIRE_READ") && (
             <Link href="/repertorio" className="block">
               <Card className="p-5 transition-colors hover:bg-surface-muted">
-                <ListMusic className="size-5 text-brand-gold" aria-hidden />
+                <ListMusic className="size-5 text-brand-brown" aria-hidden />
                 <h2 className="mt-3 font-semibold text-fg">Repertório</h2>
                 <p className="mt-1 text-sm text-muted">
                   Ouça os áudios e assista aos vídeos das músicas.
@@ -88,7 +88,7 @@ export default async function HomePage() {
           )}
           {canSeeRosters && (
             <Card className="p-5">
-              <ClipboardList className="size-5 text-brand-gold" aria-hidden />
+              <ClipboardList className="size-5 text-brand-brown" aria-hidden />
               <h2 className="mt-3 font-semibold text-fg">Minhas escalas</h2>
               {pendingAck.length > 0 ? (
                 <>

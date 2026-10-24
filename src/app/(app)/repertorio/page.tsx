@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ListMusic, Search } from "lucide-react";
+import { ListMusic } from "lucide-react";
 import {
   Badge,
-  Button,
   Card,
   EmptyState,
+  Field,
+  FilterActions,
+  FilterPanel,
   PageHeader,
   Pagination,
   SegmentedNav,
-  inputClasses,
+  Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { NewSongButton } from "@/features/repertoire/components/SongButtons";
@@ -88,59 +90,49 @@ export default async function RepertoirePage({
         </div>
       )}
 
-      <Card>
+      <FilterPanel hasActiveFilters={filtered}>
         <form
-          className="flex flex-col gap-2 border-b border-border p-4 sm:flex-row"
           role="search"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
         >
           {archived && <input type="hidden" name="arquivadas" value="1" />}
-          <label className="sr-only" htmlFor="busca">
-            Buscar
-          </label>
-          <input
-            id="busca"
+          <Field
+            label="Buscar"
             name="busca"
             defaultValue={search}
             placeholder="Título ou compositor"
-            className={`${inputClasses} sm:max-w-xs`}
           />
-          <select
+          <Select
+            label="Categoria"
             name="categoria"
             defaultValue={category ?? ""}
-            className={`${inputClasses} sm:w-48`}
-            aria-label="Categoria"
-          >
-            <option value="">Todas as categorias</option>
-            {CATEGORIES.map((value) => (
-              <option key={value} value={value}>
-                {CATEGORY_LABELS[value]}
-              </option>
-            ))}
-          </select>
-          {tags.length > 0 && (
-            <select
-              name="tag"
-              defaultValue={tag ?? ""}
-              className={`${inputClasses} sm:w-44`}
-              aria-label="Tag"
-            >
-              <option value="">Todas as tags</option>
-              {tags.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          )}
-          <Button
-            type="submit"
-            variant="secondary"
-            icon={<Search className="size-4" />}
-          >
-            Filtrar
-          </Button>
+            placeholder="Todas"
+            options={CATEGORIES.map((value) => ({
+              value,
+              label: CATEGORY_LABELS[value],
+            }))}
+          />
+          <Select
+            label="Tag"
+            name="tag"
+            defaultValue={tag ?? ""}
+            placeholder="Todas"
+            options={tags.map((value) => ({ value, label: value }))}
+            disabled={tags.length === 0}
+          />
+          <FilterActions
+            clearHref={hrefWith({
+              busca: undefined,
+              categoria: undefined,
+              tag: undefined,
+              page: undefined,
+            })}
+            hasActiveFilters={filtered}
+          />
         </form>
+      </FilterPanel>
 
+      <Card>
         {songs.items.length === 0 ? (
           <EmptyState
             icon={<ListMusic className="size-5" />}

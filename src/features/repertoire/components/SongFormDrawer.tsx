@@ -2,8 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Music } from "lucide-react";
-import { Alert, Button, Field, Modal, Select, TextArea } from "@/design-system";
+import {
+  Alert,
+  Button,
+  Field,
+  Drawer,
+  Select,
+  TextArea,
+} from "@/design-system";
 import { repertoireClient } from "@/features/repertoire/api/repertoire.client";
 import {
   CATEGORIES,
@@ -69,7 +75,7 @@ function toInput(form: FormState): SongInput | string {
 }
 
 // Create (no `song`) or edit a song.
-export function SongFormModal({
+export function SongFormDrawer({
   open,
   onClose,
   song,
@@ -110,11 +116,10 @@ export function SongFormModal({
   }
 
   return (
-    <Modal
+    <Drawer
       open={open}
       onClose={onClose}
       title={song ? "Editar música" : "Nova música"}
-      icon={<Music className="size-5" />}
       busy={pending}
       footer={
         <>
@@ -206,6 +211,6 @@ export function SongFormModal({
           onChange={(event) => set("notes", event.target.value)}
         />
       </div>
-    </Modal>
+    </Drawer>
   );
 }

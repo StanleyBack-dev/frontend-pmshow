@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { KeyRound } from "lucide-react";
-import { Alert, Button, Field } from "@/design-system";
+import { Alert, Button, PasswordField } from "@/design-system";
 import { authClient } from "@/features/auth/api/auth.client";
 import { NewPasswordFields } from "@/features/auth/components/NewPasswordFields";
 import { passwordProblem } from "@/features/auth/model/password-rules";
@@ -62,9 +62,8 @@ export function ChangePasswordForm({
           Senha alterada. As sessões em outros aparelhos foram encerradas.
         </Alert>
       )}
-      <Field
+      <PasswordField
         label={firstAccess ? "Senha temporária" : "Senha atual"}
-        type="password"
         autoComplete="current-password"
         required
         value={current}

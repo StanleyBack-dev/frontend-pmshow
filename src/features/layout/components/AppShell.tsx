@@ -1,94 +1,36 @@
 "use client";
 
-import { useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  CalendarDays,
-  CalendarOff,
+  ChevronDown,
   CircleUserRound,
-  ClipboardList,
-  House,
-  ListMusic,
   LogOut,
-  type LucideIcon,
-  Megaphone,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
-  ShieldCheck,
-  Users,
-  X,
 } from "lucide-react";
 import { Button, cn, Modal, Spinner } from "@/design-system";
-import { InstallAppInvite } from "@/features/install/components/InstallAppInvite";
-import { Logo } from "@/features/layout/components/Logo";
-import { LogoMark } from "@/features/layout/components/LogoMark";
-import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { authClient } from "@/features/auth/api/auth.client";
-import type { Permission, SessionUser } from "@/shared/contracts/api";
-
-type NavItem = {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-  /** Other paths that belong to this entry (pages shown under its tabs). */
-  also?: string[];
-  /** Shown only with this permission (the page and the API check again). */
-  permission?: Permission;
-};
-
-const BASE_NAV: NavItem[] = [
-  { href: "/inicio", label: "Início", icon: House },
-  {
-    href: "/agenda",
-    label: "Agenda",
-    icon: CalendarDays,
-    permission: "EVENTS_READ",
-  },
-  {
-    href: "/escalas",
-    label: "Minhas escalas",
-    icon: ClipboardList,
-    permission: "ROSTERS_READ_OWN",
-  },
-  {
-    href: "/repertorio",
-    label: "Repertório",
-    icon: ListMusic,
-    permission: "REPERTOIRE_READ",
-  },
-  {
-    href: "/musicos",
-    label: "Músicos",
-    icon: Users,
-    permission: "MEMBERS_READ",
-  },
-  {
-    href: "/indisponibilidades",
-    label: "Indisponibilidades",
-    icon: CalendarOff,
-    permission: "ABSENCES_REQUEST",
-  },
-  {
-    href: "/comunicados",
-    label: "Comunicados",
-    icon: Megaphone,
-    permission: "NOTIFICATIONS_BROADCAST",
-  },
-];
-
-const ACCOUNT_NAV: NavItem[] = [
-  { href: "/perfil", label: "Meu perfil", icon: CircleUserRound },
-];
-
-// Admin area (users, permissions, members, audit live under /admin).
-// `showAdmin` comes from the user's permissions and only hides the link; the
-// backend rejects every admin operation the user is not allowed to run.
-const ADMIN_ACCOUNT_NAV: NavItem[] = [
-  { href: "/admin", label: "Administração", icon: ShieldCheck },
-];
+import { InstallAppInvite } from "@/features/install/components/InstallAppInvite";
+import { LogoMark } from "@/features/layout/components/LogoMark";
+import { MenuSearch } from "@/features/layout/components/MenuSearch";
+import {
+  ACCOUNT_NAV,
+  ADMIN_NAV,
+  isActive,
+  PRIMARY_NAV,
+  type NavItem,
+} from "@/features/layout/model/navigation";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
+import type { SessionUser } from "@/shared/contracts/api";
 
 // The collapsed state is a per-browser preference. It lives in localStorage
 // (read through an external store so the server render stays expanded).
@@ -128,52 +70,60 @@ function NavPendingHint() {
   ) : null;
 }
 
-function isActive(pathname: string, item: NavItem): boolean {
-  return [item.href, ...(item.also ?? [])].some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`),
-  );
-}
-
 function NavLink({
   item,
-  pathname,
-  rail = false,
+  active,
+  collapsed,
   onNavigate,
 }: {
   item: NavItem;
-  pathname: string;
-  /** Icon-only (collapsed desktop sidebar). */
-  rail?: boolean;
+  active: boolean;
+  /** Icon rail (collapsed desktop sidebar). */
+  collapsed: boolean;
   onNavigate: () => void;
 }) {
   const { href, label, icon: Icon } = item;
-  const active = isActive(pathname, item);
   return (
     <Link
       href={href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      aria-label={rail ? label : undefined}
-      title={rail ? label : undefined}
+      title={collapsed ? label : undefined}
       className={cn(
-        "flex items-center gap-3 rounded-md py-2 text-sm font-medium transition-colors",
-        rail ? "justify-center px-0" : "px-3",
+        "group relative flex w-full items-center gap-3 rounded-md py-2 text-[13px] font-medium transition-colors",
+        collapsed ? "px-3 lg:justify-center lg:px-0" : "px-3",
         active
-          ? "bg-accent-soft text-accent"
-          : "text-muted hover:bg-surface-muted hover:text-fg",
+          ? "bg-accent/90 text-chrome-fg"
+          : "text-chrome-muted hover:bg-chrome-hover hover:text-chrome-fg",
       )}
     >
-      <Icon className="size-4 shrink-0" aria-hidden />
-      {!rail && (
-        <>
-          {label}
-          <NavPendingHint />
-        </>
-      )}
+      <span
+        aria-hidden
+        className={cn(
+          "absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-full bg-brand-gold transition-opacity",
+          active ? "opacity-100" : "opacity-0",
+        )}
+      />
+      <Icon
+        aria-hidden
+        className={cn(
+          "size-[18px] shrink-0",
+          active
+            ? "text-brand-gold"
+            : "text-chrome-subtle group-hover:text-brand-gold",
+        )}
+      />
+      <span className={cn("flex-1 truncate", collapsed && "lg:sr-only")}>
+        {label}
+      </span>
+      {!collapsed && <NavPendingHint />}
     </Link>
   );
 }
 
+// Signed-in frame (the amoremio layout): dark chrome sidebar with the main
+// menu and a collapsible "Conta" section, an off-canvas drawer on phones,
+// and a top bar over the light content with menu search and notifications.
 export function AppShell({
   user,
   showAdmin,
@@ -186,12 +136,10 @@ export function AppShell({
   unreadNotifications: number;
   children: ReactNode;
 }) {
-  const navItems = BASE_NAV.filter(
-    (item) => !item.permission || user.permissions.includes(item.permission),
-  );
   const pathname = usePathname();
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const collapsed = useSyncExternalStore(
@@ -200,9 +148,35 @@ export function AppShell({
     () => false,
   );
 
-  const accountItems = showAdmin
-    ? [...ACCOUNT_NAV, ...ADMIN_ACCOUNT_NAV]
-    : ACCOUNT_NAV;
+  const primary = PRIMARY_NAV.filter(
+    (item) => !item.permission || user.permissions.includes(item.permission),
+  );
+  const account = showAdmin ? [...ACCOUNT_NAV, ADMIN_NAV] : ACCOUNT_NAV;
+  const accountActive = account.some((item) => isActive(pathname, item));
+
+  // Pin the page behind the open mobile drawer: on iOS only `position:
+  // fixed` stops touch scrolling from reaching the page.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const { body } = document;
+    const scrollY = window.scrollY;
+    const previous = {
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+    };
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    return () => {
+      body.style.position = previous.position;
+      body.style.top = previous.top;
+      body.style.width = previous.width;
+      window.scrollTo(0, scrollY);
+    };
+  }, [mobileOpen]);
+
+  const closeMobile = () => setMobileOpen(false);
 
   async function logout() {
     setLeaving(true);
@@ -211,148 +185,200 @@ export function AppShell({
     router.refresh();
   }
 
-  const closeMobile = () => setOpen(false);
-
-  function renderNav(rail: boolean) {
-    return (
-      <nav aria-label="Principal" className="flex flex-col gap-1">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.href}
-            item={item}
-            pathname={pathname}
-            rail={rail}
-            onNavigate={closeMobile}
-          />
-        ))}
-      </nav>
-    );
-  }
-
-  function renderAccount(rail: boolean) {
-    return (
-      <nav aria-label="Conta" className="flex flex-col gap-1">
-        {accountItems.map((item) => (
-          <NavLink
-            key={item.href}
-            item={item}
-            pathname={pathname}
-            rail={rail}
-            onNavigate={closeMobile}
-          />
-        ))}
-        {renderLogout(rail)}
-      </nav>
-    );
-  }
-
-  // Last entry of the account links, styled like them.
-  function renderLogout(rail: boolean) {
-    return (
-      <button
-        type="button"
-        onClick={() => {
-          closeMobile();
-          setLogoutOpen(true);
-        }}
-        aria-label={rail ? "Sair" : undefined}
-        title={rail ? "Sair" : undefined}
-        className={cn(
-          "flex w-full items-center gap-3 rounded-md py-2 text-sm font-medium text-muted transition-colors",
-          "hover:bg-surface-muted hover:text-fg",
-          rail ? "justify-center px-0" : "px-3",
-        )}
-      >
-        <LogOut className="size-4 shrink-0" aria-hidden />
-        {!rail && "Sair"}
-      </button>
-    );
-  }
-
-  function renderFooter(rail: boolean) {
-    return (
-      <div className="border-t border-border pt-4">
-        {!rail && (
-          <div className="mb-3 px-3">
-            <p className="truncate text-sm font-medium text-fg">{user.name}</p>
-            <p className="text-xs text-soft">{GROUP_LABELS[user.group]}</p>
-          </div>
-        )}
-        {renderAccount(rail)}
-      </div>
-    );
-  }
-
   return (
-    <div
-      className={cn(
-        "min-h-dvh lg:grid lg:transition-[grid-template-columns] lg:duration-200",
-        collapsed ? "lg:grid-cols-[68px_1fr]" : "lg:grid-cols-[240px_1fr]",
-      )}
-    >
-      <aside
+    <div className="min-h-dvh bg-bg">
+      <div
+        aria-hidden
+        onClick={closeMobile}
         className={cn(
-          "sticky top-0 hidden h-dvh flex-col justify-between overflow-x-hidden overflow-y-auto border-r border-border bg-surface py-5 lg:flex",
-          collapsed ? "px-2" : "px-3",
+          "fixed inset-0 z-40 bg-black/70 transition-opacity duration-300 lg:hidden",
+          mobileOpen ? "opacity-100" : "pointer-events-none opacity-0",
+        )}
+      />
+
+      <aside
+        aria-label="Menu"
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex h-dvh w-64 max-w-[85vw] flex-col border-r border-chrome-line",
+          "bg-linear-to-b from-chrome-top via-chrome to-chrome-bottom",
+          "transition-[transform,width] duration-200 lg:max-w-none",
+          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          collapsed ? "lg:w-[68px]" : "lg:w-64",
         )}
       >
-        <div>
-          <div
+        <div
+          className={cn(
+            "flex items-center gap-3 border-b border-chrome-line px-4 py-4",
+            collapsed && "lg:flex-col lg:gap-2 lg:px-2",
+          )}
+        >
+          <Link
+            href="/inicio"
+            onClick={closeMobile}
+            className="flex min-w-0 flex-1 items-center gap-3"
+            aria-label="PM SHOW, início"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-full border border-brand-gold/40 bg-chrome-hover">
+              <LogoMark className="size-7 text-chrome-fg" />
+            </span>
+            <span className={cn("min-w-0", collapsed && "lg:hidden")}>
+              <span className="block text-[17px] leading-tight font-semibold tracking-wide text-chrome-fg">
+                PM <span className="text-brand-gold">SHOW</span>
+              </span>
+              <span className="block truncate text-[10px] tracking-[0.16em] text-brand-gold uppercase">
+                {user.name}
+              </span>
+            </span>
+          </Link>
+          <button
+            type="button"
+            onClick={() => writeCollapsed(!collapsed)}
+            aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
+            aria-expanded={!collapsed}
+            className="hidden size-8 shrink-0 place-items-center rounded-md text-chrome-subtle transition-colors hover:bg-chrome-hover hover:text-chrome-fg lg:grid"
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="size-[18px]" aria-hidden />
+            ) : (
+              <PanelLeftClose className="size-[18px]" aria-hidden />
+            )}
+          </button>
+        </div>
+
+        {/* min-h-0 lets the menu scroll inside the space the footer leaves. */}
+        <nav
+          aria-label="Principal"
+          className={cn(
+            "chrome-scrollbar flex min-h-0 flex-1 flex-col gap-0.5 overflow-x-hidden overflow-y-auto overscroll-contain py-4",
+            collapsed ? "px-3 lg:px-2" : "px-3",
+          )}
+        >
+          {primary.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              active={isActive(pathname, item)}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+          ))}
+        </nav>
+
+        <div
+          className={cn(
+            "shrink-0 border-t border-chrome-line py-3",
+            collapsed ? "px-3 lg:px-2" : "px-3",
+          )}
+        >
+          {/* Icon rail: no room for a sub-menu, so the items show directly. */}
+          {collapsed && (
+            <div className="hidden lg:block">
+              {account.map((item) => (
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  active={isActive(pathname, item)}
+                  collapsed
+                  onNavigate={closeMobile}
+                />
+              ))}
+            </div>
+          )}
+          <div className={cn(collapsed && "lg:hidden")}>
+            <button
+              type="button"
+              onClick={() => setAccountOpen((open) => !open)}
+              aria-expanded={accountOpen}
+              className={cn(
+                "flex w-full items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
+                accountActive && !accountOpen
+                  ? "text-chrome-fg"
+                  : "text-chrome-muted hover:bg-chrome-hover hover:text-chrome-fg",
+              )}
+            >
+              <CircleUserRound
+                aria-hidden
+                className="size-[18px] text-chrome-subtle"
+              />
+              <span className="min-w-0 flex-1 text-left">
+                <span className="block">Conta</span>
+                <span className="block truncate text-[11px] font-normal text-chrome-subtle">
+                  {GROUP_LABELS[user.group]}
+                </span>
+              </span>
+              <ChevronDown
+                aria-hidden
+                className={cn(
+                  "size-4 transition-transform",
+                  accountOpen && "rotate-180",
+                )}
+              />
+            </button>
+            {accountOpen && (
+              <div className="mt-0.5 flex flex-col gap-0.5 border-l border-chrome-line pl-3">
+                {account.map((item) => (
+                  <NavLink
+                    key={item.href}
+                    item={item}
+                    active={isActive(pathname, item)}
+                    collapsed={false}
+                    onNavigate={closeMobile}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              closeMobile();
+              setLogoutOpen(true);
+            }}
+            title={collapsed ? "Sair" : undefined}
             className={cn(
-              "mb-8 flex items-center",
-              collapsed ? "flex-col gap-3" : "justify-between pr-1 pl-3",
+              "mt-0.5 flex w-full items-center gap-3 rounded-md py-2 text-[13px] font-medium text-chrome-muted transition-colors hover:bg-chrome-hover hover:text-chrome-fg",
+              collapsed ? "px-3 lg:justify-center lg:px-0" : "px-3",
             )}
           >
-            {collapsed ? <LogoMark className="size-8 text-accent" /> : <Logo />}
-            <div
-              className={cn("flex items-center gap-1", collapsed && "flex-col")}
-            >
-              <NotificationBell initialCount={unreadNotifications} />
-              <button
-                type="button"
-                onClick={() => writeCollapsed(!collapsed)}
-                aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
-                title={collapsed ? "Expandir menu" : "Recolher menu"}
-                aria-expanded={!collapsed}
-                className="grid size-8 shrink-0 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg"
-              >
-                {collapsed ? (
-                  <PanelLeftOpen className="size-[18px]" aria-hidden />
-                ) : (
-                  <PanelLeftClose className="size-[18px]" aria-hidden />
-                )}
-              </button>
-            </div>
-          </div>
-          {renderNav(collapsed)}
+            <LogOut aria-hidden className="size-[18px] shrink-0" />
+            <span className={cn("flex-1 text-left", collapsed && "lg:sr-only")}>
+              Sair
+            </span>
+          </button>
         </div>
-        {renderFooter(collapsed)}
       </aside>
 
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface/90 px-4 backdrop-blur lg:hidden">
-        <Logo />
-        <div className="flex items-center gap-1">
-          <NotificationBell initialCount={unreadNotifications} />
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-label={open ? "Fechar menu" : "Abrir menu"}
-            aria-expanded={open}
-            onClick={() => setOpen((value) => !value)}
-            icon={open ? <X className="size-5" /> : <Menu className="size-5" />}
+      <div
+        className={cn(
+          "flex min-w-0 flex-col transition-[margin] duration-200",
+          collapsed ? "lg:ml-[68px]" : "lg:ml-64",
+        )}
+      >
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-border bg-surface/95 px-4 backdrop-blur sm:px-6 lg:px-8">
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Abrir menu"
+            aria-expanded={mobileOpen}
+            className="grid size-9 shrink-0 place-items-center rounded-md border border-border-strong bg-surface text-muted hover:text-fg lg:hidden"
+          >
+            <Menu className="size-[18px]" aria-hidden />
+          </button>
+          <MenuSearch
+            items={[...primary, ...account]}
+            className="min-w-0 flex-1 sm:max-w-xs"
           />
-        </div>
-      </header>
-      {open && (
-        <div className="fixed inset-x-0 top-14 z-20 max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b border-border bg-surface p-4 shadow-card lg:hidden">
-          {renderNav(false)}
-          <div className="mt-4">{renderFooter(false)}</div>
-        </div>
-      )}
+          <div className="ml-auto flex items-center gap-1">
+            <NotificationBell initialCount={unreadNotifications} />
+          </div>
+        </header>
 
-      <main className="mx-auto w-full max-w-6xl min-w-0 px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
-        {children}
-      </main>
+        <main className="mx-auto w-full max-w-7xl min-w-0 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          {children}
+        </main>
+      </div>
 
       <InstallAppInvite />
 

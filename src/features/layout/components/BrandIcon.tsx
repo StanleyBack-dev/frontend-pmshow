@@ -1,6 +1,6 @@
 import { BRAND_MARK } from "@/features/layout/model/brand-mark";
 
-// Full-bleed app icon (navy tile + white shield + gold note) for ImageResponse
+// Full-bleed app icon (dark green tile + light shield + gold note) for ImageResponse
 // renders: apple-icon and the PWA manifest icons. `padding` keeps the mark
 // inside the safe zone of maskable icons.
 export function BrandIcon({
@@ -20,7 +20,7 @@ export function BrandIcon({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: colors.navy,
+        background: colors.tile,
       }}
     >
       <svg width={inner} height={inner} viewBox={BRAND_MARK.viewBox}>

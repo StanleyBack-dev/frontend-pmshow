@@ -25,10 +25,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f6f9" },
-    { media: "(prefers-color-scheme: dark)", color: "#070f1d" },
-  ],
+  // The chrome color (globals.css): the installed app's status bar.
+  themeColor: "#0e1610",
 };
 
 // Every page renders per request: the CSP nonce (proxy.ts) can only be

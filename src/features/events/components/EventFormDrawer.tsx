@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, Pencil, Plus } from "lucide-react";
-import { Alert, Button, Field, Modal, Select, TextArea } from "@/design-system";
+import { Pencil, Plus } from "lucide-react";
+import {
+  Alert,
+  Button,
+  Field,
+  Drawer,
+  Select,
+  TextArea,
+} from "@/design-system";
 import { eventsClient } from "@/features/events/api/events.client";
 import {
   EVENT_TYPES,
@@ -61,7 +68,7 @@ function toInput(form: Form): EventInput | string {
   };
 }
 
-function EventFormModal({
+function EventFormDrawer({
   event,
   venues,
   onClose,
@@ -107,11 +114,10 @@ function EventFormModal({
   }
 
   return (
-    <Modal
+    <Drawer
       open
       onClose={onClose}
       title={event ? "Editar evento" : "Novo evento"}
-      icon={<CalendarPlus className="size-5" />}
       busy={pending}
       footer={
         <>
@@ -204,7 +210,7 @@ function EventFormModal({
           onChange={(e) => set("notes", e.target.value)}
         />
       </div>
-    </Modal>
+    </Drawer>
   );
 }
 
@@ -216,7 +222,7 @@ export function NewEventButton({ venues }: { venues: Venue[] }) {
         Novo evento
       </Button>
       {open && (
-        <EventFormModal venues={venues} onClose={() => setOpen(false)} />
+        <EventFormDrawer venues={venues} onClose={() => setOpen(false)} />
       )}
     </>
   );
@@ -241,7 +247,7 @@ export function EditEventButton({
         Editar
       </Button>
       {open && (
-        <EventFormModal
+        <EventFormDrawer
           event={event}
           venues={venues}
           onClose={() => setOpen(false)}

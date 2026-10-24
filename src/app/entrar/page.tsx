@@ -13,10 +13,7 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   return (
-    <AuthLayout
-      title="Entrar"
-      description="Use o usuário e a senha que você recebeu por e-mail."
-    >
+    <AuthLayout title="Entrar">
       <LoginForm
         next={safeNextPath(firstParam(params, "next"))}
         expired={firstParam(params, "expired") === "1"}
