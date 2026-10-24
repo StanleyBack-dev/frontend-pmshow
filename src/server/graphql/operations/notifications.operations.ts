@@ -57,3 +57,27 @@ export const setNotificationPreferenceDocument = graphql(`
     }
   }
 `);
+
+export const pushPublicKeyDocument = graphql(`
+  query PushPublicKey {
+    pushPublicKey
+  }
+`);
+
+export const subscribePushDocument = graphql(`
+  mutation SubscribePush($input: PushSubscriptionInput!) {
+    subscribePush(input: $input)
+  }
+`);
+
+export const unsubscribePushDocument = graphql(`
+  mutation UnsubscribePush($endpoint: String!) {
+    unsubscribePush(endpoint: $endpoint)
+  }
+`);
+
+export const sendTestPushDocument = graphql(`
+  mutation SendTestPush {
+    sendTestPush
+  }
+`);

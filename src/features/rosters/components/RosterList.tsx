@@ -6,18 +6,9 @@ import {
 import {
   ACK_STATUS,
   ROLE_LABELS,
-  ROLE_ORDER,
+  sortedLines,
 } from "@/features/rosters/model/roster-labels";
 import type { Roster } from "@/shared/contracts/rosters";
-
-/** Leadership first, then by war name. */
-export function sortedLines(roster: Roster) {
-  return [...roster.assignments].sort(
-    (a, b) =>
-      ROLE_ORDER[a.role] - ROLE_ORDER[b.role] ||
-      (a.person?.warName ?? "").localeCompare(b.person?.warName ?? ""),
-  );
-}
 
 // Read-only roster: who goes, in which role, and each person's answer.
 // Managers also see the justifications for accepted schedule conflicts.

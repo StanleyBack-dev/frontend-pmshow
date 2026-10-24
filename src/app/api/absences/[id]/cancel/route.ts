@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { bffRoute, requireToken } from "@/server/http/route-handler";
-import { idSchema } from "@/server/http/schemas/repertoire.schema";
+import { idSchema } from "@/server/http/schemas/fields";
 import { absencesService } from "@/server/services/absences.service";
 
 export const POST = bffRoute<{ id: string }>(async (_request, { params }) => {

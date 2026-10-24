@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { bffRoute, readBody, requireToken } from "@/server/http/route-handler";
-import { idSchema } from "@/server/http/schemas/repertoire.schema";
-import { reviewAbsenceSchema } from "@/server/http/schemas/rosters.schema";
+import { idSchema } from "@/server/http/schemas/fields";
+import { reviewAbsenceSchema } from "@/server/http/schemas/absences.schema";
 import { absencesService } from "@/server/services/absences.service";
 
 export const POST = bffRoute<{ id: string }>(async (request, { params }) => {

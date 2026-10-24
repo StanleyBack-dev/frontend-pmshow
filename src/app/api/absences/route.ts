@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { bffRoute, readBody, requireToken } from "@/server/http/route-handler";
-import { absenceInputSchema } from "@/server/http/schemas/rosters.schema";
+import { absenceInputSchema } from "@/server/http/schemas/absences.schema";
 import { absencesService } from "@/server/services/absences.service";
 
 // The signed-in member asks for an absence (pending review).

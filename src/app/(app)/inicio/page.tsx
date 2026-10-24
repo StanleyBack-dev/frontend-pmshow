@@ -9,9 +9,11 @@ import {
   buttonClasses,
 } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
+import { BandDashboardPanel } from "@/features/dashboard/components/BandDashboardPanel";
 import { EventList } from "@/features/events/components/EventList";
 import { ROLE_LABELS } from "@/features/rosters/model/roster-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
+import { dashboardService } from "@/server/services/dashboard.service";
 import { eventsService } from "@/server/services/events.service";
 import { rostersService } from "@/server/services/rosters.service";
 import { can } from "@/shared/lib/access";
@@ -23,10 +25,12 @@ export default async function HomePage() {
   const user = await getSessionUser();
   const canSeeAgenda = can(user, "EVENTS_READ");
   const canSeeRosters = can(user, "ROSTERS_READ_OWN");
-  const [upcoming, assignments] = await authed((token) =>
+  const isManager = can(user, "ROSTERS_READ_ALL");
+  const [upcoming, assignments, dashboard] = await authed((token) =>
     Promise.all([
       canSeeAgenda ? eventsService.upcoming(token, 5) : Promise.resolve([]),
       canSeeRosters ? rostersService.mine(token) : Promise.resolve([]),
+      isManager ? dashboardService.get(token) : Promise.resolve(null),
     ]),
   );
   // Waiting for the member's answer, on events still to happen.
@@ -43,6 +47,11 @@ export default async function HomePage() {
         title={`Olá, ${user.name.split(" ")[0]}!`}
         description={`Você entrou como ${GROUP_LABELS[user.group]}.`}
       />
+      {dashboard && (
+        <div className="mb-6">
+          <BandDashboardPanel dashboard={dashboard} />
+        </div>
+      )}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         {canSeeAgenda && (
           <Card>

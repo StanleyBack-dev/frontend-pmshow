@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { bffRoute, requireToken } from "@/server/http/route-handler";
-import { idSchema } from "@/server/http/schemas/repertoire.schema";
+import { idSchema } from "@/server/http/schemas/fields";
 import { repertoireService } from "@/server/services/repertoire.service";
 
 // A fresh signed URL each time the player starts a track, so pages never

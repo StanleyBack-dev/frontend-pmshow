@@ -34,6 +34,15 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     label: "Resposta de indisponibilidade",
     description: "Seu pedido de indisponibilidade foi aprovado ou recusado.",
   },
+  EVENT_REMINDER: {
+    label: "Lembrete de evento",
+    description:
+      "Na véspera e na manhã de um evento em que você está escalado.",
+  },
+  BROADCAST: {
+    label: "Comunicados",
+    description: "Avisos gerais enviados pelos gestores da banda.",
+  },
 };
 
 /** "há 5 min", "ontem", "12/11". */

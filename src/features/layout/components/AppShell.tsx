@@ -12,6 +12,7 @@ import {
   ListMusic,
   LogOut,
   type LucideIcon,
+  Megaphone,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
@@ -69,6 +70,12 @@ const BASE_NAV: NavItem[] = [
     label: "Indisponibilidades",
     icon: CalendarOff,
     permission: "ABSENCES_REQUEST",
+  },
+  {
+    href: "/comunicados",
+    label: "Comunicados",
+    icon: Megaphone,
+    permission: "NOTIFICATIONS_BROADCAST",
   },
 ];
 

@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/shared/lib/site";
 
-// Makes the app installable (home screen / app launcher). No service worker:
-// every page needs the server and a session, so there is nothing to serve
-// offline — the installed app is the same site in its own window.
+// Makes the app installable (home screen / app launcher). The service worker
+// (public/sw.js) only handles Web Push: every page needs the server and a
+// session, so nothing is served offline — the installed app is the same site
+// in its own window.
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: SITE_NAME,

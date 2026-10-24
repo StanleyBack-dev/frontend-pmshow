@@ -63,6 +63,21 @@ const dayFormat = new Intl.DateTimeFormat("pt-BR", {
   day: "numeric",
   month: "long",
 });
+const fullDayFormat = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: TIME_ZONE,
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+const numericDateTimeFormat = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: TIME_ZONE,
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 const shortDayFormat = new Intl.DateTimeFormat("pt-BR", {
   timeZone: TIME_ZONE,
   weekday: "short",
@@ -78,6 +93,12 @@ const monthFormat = new Intl.DateTimeFormat("pt-BR", {
 export const formatTime = (iso: string) => timeFormat.format(new Date(iso));
 /** "sábado, 15 de novembro". */
 export const formatLongDay = (iso: string) => dayFormat.format(new Date(iso));
+/** "sábado, 15 de novembro de 2026" (documents). */
+export const formatFullDay = (iso: string) =>
+  fullDayFormat.format(new Date(iso));
+/** "15/11/2026, 19:00". */
+export const formatDateTime = (iso: string) =>
+  numericDateTimeFormat.format(new Date(iso));
 /** "sáb., 15 de nov.". */
 export const formatShortDay = (iso: string) =>
   shortDayFormat.format(new Date(iso));

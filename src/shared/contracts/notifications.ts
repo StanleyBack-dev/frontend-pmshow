@@ -20,6 +20,13 @@ export type NotificationPage = {
   totalPages: number;
 };
 
+/** PushSubscription keys as the browser serializes them. */
+export type PushSubscriptionInput = {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+};
+
 export type NotificationPreference = {
   type: NotificationType;
   emailEnabled: boolean;
