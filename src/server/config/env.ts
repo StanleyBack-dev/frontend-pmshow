@@ -8,6 +8,11 @@ const schema = z.object({
   INTERNAL_API_KEY: z.string().min(32),
   SESSION_COOKIE_NAME: z.string().min(1).default("pms_session"),
   APP_TIMEZONE: z.string().default("America/Sao_Paulo"),
+  /** Origin of the audio storage, allowed by the CSP (e.g. https://…neon.tech). */
+  MEDIA_ORIGIN: z
+    .url()
+    .optional()
+    .transform((value) => (value ? new URL(value).origin : null)),
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),

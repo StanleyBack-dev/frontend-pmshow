@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { connection } from "next/server";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/shared/lib/site";
 import "./globals.css";
 
@@ -30,11 +31,14 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+// Every page renders per request: the CSP nonce (proxy.ts) can only be
+// applied to dynamically rendered HTML.
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await connection();
   return (
     <html lang="pt-BR" className={inter.variable}>
       <body>{children}</body>

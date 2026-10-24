@@ -166,6 +166,7 @@ export function NewAbsenceButton({
           </div>
           <TextArea
             label="Observação (opcional)"
+            hint="Não informe diagnóstico nem dados de saúde: o tipo e o período bastam."
             rows={2}
             maxLength={500}
             value={reason}
