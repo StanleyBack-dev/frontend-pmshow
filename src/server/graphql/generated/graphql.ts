@@ -4,6 +4,49 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
+export type AbsenceFilterInput = {
+  /** Tocando o período a partir de (AAAA-MM-DD). */
+  from?: string | null | undefined;
+  statuses?: Array<AbsenceStatus> | null | undefined;
+  /** Tocando o período até (AAAA-MM-DD). */
+  to?: string | null | undefined;
+  userId?: string | number | null | undefined;
+};
+
+export type AbsenceInput = {
+  /** AAAA-MM-DD */
+  endsOn: string;
+  reason?: string | null | undefined;
+  /** AAAA-MM-DD */
+  startsOn: string;
+  type: AbsenceType;
+};
+
+export type AbsenceStatus =
+  | 'APROVADA'
+  | 'CANCELADA'
+  | 'PENDENTE'
+  | 'RECUSADA';
+
+/** Motivo da indisponibilidade. */
+export type AbsenceType =
+  | 'CURSO'
+  | 'DISPENSA_MEDICA'
+  | 'FERIAS'
+  | 'LICENCA'
+  | 'MISSAO'
+  | 'OUTRO';
+
+export type AckAnswer =
+  | 'CIENTE'
+  | 'TROCA_SOLICITADA';
+
+/** Resposta do escalado. */
+export type AckStatus =
+  | 'CIENTE'
+  | 'PENDENTE'
+  | 'TROCA_SOLICITADA';
+
 export type AddYoutubeVideoInput = {
   /** Link do vídeo (youtube.com, youtu.be, shorts…). */
   link: string;
@@ -12,11 +55,39 @@ export type AddYoutubeVideoInput = {
   title?: string | null | undefined;
 };
 
+export type AssignmentInput = {
+  instrumentId?: string | number | null | undefined;
+  notes?: string | null | undefined;
+  overrideReason?: string | null | undefined;
+  role: AssignmentRole;
+  userId: string | number;
+};
+
+/** Função na escala. */
+export type AssignmentRole =
+  | 'APOIO'
+  | 'CHEFE_EQUIPE'
+  | 'MOTORISTA'
+  | 'MUSICO'
+  | 'REGENTE'
+  | 'SOM';
+
 export type AuditFilterInput = {
   actorId?: string | number | null | undefined;
   entity?: string | null | undefined;
   entityId?: string | null | undefined;
 };
+
+/** Por que a pessoa não pode ser escalada. */
+export type CandidateBlocker =
+  /** Indisponibilidade aprovada no período. */
+  | 'ABSENT'
+  /** Afastado. */
+  | 'AWAY'
+  /** Inativo. */
+  | 'INACTIVE'
+  /** Sem cadastro ativo na banda. */
+  | 'NO_PROFILE';
 
 export type ChangePasswordInput = {
   currentPassword: string;
@@ -116,6 +187,15 @@ export type MemberStatus =
   | 'ATIVO'
   | 'INATIVO';
 
+export type NotificationType =
+  | 'ABSENCE_REVIEWED'
+  | 'EVENT_CANCELLED'
+  | 'EVENT_RESCHEDULED'
+  | 'ROSTER_PUBLISHED'
+  | 'ROSTER_REMOVED'
+  | 'ROSTER_SWAP_REQUESTED'
+  | 'ROSTER_UPDATED';
+
 export type PageInput = {
   limit?: number;
   page?: number;
@@ -181,6 +261,14 @@ export type RosterFilterInput = {
   /** false = só quem ainda não tem cadastro. */
   withProfile?: boolean | null | undefined;
 };
+
+export type RosterInput = {
+  assignments: Array<AssignmentInput>;
+};
+
+export type RosterStatus =
+  | 'PUBLICADA'
+  | 'RASCUNHO';
 
 /** Naipe da banda. */
 export type Section =
@@ -292,6 +380,51 @@ export type VerifyRecoveryCodeInput = {
   code: string;
   login: string;
 };
+
+export type AbsenceFieldsFragment = { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, createdAt: string };
+
+export type MyAbsencesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyAbsencesQuery = { myAbsences: Array<{ id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, createdAt: string }> };
+
+export type AbsencesQueryVariables = Exact<{
+  filter?: AbsenceFilterInput | null | undefined;
+}>;
+
+
+export type AbsencesQuery = { absences: Array<{ id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, createdAt: string }> };
+
+export type RequestAbsenceMutationVariables = Exact<{
+  input: AbsenceInput;
+}>;
+
+
+export type RequestAbsenceMutation = { requestAbsence: { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, createdAt: string } };
+
+export type RegisterAbsenceMutationVariables = Exact<{
+  userId: string | number;
+  input: AbsenceInput;
+}>;
+
+
+export type RegisterAbsenceMutation = { registerAbsence: { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, createdAt: string } };
+
+export type ReviewAbsenceMutationVariables = Exact<{
+  id: string | number;
+  approve: boolean;
+  note?: string | null | undefined;
+}>;
+
+
+export type ReviewAbsenceMutation = { reviewAbsence: { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, createdAt: string } };
+
+export type CancelAbsenceMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type CancelAbsenceMutation = { cancelAbsence: { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, createdAt: string } };
 
 export type UsersQueryVariables = Exact<{
   filter?: UserFilterInput | null | undefined;
@@ -566,6 +699,44 @@ export type UpdateInstrumentMutationVariables = Exact<{
 
 export type UpdateInstrumentMutation = { updateInstrument: { id: string, name: string, section: Section, archived: boolean } };
 
+export type MyNotificationsQueryVariables = Exact<{
+  unreadOnly: boolean;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type MyNotificationsQuery = { myNotifications: { total: number, page: number, totalPages: number, items: Array<{ id: string, type: NotificationType, title: string, body: string, link: string | null, readAt: string | null, createdAt: string }> } };
+
+export type UnreadNotificationsCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UnreadNotificationsCountQuery = { unreadNotificationsCount: number };
+
+export type MarkNotificationReadMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type MarkNotificationReadMutation = { markNotificationRead: boolean };
+
+export type MarkAllNotificationsReadMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MarkAllNotificationsReadMutation = { markAllNotificationsRead: number };
+
+export type NotificationPreferencesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NotificationPreferencesQuery = { myNotificationPreferences: Array<{ type: NotificationType, emailEnabled: boolean }> };
+
+export type SetNotificationPreferenceMutationVariables = Exact<{
+  type: NotificationType;
+  emailEnabled: boolean;
+}>;
+
+
+export type SetNotificationPreferenceMutation = { setNotificationPreference: { type: NotificationType, emailEnabled: boolean } };
+
 export type SongFieldsFragment = { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string };
 
 export type MediaAssetFieldsFragment = { id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string };
@@ -658,6 +829,53 @@ export type AudioDownloadUrlQueryVariables = Exact<{
 
 export type AudioDownloadUrlQuery = { audioDownloadUrl: string };
 
+export type AssignmentFieldsFragment = { userId: string, role: AssignmentRole, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, section: Section } | null };
+
+export type RosterFieldsFragment = { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, role: AssignmentRole, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, section: Section } | null }> };
+
+export type EventRosterQueryVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type EventRosterQuery = { eventRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, role: AssignmentRole, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, section: Section } | null }> } | null };
+
+export type RosterCandidatesQueryVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type RosterCandidatesQuery = { rosterCandidates: Array<{ userId: string, name: string, warName: string, rank: Rank, section: Section, memberStatus: MemberStatus, blocker: CandidateBlocker | null, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, absence: { type: AbsenceType, startsOn: string, endsOn: string } | null, busyWith: Array<{ eventId: string, title: string }> }> };
+
+export type MyAssignmentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyAssignmentsQuery = { myAssignments: Array<{ eventId: string, role: AssignmentRole, instrumentId: string | null, instrumentName: string | null, ackStatus: AckStatus, ackNote: string | null, event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venue: { id: string, name: string } | null } | null }> };
+
+export type SaveRosterMutationVariables = Exact<{
+  eventId: string | number;
+  input: RosterInput;
+}>;
+
+
+export type SaveRosterMutation = { saveRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, role: AssignmentRole, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, section: Section } | null }> } };
+
+export type PublishRosterMutationVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type PublishRosterMutation = { publishRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, role: AssignmentRole, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, section: Section } | null }> } };
+
+export type AcknowledgeRosterMutationVariables = Exact<{
+  eventId: string | number;
+  answer: AckAnswer;
+  note?: string | null | undefined;
+}>;
+
+
+export type AcknowledgeRosterMutation = { acknowledgeRoster: { ackStatus: AckStatus, ackNote: string | null } };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -676,6 +894,22 @@ export class TypedDocumentString<TResult, TVariables>
     return this.value;
   }
 }
+export const AbsenceFieldsFragmentDoc = new TypedDocumentString(`
+    fragment AbsenceFields on Absence {
+  id
+  userId
+  userName
+  warName
+  type
+  startsOn
+  endsOn
+  reason
+  status
+  reviewNote
+  reviewedAt
+  createdAt
+}
+    `, {"fragmentName":"AbsenceFields"}) as unknown as TypedDocumentString<AbsenceFieldsFragment, unknown>;
 export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
     fragment UserAccountFields on UserAccount {
   id
@@ -782,6 +1016,173 @@ export const MediaAssetFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"MediaAssetFields"}) as unknown as TypedDocumentString<MediaAssetFieldsFragment, unknown>;
+export const AssignmentFieldsFragmentDoc = new TypedDocumentString(`
+    fragment AssignmentFields on Assignment {
+  userId
+  role
+  instrumentId
+  instrumentName
+  notes
+  overrideReason
+  ackStatus
+  ackNote
+  ackAt
+  person {
+    name
+    warName
+    rank
+    section
+  }
+}
+    `, {"fragmentName":"AssignmentFields"}) as unknown as TypedDocumentString<AssignmentFieldsFragment, unknown>;
+export const RosterFieldsFragmentDoc = new TypedDocumentString(`
+    fragment RosterFields on Roster {
+  eventId
+  status
+  version
+  publishedAt
+  uncoveredSections
+  assignments {
+    ...AssignmentFields
+  }
+}
+    fragment AssignmentFields on Assignment {
+  userId
+  role
+  instrumentId
+  instrumentName
+  notes
+  overrideReason
+  ackStatus
+  ackNote
+  ackAt
+  person {
+    name
+    warName
+    rank
+    section
+  }
+}`, {"fragmentName":"RosterFields"}) as unknown as TypedDocumentString<RosterFieldsFragment, unknown>;
+export const MyAbsencesDocument = new TypedDocumentString(`
+    query MyAbsences {
+  myAbsences {
+    ...AbsenceFields
+  }
+}
+    fragment AbsenceFields on Absence {
+  id
+  userId
+  userName
+  warName
+  type
+  startsOn
+  endsOn
+  reason
+  status
+  reviewNote
+  reviewedAt
+  createdAt
+}`) as unknown as TypedDocumentString<MyAbsencesQuery, MyAbsencesQueryVariables>;
+export const AbsencesDocument = new TypedDocumentString(`
+    query Absences($filter: AbsenceFilterInput) {
+  absences(filter: $filter) {
+    ...AbsenceFields
+  }
+}
+    fragment AbsenceFields on Absence {
+  id
+  userId
+  userName
+  warName
+  type
+  startsOn
+  endsOn
+  reason
+  status
+  reviewNote
+  reviewedAt
+  createdAt
+}`) as unknown as TypedDocumentString<AbsencesQuery, AbsencesQueryVariables>;
+export const RequestAbsenceDocument = new TypedDocumentString(`
+    mutation RequestAbsence($input: AbsenceInput!) {
+  requestAbsence(input: $input) {
+    ...AbsenceFields
+  }
+}
+    fragment AbsenceFields on Absence {
+  id
+  userId
+  userName
+  warName
+  type
+  startsOn
+  endsOn
+  reason
+  status
+  reviewNote
+  reviewedAt
+  createdAt
+}`) as unknown as TypedDocumentString<RequestAbsenceMutation, RequestAbsenceMutationVariables>;
+export const RegisterAbsenceDocument = new TypedDocumentString(`
+    mutation RegisterAbsence($userId: ID!, $input: AbsenceInput!) {
+  registerAbsence(userId: $userId, input: $input) {
+    ...AbsenceFields
+  }
+}
+    fragment AbsenceFields on Absence {
+  id
+  userId
+  userName
+  warName
+  type
+  startsOn
+  endsOn
+  reason
+  status
+  reviewNote
+  reviewedAt
+  createdAt
+}`) as unknown as TypedDocumentString<RegisterAbsenceMutation, RegisterAbsenceMutationVariables>;
+export const ReviewAbsenceDocument = new TypedDocumentString(`
+    mutation ReviewAbsence($id: ID!, $approve: Boolean!, $note: String) {
+  reviewAbsence(id: $id, approve: $approve, note: $note) {
+    ...AbsenceFields
+  }
+}
+    fragment AbsenceFields on Absence {
+  id
+  userId
+  userName
+  warName
+  type
+  startsOn
+  endsOn
+  reason
+  status
+  reviewNote
+  reviewedAt
+  createdAt
+}`) as unknown as TypedDocumentString<ReviewAbsenceMutation, ReviewAbsenceMutationVariables>;
+export const CancelAbsenceDocument = new TypedDocumentString(`
+    mutation CancelAbsence($id: ID!) {
+  cancelAbsence(id: $id) {
+    ...AbsenceFields
+  }
+}
+    fragment AbsenceFields on Absence {
+  id
+  userId
+  userName
+  warName
+  type
+  startsOn
+  endsOn
+  reason
+  status
+  reviewNote
+  reviewedAt
+  createdAt
+}`) as unknown as TypedDocumentString<CancelAbsenceMutation, CancelAbsenceMutationVariables>;
 export const UsersDocument = new TypedDocumentString(`
     query Users($filter: UserFilterInput, $page: PageInput) {
   users(filter: $filter, page: $page) {
@@ -1480,6 +1881,55 @@ export const UpdateInstrumentDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateInstrumentMutation, UpdateInstrumentMutationVariables>;
+export const MyNotificationsDocument = new TypedDocumentString(`
+    query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {
+  myNotifications(unreadOnly: $unreadOnly, page: $page) {
+    items {
+      id
+      type
+      title
+      body
+      link
+      readAt
+      createdAt
+    }
+    total
+    page
+    totalPages
+  }
+}
+    `) as unknown as TypedDocumentString<MyNotificationsQuery, MyNotificationsQueryVariables>;
+export const UnreadNotificationsCountDocument = new TypedDocumentString(`
+    query UnreadNotificationsCount {
+  unreadNotificationsCount
+}
+    `) as unknown as TypedDocumentString<UnreadNotificationsCountQuery, UnreadNotificationsCountQueryVariables>;
+export const MarkNotificationReadDocument = new TypedDocumentString(`
+    mutation MarkNotificationRead($id: ID!) {
+  markNotificationRead(id: $id)
+}
+    `) as unknown as TypedDocumentString<MarkNotificationReadMutation, MarkNotificationReadMutationVariables>;
+export const MarkAllNotificationsReadDocument = new TypedDocumentString(`
+    mutation MarkAllNotificationsRead {
+  markAllNotificationsRead
+}
+    `) as unknown as TypedDocumentString<MarkAllNotificationsReadMutation, MarkAllNotificationsReadMutationVariables>;
+export const NotificationPreferencesDocument = new TypedDocumentString(`
+    query NotificationPreferences {
+  myNotificationPreferences {
+    type
+    emailEnabled
+  }
+}
+    `) as unknown as TypedDocumentString<NotificationPreferencesQuery, NotificationPreferencesQueryVariables>;
+export const SetNotificationPreferenceDocument = new TypedDocumentString(`
+    mutation SetNotificationPreference($type: NotificationType!, $emailEnabled: Boolean!) {
+  setNotificationPreference(type: $type, emailEnabled: $emailEnabled) {
+    type
+    emailEnabled
+  }
+}
+    `) as unknown as TypedDocumentString<SetNotificationPreferenceMutation, SetNotificationPreferenceMutationVariables>;
 export const SongsDocument = new TypedDocumentString(`
     query Songs($filter: SongFilterInput, $page: PageInput) {
   songs(filter: $filter, page: $page) {
@@ -1711,3 +2161,162 @@ export const AudioDownloadUrlDocument = new TypedDocumentString(`
   audioDownloadUrl(assetId: $assetId)
 }
     `) as unknown as TypedDocumentString<AudioDownloadUrlQuery, AudioDownloadUrlQueryVariables>;
+export const EventRosterDocument = new TypedDocumentString(`
+    query EventRoster($eventId: ID!) {
+  eventRoster(eventId: $eventId) {
+    ...RosterFields
+  }
+}
+    fragment AssignmentFields on Assignment {
+  userId
+  role
+  instrumentId
+  instrumentName
+  notes
+  overrideReason
+  ackStatus
+  ackNote
+  ackAt
+  person {
+    name
+    warName
+    rank
+    section
+  }
+}
+fragment RosterFields on Roster {
+  eventId
+  status
+  version
+  publishedAt
+  uncoveredSections
+  assignments {
+    ...AssignmentFields
+  }
+}`) as unknown as TypedDocumentString<EventRosterQuery, EventRosterQueryVariables>;
+export const RosterCandidatesDocument = new TypedDocumentString(`
+    query RosterCandidates($eventId: ID!) {
+  rosterCandidates(eventId: $eventId) {
+    userId
+    name
+    warName
+    rank
+    section
+    memberStatus
+    instruments {
+      instrumentId
+      name
+      primary
+    }
+    blocker
+    absence {
+      type
+      startsOn
+      endsOn
+    }
+    busyWith {
+      eventId
+      title
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<RosterCandidatesQuery, RosterCandidatesQueryVariables>;
+export const MyAssignmentsDocument = new TypedDocumentString(`
+    query MyAssignments {
+  myAssignments {
+    eventId
+    role
+    instrumentId
+    instrumentName
+    ackStatus
+    ackNote
+    event {
+      id
+      title
+      type
+      status
+      callTime
+      startsAt
+      endsAt
+      venue {
+        id
+        name
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<MyAssignmentsQuery, MyAssignmentsQueryVariables>;
+export const SaveRosterDocument = new TypedDocumentString(`
+    mutation SaveRoster($eventId: ID!, $input: RosterInput!) {
+  saveRoster(eventId: $eventId, input: $input) {
+    ...RosterFields
+  }
+}
+    fragment AssignmentFields on Assignment {
+  userId
+  role
+  instrumentId
+  instrumentName
+  notes
+  overrideReason
+  ackStatus
+  ackNote
+  ackAt
+  person {
+    name
+    warName
+    rank
+    section
+  }
+}
+fragment RosterFields on Roster {
+  eventId
+  status
+  version
+  publishedAt
+  uncoveredSections
+  assignments {
+    ...AssignmentFields
+  }
+}`) as unknown as TypedDocumentString<SaveRosterMutation, SaveRosterMutationVariables>;
+export const PublishRosterDocument = new TypedDocumentString(`
+    mutation PublishRoster($eventId: ID!) {
+  publishRoster(eventId: $eventId) {
+    ...RosterFields
+  }
+}
+    fragment AssignmentFields on Assignment {
+  userId
+  role
+  instrumentId
+  instrumentName
+  notes
+  overrideReason
+  ackStatus
+  ackNote
+  ackAt
+  person {
+    name
+    warName
+    rank
+    section
+  }
+}
+fragment RosterFields on Roster {
+  eventId
+  status
+  version
+  publishedAt
+  uncoveredSections
+  assignments {
+    ...AssignmentFields
+  }
+}`) as unknown as TypedDocumentString<PublishRosterMutation, PublishRosterMutationVariables>;
+export const AcknowledgeRosterDocument = new TypedDocumentString(`
+    mutation AcknowledgeRoster($eventId: ID!, $answer: AckAnswer!, $note: String) {
+  acknowledgeRoster(eventId: $eventId, answer: $answer, note: $note) {
+    ackStatus
+    ackNote
+  }
+}
+    `) as unknown as TypedDocumentString<AcknowledgeRosterMutation, AcknowledgeRosterMutationVariables>;

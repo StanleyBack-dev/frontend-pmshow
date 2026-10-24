@@ -1,3 +1,48 @@
+export type AbsenceStatus =
+  | 'APROVADA'
+  | 'CANCELADA'
+  | 'PENDENTE'
+  | 'RECUSADA';
+
+/** Motivo da indisponibilidade. */
+export type AbsenceType =
+  | 'CURSO'
+  | 'DISPENSA_MEDICA'
+  | 'FERIAS'
+  | 'LICENCA'
+  | 'MISSAO'
+  | 'OUTRO';
+
+export type AckAnswer =
+  | 'CIENTE'
+  | 'TROCA_SOLICITADA';
+
+/** Resposta do escalado. */
+export type AckStatus =
+  | 'CIENTE'
+  | 'PENDENTE'
+  | 'TROCA_SOLICITADA';
+
+/** Função na escala. */
+export type AssignmentRole =
+  | 'APOIO'
+  | 'CHEFE_EQUIPE'
+  | 'MOTORISTA'
+  | 'MUSICO'
+  | 'REGENTE'
+  | 'SOM';
+
+/** Por que a pessoa não pode ser escalada. */
+export type CandidateBlocker =
+  /** Indisponibilidade aprovada no período. */
+  | 'ABSENT'
+  /** Afastado. */
+  | 'AWAY'
+  /** Inativo. */
+  | 'INACTIVE'
+  /** Sem cadastro ativo na banda. */
+  | 'NO_PROFILE';
+
 export type EventStatus =
   | 'CANCELADO'
   | 'CONFIRMADO'
@@ -27,6 +72,15 @@ export type MemberStatus =
   | 'AFASTADO'
   | 'ATIVO'
   | 'INATIVO';
+
+export type NotificationType =
+  | 'ABSENCE_REVIEWED'
+  | 'EVENT_CANCELLED'
+  | 'EVENT_RESCHEDULED'
+  | 'ROSTER_PUBLISHED'
+  | 'ROSTER_REMOVED'
+  | 'ROSTER_SWAP_REQUESTED'
+  | 'ROSTER_UPDATED';
 
 /** Capacidade verificada pela API. */
 export type Permission =
@@ -66,6 +120,10 @@ export type Rank =
   | 'SUBTENENTE'
   | 'TENENTE_CORONEL'
   | 'TERCEIRO_SARGENTO';
+
+export type RosterStatus =
+  | 'PUBLICADA'
+  | 'RASCUNHO';
 
 /** Naipe da banda. */
 export type Section =

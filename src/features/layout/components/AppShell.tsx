@@ -5,7 +5,9 @@ import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   CalendarDays,
+  CalendarOff,
   CircleUserRound,
+  ClipboardList,
   House,
   ListMusic,
   LogOut,
@@ -21,6 +23,7 @@ import { Button, cn, Modal, Spinner } from "@/design-system";
 import { InstallAppInvite } from "@/features/install/components/InstallAppInvite";
 import { Logo } from "@/features/layout/components/Logo";
 import { LogoMark } from "@/features/layout/components/LogoMark";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { authClient } from "@/features/auth/api/auth.client";
 import type { Permission, SessionUser } from "@/shared/contracts/api";
@@ -35,8 +38,6 @@ type NavItem = {
   permission?: Permission;
 };
 
-// Only pages that exist: rosters and notifications join as their phases
-// ship.
 const BASE_NAV: NavItem[] = [
   { href: "/inicio", label: "Início", icon: House },
   {
@@ -44,6 +45,12 @@ const BASE_NAV: NavItem[] = [
     label: "Agenda",
     icon: CalendarDays,
     permission: "EVENTS_READ",
+  },
+  {
+    href: "/escalas",
+    label: "Minhas escalas",
+    icon: ClipboardList,
+    permission: "ROSTERS_READ_OWN",
   },
   {
     href: "/repertorio",
@@ -56,6 +63,12 @@ const BASE_NAV: NavItem[] = [
     label: "Músicos",
     icon: Users,
     permission: "MEMBERS_READ",
+  },
+  {
+    href: "/indisponibilidades",
+    label: "Indisponibilidades",
+    icon: CalendarOff,
+    permission: "ABSENCES_REQUEST",
   },
 ];
 
@@ -157,10 +170,13 @@ function NavLink({
 export function AppShell({
   user,
   showAdmin,
+  unreadNotifications,
   children,
 }: {
   user: Pick<SessionUser, "name" | "group" | "permissions">;
   showAdmin: boolean;
+  /** Server-side count; the bell keeps it fresh afterwards. */
+  unreadNotifications: number;
   children: ReactNode;
 }) {
   const navItems = BASE_NAV.filter(
@@ -281,20 +297,25 @@ export function AppShell({
             )}
           >
             {collapsed ? <LogoMark className="size-8 text-accent" /> : <Logo />}
-            <button
-              type="button"
-              onClick={() => writeCollapsed(!collapsed)}
-              aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
-              title={collapsed ? "Expandir menu" : "Recolher menu"}
-              aria-expanded={!collapsed}
-              className="grid size-8 shrink-0 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg"
+            <div
+              className={cn("flex items-center gap-1", collapsed && "flex-col")}
             >
-              {collapsed ? (
-                <PanelLeftOpen className="size-[18px]" aria-hidden />
-              ) : (
-                <PanelLeftClose className="size-[18px]" aria-hidden />
-              )}
-            </button>
+              <NotificationBell initialCount={unreadNotifications} />
+              <button
+                type="button"
+                onClick={() => writeCollapsed(!collapsed)}
+                aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+                title={collapsed ? "Expandir menu" : "Recolher menu"}
+                aria-expanded={!collapsed}
+                className="grid size-8 shrink-0 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg"
+              >
+                {collapsed ? (
+                  <PanelLeftOpen className="size-[18px]" aria-hidden />
+                ) : (
+                  <PanelLeftClose className="size-[18px]" aria-hidden />
+                )}
+              </button>
+            </div>
           </div>
           {renderNav(collapsed)}
         </div>
@@ -303,14 +324,17 @@ export function AppShell({
 
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-surface/90 px-4 backdrop-blur lg:hidden">
         <Logo />
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-label={open ? "Fechar menu" : "Abrir menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
-          icon={open ? <X className="size-5" /> : <Menu className="size-5" />}
-        />
+        <div className="flex items-center gap-1">
+          <NotificationBell initialCount={unreadNotifications} />
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((value) => !value)}
+            icon={open ? <X className="size-5" /> : <Menu className="size-5" />}
+          />
+        </div>
       </header>
       {open && (
         <div className="fixed inset-x-0 top-14 z-20 max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b border-border bg-surface p-4 shadow-card lg:hidden">

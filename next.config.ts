@@ -16,8 +16,16 @@ const securityHeaders = [
   },
 ];
 
+// `next dev` only: hosts allowed to load dev resources (HMR), e.g. the
+// notebook's LAN IP to open the app on a phone on the same Wi-Fi.
+const allowedDevOrigins = (process.env.DEV_ALLOWED_ORIGINS ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  allowedDevOrigins,
   reactStrictMode: true,
   images: {
     // YouTube video thumbnails on the song page.
