@@ -1,19 +1,7 @@
 import "server-only";
 import { z } from "zod";
+import { enumLike, optionalText } from "@/server/http/schemas/fields";
 import type { EventStatus, EventType } from "@/shared/contracts/events";
-
-const enumLike = <T extends string>() =>
-  z
-    .string()
-    .regex(/^[A-Z_]{2,32}$/)
-    .transform((value) => value as T);
-
-const optionalText = (max: number) =>
-  z
-    .string()
-    .max(max)
-    .nullish()
-    .transform((value) => value?.trim() || null);
 
 /** ISO instant with offset, as built by shared/lib/datetime. */
 const instant = z.iso.datetime({ offset: true });

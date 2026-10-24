@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ClipboardList, ExternalLink } from "lucide-react";
+import { ArrowLeft, ClipboardList, ExternalLink, FileDown } from "lucide-react";
 import {
   Alert,
   Badge,
@@ -189,14 +189,29 @@ export default async function EventPage({
                   : "Ninguém escalado ainda."
             }
             action={
-              canBuildRoster && open ? (
-                <Link
-                  href={`/agenda/${event.id}/escala`}
-                  className={buttonClasses("secondary", "sm")}
-                >
-                  <ClipboardList className="size-4" />
-                  {roster ? "Editar escala" : "Montar escala"}
-                </Link>
+              roster || (canBuildRoster && open) ? (
+                <span className="flex flex-wrap justify-end gap-2">
+                  {roster && (
+                    // A file download, not a page: plain anchor on purpose.
+                    <a
+                      href={`/api/events/${event.id}/roster/pdf`}
+                      download
+                      className={buttonClasses("ghost", "sm")}
+                    >
+                      <FileDown className="size-4" />
+                      PDF
+                    </a>
+                  )}
+                  {canBuildRoster && open && (
+                    <Link
+                      href={`/agenda/${event.id}/escala`}
+                      className={buttonClasses("secondary", "sm")}
+                    >
+                      <ClipboardList className="size-4" />
+                      {roster ? "Editar escala" : "Montar escala"}
+                    </Link>
+                  )}
+                </span>
               ) : undefined
             }
           />

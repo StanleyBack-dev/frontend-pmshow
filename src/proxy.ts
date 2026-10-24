@@ -72,8 +72,8 @@ function loginUrl(request: NextRequest, expired: boolean): URL {
 
 export const config = {
   matcher: [
-    // Everything except static assets, generated icons and the public auth
-    // endpoints (login, logout, password recovery).
-    "/((?!_next/static|_next/image|icon.svg|apple-icon|pwa-icon|manifest.webmanifest|robots.txt|api/auth/).*)",
+    // Everything except static assets, generated icons, the service worker
+    // and the public auth endpoints (login, logout, password recovery).
+    "/((?!_next/static|_next/image|icon.svg|apple-icon|pwa-icon|manifest.webmanifest|robots.txt|sw.js|api/auth/).*)",
   ],
 };

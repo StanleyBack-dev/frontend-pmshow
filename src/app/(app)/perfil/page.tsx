@@ -3,8 +3,10 @@ import { Card, CardBody, CardHeader, PageHeader } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { ChangePasswordForm } from "@/features/auth/components/ChangePasswordForm";
 import { ProfileForm } from "@/features/auth/components/ProfileForm";
+import { InstallAppCard } from "@/features/install/components/InstallAppCard";
 import { MyBandProfileCard } from "@/features/members/components/MyBandProfileCard";
 import { NotificationPreferences } from "@/features/notifications/components/NotificationPreferences";
+import { PushNotificationsCard } from "@/features/notifications/components/PushNotificationsCard";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { membersService } from "@/server/services/members.service";
 import { notificationsService } from "@/server/services/notifications.service";
@@ -48,6 +50,8 @@ export default async function ProfilePage() {
         <div className="lg:col-span-2">
           <MyBandProfileCard profile={bandProfile} />
         </div>
+        <InstallAppCard />
+        <PushNotificationsCard />
         <Card className="lg:col-span-2">
           <CardHeader
             title="Avisos por e-mail"

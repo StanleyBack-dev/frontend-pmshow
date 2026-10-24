@@ -43,6 +43,10 @@ type Documents = {
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": typeof types.RequestPasswordRecoveryDocument,
     "\n  mutation VerifyPasswordRecoveryCode($input: VerifyRecoveryCodeInput!) {\n    verifyPasswordRecoveryCode(input: $input)\n  }\n": typeof types.VerifyPasswordRecoveryCodeDocument,
     "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n": typeof types.ResetPasswordWithRecoveryDocument,
+    "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    section\n    eventId\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n": typeof types.BroadcastFieldsFragmentDoc,
+    "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": typeof types.BroadcastsDocument,
+    "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": typeof types.SendBroadcastDocument,
+    "\n  query BandDashboard {\n    bandDashboard {\n      activeMembers\n      awayMembers\n      upcomingEvents\n      eventsWithoutRoster\n      pendingAcks\n      swapRequests\n      pendingAbsences\n      absentToday\n      failedNotifications\n    }\n  }\n": typeof types.BandDashboardDocument,
     "\n  fragment EventFields on Event {\n    id\n    title\n    type\n    status\n    callTime\n    startsAt\n    endsAt\n    venueId\n    uniform\n    requester\n    documentRef\n    notes\n    cancellationReason\n    venue {\n      ...VenueFields\n    }\n  }\n": typeof types.EventFieldsFragmentDoc,
     "\n  fragment VenueFields on Venue {\n    id\n    name\n    address\n    city\n    mapsUrl\n    notes\n    archived\n  }\n": typeof types.VenueFieldsFragmentDoc,
     "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n    }\n  }\n": typeof types.EventsDocument,
@@ -69,6 +73,10 @@ type Documents = {
     "\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n": typeof types.MarkAllNotificationsReadDocument,
     "\n  query NotificationPreferences {\n    myNotificationPreferences {\n      type\n      emailEnabled\n    }\n  }\n": typeof types.NotificationPreferencesDocument,
     "\n  mutation SetNotificationPreference(\n    $type: NotificationType!\n    $emailEnabled: Boolean!\n  ) {\n    setNotificationPreference(type: $type, emailEnabled: $emailEnabled) {\n      type\n      emailEnabled\n    }\n  }\n": typeof types.SetNotificationPreferenceDocument,
+    "\n  query PushPublicKey {\n    pushPublicKey\n  }\n": typeof types.PushPublicKeyDocument,
+    "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": typeof types.SubscribePushDocument,
+    "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": typeof types.UnsubscribePushDocument,
+    "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
     "\n  fragment SongFields on Song {\n    id\n    title\n    artist\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": typeof types.SongFieldsFragmentDoc,
     "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n": typeof types.MediaAssetFieldsFragmentDoc,
     "\n  query Songs($filter: SongFilterInput, $page: PageInput) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n      }\n    }\n    songTags\n  }\n": typeof types.SongsDocument,
@@ -121,6 +129,10 @@ const documents: Documents = {
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": types.RequestPasswordRecoveryDocument,
     "\n  mutation VerifyPasswordRecoveryCode($input: VerifyRecoveryCodeInput!) {\n    verifyPasswordRecoveryCode(input: $input)\n  }\n": types.VerifyPasswordRecoveryCodeDocument,
     "\n  mutation ResetPasswordWithRecovery($input: ResetPasswordInput!) {\n    resetPasswordWithRecovery(input: $input)\n  }\n": types.ResetPasswordWithRecoveryDocument,
+    "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    section\n    eventId\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n": types.BroadcastFieldsFragmentDoc,
+    "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": types.BroadcastsDocument,
+    "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": types.SendBroadcastDocument,
+    "\n  query BandDashboard {\n    bandDashboard {\n      activeMembers\n      awayMembers\n      upcomingEvents\n      eventsWithoutRoster\n      pendingAcks\n      swapRequests\n      pendingAbsences\n      absentToday\n      failedNotifications\n    }\n  }\n": types.BandDashboardDocument,
     "\n  fragment EventFields on Event {\n    id\n    title\n    type\n    status\n    callTime\n    startsAt\n    endsAt\n    venueId\n    uniform\n    requester\n    documentRef\n    notes\n    cancellationReason\n    venue {\n      ...VenueFields\n    }\n  }\n": types.EventFieldsFragmentDoc,
     "\n  fragment VenueFields on Venue {\n    id\n    name\n    address\n    city\n    mapsUrl\n    notes\n    archived\n  }\n": types.VenueFieldsFragmentDoc,
     "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n    }\n  }\n": types.EventsDocument,
@@ -147,6 +159,10 @@ const documents: Documents = {
     "\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n": types.MarkAllNotificationsReadDocument,
     "\n  query NotificationPreferences {\n    myNotificationPreferences {\n      type\n      emailEnabled\n    }\n  }\n": types.NotificationPreferencesDocument,
     "\n  mutation SetNotificationPreference(\n    $type: NotificationType!\n    $emailEnabled: Boolean!\n  ) {\n    setNotificationPreference(type: $type, emailEnabled: $emailEnabled) {\n      type\n      emailEnabled\n    }\n  }\n": types.SetNotificationPreferenceDocument,
+    "\n  query PushPublicKey {\n    pushPublicKey\n  }\n": types.PushPublicKeyDocument,
+    "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": types.SubscribePushDocument,
+    "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": types.UnsubscribePushDocument,
+    "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
     "\n  fragment SongFields on Song {\n    id\n    title\n    artist\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": types.SongFieldsFragmentDoc,
     "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n": types.MediaAssetFieldsFragmentDoc,
     "\n  query Songs($filter: SongFilterInput, $page: PageInput) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n      }\n    }\n    songTags\n  }\n": types.SongsDocument,
@@ -286,6 +302,22 @@ export function graphql(source: "\n  mutation ResetPasswordWithRecovery($input: 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    section\n    eventId\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n"): typeof import('./graphql').BroadcastFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n"): typeof import('./graphql').BroadcastsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n"): typeof import('./graphql').SendBroadcastDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query BandDashboard {\n    bandDashboard {\n      activeMembers\n      awayMembers\n      upcomingEvents\n      eventsWithoutRoster\n      pendingAcks\n      swapRequests\n      pendingAbsences\n      absentToday\n      failedNotifications\n    }\n  }\n"): typeof import('./graphql').BandDashboardDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  fragment EventFields on Event {\n    id\n    title\n    type\n    status\n    callTime\n    startsAt\n    endsAt\n    venueId\n    uniform\n    requester\n    documentRef\n    notes\n    cancellationReason\n    venue {\n      ...VenueFields\n    }\n  }\n"): typeof import('./graphql').EventFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -387,6 +419,22 @@ export function graphql(source: "\n  query NotificationPreferences {\n    myNoti
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation SetNotificationPreference(\n    $type: NotificationType!\n    $emailEnabled: Boolean!\n  ) {\n    setNotificationPreference(type: $type, emailEnabled: $emailEnabled) {\n      type\n      emailEnabled\n    }\n  }\n"): typeof import('./graphql').SetNotificationPreferenceDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query PushPublicKey {\n    pushPublicKey\n  }\n"): typeof import('./graphql').PushPublicKeyDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n"): typeof import('./graphql').SubscribePushDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n"): typeof import('./graphql').UnsubscribePushDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SendTestPush {\n    sendTestPush\n  }\n"): typeof import('./graphql').SendTestPushDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

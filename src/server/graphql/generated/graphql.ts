@@ -78,6 +78,22 @@ export type AuditFilterInput = {
   entityId?: string | null | undefined;
 };
 
+/** Quem recebe o comunicado. */
+export type BroadcastAudience =
+  | 'ESCALA_EVENTO'
+  | 'NAIPE'
+  | 'TODOS';
+
+export type BroadcastInput = {
+  audience: BroadcastAudience;
+  body: string;
+  eventId?: string | number | null | undefined;
+  section?: Section | null | undefined;
+  /** Também envia por e-mail. */
+  sendEmail: boolean;
+  title: string;
+};
+
 /** Por que a pessoa não pode ser escalada. */
 export type CandidateBlocker =
   /** Indisponibilidade aprovada no período. */
@@ -189,7 +205,9 @@ export type MemberStatus =
 
 export type NotificationType =
   | 'ABSENCE_REVIEWED'
+  | 'BROADCAST'
   | 'EVENT_CANCELLED'
+  | 'EVENT_REMINDER'
   | 'EVENT_RESCHEDULED'
   | 'ROSTER_PUBLISHED'
   | 'ROSTER_REMOVED'
@@ -221,6 +239,15 @@ export type Permission =
   | 'ROSTERS_READ_ALL'
   | 'ROSTERS_READ_OWN'
   | 'USERS_MANAGE';
+
+/** PushSubscription do navegador (PushManager). */
+export type PushSubscriptionInput = {
+  /** Segredo de autenticação (base64url). */
+  auth: string;
+  endpoint: string;
+  /** Chave pública do aparelho (base64url). */
+  p256dh: string;
+};
 
 /** Posto/graduação. */
 export type Rank =
@@ -568,6 +595,25 @@ export type ResetPasswordWithRecoveryMutationVariables = Exact<{
 
 export type ResetPasswordWithRecoveryMutation = { resetPasswordWithRecovery: boolean };
 
+export type BroadcastFieldsFragment = { id: string, title: string, body: string, audience: BroadcastAudience, section: Section | null, eventId: string | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string };
+
+export type BroadcastsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BroadcastsQuery = { broadcasts: Array<{ id: string, title: string, body: string, audience: BroadcastAudience, section: Section | null, eventId: string | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string }> };
+
+export type SendBroadcastMutationVariables = Exact<{
+  input: BroadcastInput;
+}>;
+
+
+export type SendBroadcastMutation = { sendBroadcast: { id: string, title: string, body: string, audience: BroadcastAudience, section: Section | null, eventId: string | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string } };
+
+export type BandDashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type BandDashboardQuery = { bandDashboard: { activeMembers: number, awayMembers: number, upcomingEvents: number, eventsWithoutRoster: number, pendingAcks: number, swapRequests: number, pendingAbsences: number, absentToday: number, failedNotifications: number } };
+
 export type EventFieldsFragment = { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null };
 
 export type VenueFieldsFragment = { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean };
@@ -736,6 +782,30 @@ export type SetNotificationPreferenceMutationVariables = Exact<{
 
 
 export type SetNotificationPreferenceMutation = { setNotificationPreference: { type: NotificationType, emailEnabled: boolean } };
+
+export type PushPublicKeyQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PushPublicKeyQuery = { pushPublicKey: string | null };
+
+export type SubscribePushMutationVariables = Exact<{
+  input: PushSubscriptionInput;
+}>;
+
+
+export type SubscribePushMutation = { subscribePush: boolean };
+
+export type UnsubscribePushMutationVariables = Exact<{
+  endpoint: string;
+}>;
+
+
+export type UnsubscribePushMutation = { unsubscribePush: boolean };
+
+export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SendTestPushMutation = { sendTestPush: number };
 
 export type SongFieldsFragment = { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string };
 
@@ -926,6 +996,20 @@ export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"UserAccountFields"}) as unknown as TypedDocumentString<UserAccountFieldsFragment, unknown>;
+export const BroadcastFieldsFragmentDoc = new TypedDocumentString(`
+    fragment BroadcastFields on Broadcast {
+  id
+  title
+  body
+  audience
+  section
+  eventId
+  sendEmail
+  recipients
+  authorName
+  createdAt
+}
+    `, {"fragmentName":"BroadcastFields"}) as unknown as TypedDocumentString<BroadcastFieldsFragment, unknown>;
 export const VenueFieldsFragmentDoc = new TypedDocumentString(`
     fragment VenueFields on Venue {
   id
@@ -1483,6 +1567,57 @@ export const ResetPasswordWithRecoveryDocument = new TypedDocumentString(`
   resetPasswordWithRecovery(input: $input)
 }
     `) as unknown as TypedDocumentString<ResetPasswordWithRecoveryMutation, ResetPasswordWithRecoveryMutationVariables>;
+export const BroadcastsDocument = new TypedDocumentString(`
+    query Broadcasts {
+  broadcasts {
+    ...BroadcastFields
+  }
+}
+    fragment BroadcastFields on Broadcast {
+  id
+  title
+  body
+  audience
+  section
+  eventId
+  sendEmail
+  recipients
+  authorName
+  createdAt
+}`) as unknown as TypedDocumentString<BroadcastsQuery, BroadcastsQueryVariables>;
+export const SendBroadcastDocument = new TypedDocumentString(`
+    mutation SendBroadcast($input: BroadcastInput!) {
+  sendBroadcast(input: $input) {
+    ...BroadcastFields
+  }
+}
+    fragment BroadcastFields on Broadcast {
+  id
+  title
+  body
+  audience
+  section
+  eventId
+  sendEmail
+  recipients
+  authorName
+  createdAt
+}`) as unknown as TypedDocumentString<SendBroadcastMutation, SendBroadcastMutationVariables>;
+export const BandDashboardDocument = new TypedDocumentString(`
+    query BandDashboard {
+  bandDashboard {
+    activeMembers
+    awayMembers
+    upcomingEvents
+    eventsWithoutRoster
+    pendingAcks
+    swapRequests
+    pendingAbsences
+    absentToday
+    failedNotifications
+  }
+}
+    `) as unknown as TypedDocumentString<BandDashboardQuery, BandDashboardQueryVariables>;
 export const EventsDocument = new TypedDocumentString(`
     query Events($filter: EventFilterInput) {
   events(filter: $filter) {
@@ -1930,6 +2065,26 @@ export const SetNotificationPreferenceDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<SetNotificationPreferenceMutation, SetNotificationPreferenceMutationVariables>;
+export const PushPublicKeyDocument = new TypedDocumentString(`
+    query PushPublicKey {
+  pushPublicKey
+}
+    `) as unknown as TypedDocumentString<PushPublicKeyQuery, PushPublicKeyQueryVariables>;
+export const SubscribePushDocument = new TypedDocumentString(`
+    mutation SubscribePush($input: PushSubscriptionInput!) {
+  subscribePush(input: $input)
+}
+    `) as unknown as TypedDocumentString<SubscribePushMutation, SubscribePushMutationVariables>;
+export const UnsubscribePushDocument = new TypedDocumentString(`
+    mutation UnsubscribePush($endpoint: String!) {
+  unsubscribePush(endpoint: $endpoint)
+}
+    `) as unknown as TypedDocumentString<UnsubscribePushMutation, UnsubscribePushMutationVariables>;
+export const SendTestPushDocument = new TypedDocumentString(`
+    mutation SendTestPush {
+  sendTestPush
+}
+    `) as unknown as TypedDocumentString<SendTestPushMutation, SendTestPushMutationVariables>;
 export const SongsDocument = new TypedDocumentString(`
     query Songs($filter: SongFilterInput, $page: PageInput) {
   songs(filter: $filter, page: $page) {

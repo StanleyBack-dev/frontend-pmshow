@@ -3,6 +3,7 @@ import type {
   AckStatus,
   AssignmentRole,
   CandidateBlocker,
+  Roster,
 } from "@/shared/contracts/rosters";
 
 export const ROLE_LABELS: Record<AssignmentRole, string> = {
@@ -38,3 +39,12 @@ export const BLOCKER_LABELS: Record<CandidateBlocker, string> = {
   AWAY: "Afastado",
   ABSENT: "Indisponível",
 };
+
+/** Leadership first, then by war name. */
+export function sortedLines(roster: Pick<Roster, "assignments">) {
+  return [...roster.assignments].sort(
+    (a, b) =>
+      ROLE_ORDER[a.role] - ROLE_ORDER[b.role] ||
+      (a.person?.warName ?? "").localeCompare(b.person?.warName ?? ""),
+  );
+}

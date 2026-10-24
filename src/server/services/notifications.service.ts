@@ -5,13 +5,18 @@ import {
   markNotificationReadDocument,
   myNotificationsDocument,
   notificationPreferencesDocument,
+  pushPublicKeyDocument,
+  sendTestPushDocument,
   setNotificationPreferenceDocument,
+  subscribePushDocument,
   unreadNotificationsCountDocument,
+  unsubscribePushDocument,
 } from "@/server/graphql/operations/notifications.operations";
 import type {
   NotificationPage,
   NotificationPreference,
   NotificationType,
+  PushSubscriptionInput,
 } from "@/shared/contracts/notifications";
 
 export const notificationsService = {
@@ -68,5 +73,36 @@ export const notificationsService = {
       { token, variables: { type, emailEnabled } },
     );
     return setNotificationPreference;
+  },
+
+  async pushPublicKey(token: string): Promise<string | null> {
+    const { pushPublicKey } = await backendGraphql(pushPublicKeyDocument, {
+      token,
+    });
+    return pushPublicKey ?? null;
+  },
+
+  async subscribePush(
+    token: string,
+    input: PushSubscriptionInput,
+  ): Promise<void> {
+    await backendGraphql(subscribePushDocument, {
+      token,
+      variables: { input },
+    });
+  },
+
+  async unsubscribePush(token: string, endpoint: string): Promise<void> {
+    await backendGraphql(unsubscribePushDocument, {
+      token,
+      variables: { endpoint },
+    });
+  },
+
+  async sendTestPush(token: string): Promise<number> {
+    const { sendTestPush } = await backendGraphql(sendTestPushDocument, {
+      token,
+    });
+    return sendTestPush;
   },
 };

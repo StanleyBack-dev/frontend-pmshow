@@ -1,29 +1,14 @@
 import "server-only";
 import { z } from "zod";
+import { enumLike, optionalText } from "@/server/http/schemas/fields";
 import type { MemberStatus, Rank, Section } from "@/shared/contracts/members";
 import type { SongCategory } from "@/shared/contracts/repertoire";
-
-// Shapes only; the API validates every value against its own enums and rules.
-const enumLike = <T extends string>() =>
-  z
-    .string()
-    .regex(/^[A-Z_]{2,32}$/)
-    .transform((value) => value as T);
-
-const optionalText = (max: number) =>
-  z
-    .string()
-    .max(max)
-    .nullish()
-    .transform((value) => value?.trim() || null);
 
 const optionalInt = z
   .number()
   .int()
   .nullish()
   .transform((v) => v ?? null);
-
-export const idSchema = z.uuid();
 
 export const songInputSchema = z.object({
   title: z.string().trim().min(1).max(160),

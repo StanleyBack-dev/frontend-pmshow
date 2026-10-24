@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { bffRoute, readBody, requireToken } from "@/server/http/route-handler";
-import {
-  idSchema,
-  instrumentInputSchema,
-} from "@/server/http/schemas/repertoire.schema";
+import { idSchema } from "@/server/http/schemas/fields";
+import { instrumentInputSchema } from "@/server/http/schemas/repertoire.schema";
 import { membersService } from "@/server/services/members.service";
 
 // Rename, move to another section, or archive/restore.

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { bffRoute, readBody, requireToken } from "@/server/http/route-handler";
-import { idSchema } from "@/server/http/schemas/repertoire.schema";
+import { idSchema } from "@/server/http/schemas/fields";
 import { ackSchema } from "@/server/http/schemas/rosters.schema";
 import { rostersService } from "@/server/services/rosters.service";
 

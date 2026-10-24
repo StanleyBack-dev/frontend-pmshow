@@ -32,6 +32,12 @@ export type AssignmentRole =
   | 'REGENTE'
   | 'SOM';
 
+/** Quem recebe o comunicado. */
+export type BroadcastAudience =
+  | 'ESCALA_EVENTO'
+  | 'NAIPE'
+  | 'TODOS';
+
 /** Por que a pessoa não pode ser escalada. */
 export type CandidateBlocker =
   /** Indisponibilidade aprovada no período. */
@@ -75,7 +81,9 @@ export type MemberStatus =
 
 export type NotificationType =
   | 'ABSENCE_REVIEWED'
+  | 'BROADCAST'
   | 'EVENT_CANCELLED'
+  | 'EVENT_REMINDER'
   | 'EVENT_RESCHEDULED'
   | 'ROSTER_PUBLISHED'
   | 'ROSTER_REMOVED'

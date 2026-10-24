@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { bffRoute, readBody, requireToken } from "@/server/http/route-handler";
-import { idSchema } from "@/server/http/schemas/repertoire.schema";
+import { idSchema } from "@/server/http/schemas/fields";
 import { repertoireService } from "@/server/services/repertoire.service";
 
 const schema = z.object({

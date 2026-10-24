@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { bffRoute, requireToken } from "@/server/http/route-handler";
-import { idSchema } from "@/server/http/schemas/repertoire.schema";
+import { idSchema } from "@/server/http/schemas/fields";
 import { repertoireService } from "@/server/services/repertoire.service";
 
 // Plain link target (<a href>): redirects to a signed URL that makes the
