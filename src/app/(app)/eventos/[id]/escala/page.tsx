@@ -46,7 +46,7 @@ export default async function RosterEditorPage({
   return (
     <div className="space-y-6">
       <Link
-        href={`/agenda/${event.id}`}
+        href={`/eventos/${event.id}`}
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
         <ArrowLeft className="size-4" /> {event.title}

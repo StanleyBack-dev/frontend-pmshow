@@ -49,7 +49,7 @@ export default async function MyRostersPage() {
                   <div className="flex flex-wrap items-start gap-2">
                     <div className="min-w-0 flex-1">
                       <Link
-                        href={`/agenda/${event.id}`}
+                        href={`/eventos/${event.id}`}
                         className="font-semibold text-fg hover:text-accent"
                       >
                         {event.title}

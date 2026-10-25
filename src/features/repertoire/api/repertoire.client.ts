@@ -1,9 +1,11 @@
 import { ApiClientError, apiRequest } from "@/shared/lib/api-client";
 import type {
   AudioUploadTicket,
+  LyricsResult,
   MediaAsset,
   Song,
   SongInput,
+  YoutubeVideoResult,
 } from "@/shared/contracts/repertoire";
 
 const json = (method: string, body: unknown): RequestInit => ({
@@ -25,6 +27,16 @@ export const repertoireClient = {
     apiRequest<MediaAsset>(
       `/songs/${songId}/videos`,
       json("POST", { link, title }),
+    ),
+
+  searchYoutube: (query: string) =>
+    apiRequest<YoutubeVideoResult[]>(
+      `/youtube/search?q=${encodeURIComponent(query)}`,
+    ),
+
+  findLyrics: (artist: string, title: string) =>
+    apiRequest<LyricsResult | null>(
+      `/lyrics?${new URLSearchParams({ artista: artist, titulo: title })}`,
     ),
 
   renameMedia: (id: string, title: string) =>

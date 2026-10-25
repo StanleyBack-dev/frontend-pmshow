@@ -177,7 +177,7 @@ export function RosterEditor({
     if (ok) {
       try {
         await rostersClient.publish(eventId);
-        router.push(`/agenda/${eventId}`);
+        router.push(`/eventos/${eventId}`);
         router.refresh();
         return;
       } catch (cause) {
@@ -379,6 +379,7 @@ function CandidateRow({
         <div className="mt-2 ml-7 grid gap-2 sm:grid-cols-2">
           <Select
             label="Função"
+            required
             hideLabel
             value={line.role}
             options={ROLES.map((role) => ({
@@ -409,6 +410,7 @@ function CandidateRow({
               </p>
               <Field
                 label="Justificativa para manter"
+                required
                 maxLength={300}
                 value={line.overrideReason ?? ""}
                 onChange={(e) => onChange({ overrideReason: e.target.value })}

@@ -35,8 +35,13 @@ export const setlistSchema = z.object({
 
 export const venueInputSchema = z.object({
   name: z.string().trim().min(2).max(120),
-  address: optionalText(255),
+  zipCode: optionalText(9),
+  street: optionalText(160),
+  number: optionalText(10),
+  complement: optionalText(80),
+  district: optionalText(80),
   city: optionalText(80),
+  state: optionalText(2),
   mapsUrl: optionalText(500),
   notes: optionalText(500),
   archived: z.boolean().optional(),

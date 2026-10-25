@@ -6,7 +6,11 @@ import { formatTime, localDay } from "@/shared/lib/datetime";
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const MAX_PER_DAY = 3;
 
-/** Month calendar (desktop). `month` is "YYYY-MM"; `today` is "YYYY-MM-DD". */
+/**
+ * Month calendar. `month` is "YYYY-MM"; `today` is "YYYY-MM-DD". On larger
+ * screens each day lists its events; on phones a dot marks each event (the
+ * month's list below the calendar gives the details).
+ */
 export function MonthGrid({
   month,
   today,
@@ -48,8 +52,14 @@ export function MonthGrid({
             <div
               key={index}
               className={cn(
-                "min-h-24 border-r border-b border-border p-1.5 text-xs [&:nth-child(7n)]:border-r-0",
-                !day && "bg-surface-sunken/50",
+                "min-h-14 border-r border-b border-border p-1 text-xs sm:min-h-24 sm:p-1.5 [&:nth-child(7n)]:border-r-0",
+                // Today in gold, days with events in green (today wins).
+                !day
+                  ? "bg-surface-sunken/50"
+                  : key === today
+                    ? "bg-brand-gold-soft shadow-[inset_0_0_0_2px_var(--brand-gold)]"
+                    : items.length > 0 &&
+                      "bg-accent-soft shadow-[inset_3px_0_0_var(--accent)]",
               )}
             >
               {day && (
@@ -62,11 +72,29 @@ export function MonthGrid({
                   {day}
                 </span>
               )}
-              <ul className="space-y-1">
+              {items.length > 0 && (
+                <span
+                  aria-hidden
+                  className="flex flex-wrap gap-0.5 px-0.5 sm:hidden"
+                >
+                  {items.slice(0, 4).map((event) => (
+                    <span
+                      key={event.id}
+                      className={cn(
+                        "size-1.5 rounded-full",
+                        event.status === "CANCELADO"
+                          ? "bg-danger"
+                          : "bg-accent",
+                      )}
+                    />
+                  ))}
+                </span>
+              )}
+              <ul className="hidden space-y-1 sm:block">
                 {items.slice(0, MAX_PER_DAY).map((event) => (
                   <li key={event.id}>
                     <Link
-                      href={`/agenda/${event.id}`}
+                      href={`/eventos/${event.id}`}
                       title={event.title}
                       className={cn(
                         "block truncate rounded px-1 py-0.5",

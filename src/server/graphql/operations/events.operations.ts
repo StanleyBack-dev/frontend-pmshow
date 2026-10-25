@@ -25,11 +25,62 @@ export const venueFieldsFragment = graphql(`
   fragment VenueFields on Venue {
     id
     name
-    address
+    zipCode
+    street
+    number
+    complement
+    district
     city
+    state
+    fullAddress
     mapsUrl
     notes
     archived
+  }
+`);
+
+export const eventsPageDocument = graphql(`
+  query EventsPage($filter: EventPageFilterInput, $page: PageInput) {
+    eventsPage(filter: $filter, page: $page) {
+      total
+      page
+      limit
+      totalPages
+      items {
+        ...EventFields
+        setlistCount
+        rosterSummary {
+          status
+          assignments
+        }
+      }
+    }
+  }
+`);
+
+export const venuesPageDocument = graphql(`
+  query VenuesPage($filter: VenueFilterInput, $page: PageInput) {
+    venuesPage(filter: $filter, page: $page) {
+      total
+      page
+      limit
+      totalPages
+      items {
+        ...VenueFields
+      }
+    }
+  }
+`);
+
+export const zipCodeAddressDocument = graphql(`
+  query ZipCodeAddress($zipCode: String!) {
+    zipCodeAddress(zipCode: $zipCode) {
+      zipCode
+      street
+      district
+      city
+      state
+    }
   }
 `);
 
@@ -62,6 +113,7 @@ export const eventDocument = graphql(`
           title
           musicalKey
           durationSeconds
+          lyrics
           archivedAt
           media {
             id

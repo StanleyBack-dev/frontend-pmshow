@@ -9,6 +9,7 @@ import { repertoireClient } from "@/features/repertoire/api/repertoire.client";
 import { MediaItemActions } from "@/features/repertoire/components/MediaItemActions";
 import type { MediaAsset } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { urlError } from "@/shared/lib/masks";
 
 // Thumbnail first; the YouTube player (privacy-enhanced domain) loads only
 // when someone presses play, so pages stay light and nothing is sent to
@@ -107,16 +108,20 @@ export function AddVideoForm({ songId }: { songId: string }) {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <Field
           label="Link do YouTube"
+          required
+          type="url"
+          inputMode="url"
           placeholder="https://youtu.be/…"
           className="flex-1"
           value={link}
           onChange={(event) => setLink(event.target.value)}
+          error={urlError(link) ?? undefined}
         />
         <Button
           type="submit"
           variant="secondary"
           loading={pending}
-          disabled={!link.trim()}
+          disabled={!link.trim() || Boolean(urlError(link))}
           icon={<Plus className="size-4" />}
         >
           Adicionar vídeo

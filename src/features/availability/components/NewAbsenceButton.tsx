@@ -125,6 +125,7 @@ export function NewAbsenceButton({
           {forSomeone && (
             <Select
               label="Integrante"
+              required
               placeholder="Escolha"
               value={userId}
               options={members.map((m) => ({
@@ -136,6 +137,7 @@ export function NewAbsenceButton({
           )}
           <Select
             label="Motivo"
+            required
             value={type}
             options={ABSENCE_TYPES.map((value) => ({
               value,
@@ -146,6 +148,7 @@ export function NewAbsenceButton({
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="De"
+              required
               type="date"
               value={startsOn}
               onChange={(e) => {
@@ -157,6 +160,7 @@ export function NewAbsenceButton({
             />
             <Field
               label="Até (inclusive)"
+              required
               type="date"
               min={startsOn || undefined}
               value={endsOn}

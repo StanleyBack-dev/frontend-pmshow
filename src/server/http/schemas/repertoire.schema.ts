@@ -2,7 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { enumLike, optionalText } from "@/server/http/schemas/fields";
 import type { MemberStatus, Rank, Section } from "@/shared/contracts/members";
-import type { SongCategory } from "@/shared/contracts/repertoire";
+import type { SongCategory, SongStage } from "@/shared/contracts/repertoire";
 
 const optionalInt = z
   .number()
@@ -12,7 +12,11 @@ const optionalInt = z
 
 export const songInputSchema = z.object({
   title: z.string().trim().min(1).max(160),
-  artist: optionalText(160),
+  artistId: z
+    .uuid()
+    .nullish()
+    .transform((value) => value ?? null),
+  stage: enumLike<SongStage>(),
   arranger: optionalText(160),
   category: enumLike<SongCategory>(),
   musicalKey: optionalText(8),
@@ -46,4 +50,9 @@ export const audioUploadRequestSchema = z.object({
   title: z.string().trim().min(1).max(160),
   mimeType: z.string().min(3).max(64),
   sizeBytes: z.number().positive(),
+});
+
+export const artistInputSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  archived: z.boolean().optional(),
 });

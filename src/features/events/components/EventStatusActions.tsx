@@ -133,6 +133,7 @@ export function EventStatusActions({ event }: { event: BandEvent }) {
           {action?.to === "CANCELADO" && (
             <TextArea
               label="Motivo do cancelamento"
+              required
               rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}

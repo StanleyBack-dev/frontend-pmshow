@@ -12,21 +12,37 @@ import { NotificationList } from "@/features/notifications/components/Notificati
 import { authed } from "@/server/auth/current-user";
 import { requestTime } from "@/server/request-time";
 import { notificationsService } from "@/server/services/notifications.service";
+import {
+  PAGE_SIZES,
+  buildHref,
+  pageSizeParam,
+  pageSizeQuery,
+  type RawSearchParams,
+} from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Notificações" };
 
 export default async function NotificationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ filtro?: string; pagina?: string }>;
+  searchParams: Promise<RawSearchParams>;
 }) {
-  const { filtro, pagina } = await searchParams;
-  const unreadOnly = filtro === "nao-lidas";
-  const page = Math.max(1, Number(pagina) || 1);
+  const params = await searchParams;
+  const unreadOnly = params.filtro === "nao-lidas";
+  const page = Math.max(1, Number(params.pagina) || 1);
+  const pageSize = pageSizeParam(params);
   const [result, now] = await Promise.all([
-    authed((token) => notificationsService.list(token, unreadOnly, page)),
+    authed((token) =>
+      notificationsService.list(token, unreadOnly, page, pageSize),
+    ),
     requestTime(),
   ]);
+  const hrefWith = (overrides: Record<string, string | number | undefined>) =>
+    buildHref("/notificacoes", {
+      filtro: unreadOnly ? "nao-lidas" : undefined,
+      "por-pagina": pageSizeQuery(pageSize),
+      ...overrides,
+    });
 
   return (
     <>
@@ -73,19 +89,19 @@ export default async function NotificationsPage({
             notifications={result.items}
             now={now.toISOString()}
           />
-          <div className="mt-4">
+          <Card className="mt-4">
             <Pagination
               page={result.page}
               totalPages={result.totalPages}
               total={result.total}
-              hrefFor={(target) =>
-                `/notificacoes?${new URLSearchParams({
-                  ...(unreadOnly ? { filtro: "nao-lidas" } : {}),
-                  pagina: String(target),
-                })}`
+              pageSize={pageSize}
+              hrefFor={(target) => hrefWith({ pagina: target })}
+              pageSizes={PAGE_SIZES}
+              pageSizeHref={(size) =>
+                hrefWith({ "por-pagina": size, pagina: undefined })
               }
             />
-          </div>
+          </Card>
         </>
       )}
     </>

@@ -2,7 +2,11 @@
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
-import { inputClasses, labelClasses } from "@/design-system/components/Field";
+import {
+  inputClasses,
+  labelClasses,
+  RequiredMark,
+} from "@/design-system/components/Field";
 import { Spinner } from "@/design-system/components/Spinner";
 import { cn } from "@/design-system/utils/cn";
 
@@ -28,6 +32,8 @@ type ComboboxProps = {
   emptyText?: string;
   footer?: string;
   disabled?: boolean;
+  /** Marks the field with "*" (and aria-required). */
+  required?: boolean;
   className?: string;
 };
 
@@ -46,6 +52,7 @@ export function Combobox({
   emptyText = "Nenhum resultado",
   footer,
   disabled = false,
+  required = false,
   className,
 }: ComboboxProps) {
   const id = useId();
@@ -127,6 +134,7 @@ export function Combobox({
     <div ref={rootRef} className={cn("relative", className)}>
       <label htmlFor={id} className={cn(labelClasses, hideLabel && "sr-only")}>
         {label}
+        {required && <RequiredMark />}
       </label>
       <div className="relative">
         <Search
@@ -137,6 +145,7 @@ export function Combobox({
           id={id}
           type="text"
           role="combobox"
+          aria-required={required || undefined}
           aria-expanded={open}
           aria-controls={listId}
           aria-autocomplete="list"

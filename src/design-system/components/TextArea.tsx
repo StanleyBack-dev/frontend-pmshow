@@ -1,5 +1,9 @@
 import { useId, type TextareaHTMLAttributes } from "react";
-import { inputClasses, labelClasses } from "@/design-system/components/Field";
+import {
+  inputClasses,
+  labelClasses,
+  RequiredMark,
+} from "@/design-system/components/Field";
 import { cn } from "@/design-system/utils/cn";
 
 type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
@@ -23,6 +27,7 @@ export function TextArea({
     <div className={className}>
       <label htmlFor={textareaId} className={labelClasses}>
         {label}
+        {props.required && <RequiredMark />}
       </label>
       <textarea
         id={textareaId}

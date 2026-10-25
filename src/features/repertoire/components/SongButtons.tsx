@@ -6,10 +6,10 @@ import { Archive, ArchiveRestore, Pencil, Plus } from "lucide-react";
 import { Alert, Button, Modal } from "@/design-system";
 import { repertoireClient } from "@/features/repertoire/api/repertoire.client";
 import { SongFormDrawer } from "@/features/repertoire/components/SongFormDrawer";
-import type { Song } from "@/shared/contracts/repertoire";
+import type { Artist, Song } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
 
-export function NewSongButton() {
+export function NewSongButton({ artists }: { artists: Artist[] }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -17,12 +17,20 @@ export function NewSongButton() {
         Nova música
       </Button>
       {/* Remounted on each open, so the form starts empty. */}
-      {open && <SongFormDrawer open onClose={() => setOpen(false)} />}
+      {open && (
+        <SongFormDrawer open artists={artists} onClose={() => setOpen(false)} />
+      )}
     </>
   );
 }
 
-export function EditSongButton({ song }: { song: Song }) {
+export function EditSongButton({
+  song,
+  artists,
+}: {
+  song: Song;
+  artists: Artist[];
+}) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -35,7 +43,45 @@ export function EditSongButton({ song }: { song: Song }) {
         Editar
       </Button>
       {open && (
-        <SongFormDrawer open song={song} onClose={() => setOpen(false)} />
+        <SongFormDrawer
+          open
+          song={song}
+          artists={artists}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
+// Pencil at the start of a repertoire row: the only way to open the form
+// from the list (the row itself is not clickable).
+export function EditSongIconButton({
+  song,
+  artists,
+}: {
+  song: Song;
+  artists: Artist[];
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={`Editar ${song.title}`}
+        title="Editar música"
+        className="grid size-8 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg"
+      >
+        <Pencil aria-hidden className="size-4" />
+      </button>
+      {open && (
+        <SongFormDrawer
+          open
+          song={song}
+          artists={artists}
+          onClose={() => setOpen(false)}
+        />
       )}
     </>
   );

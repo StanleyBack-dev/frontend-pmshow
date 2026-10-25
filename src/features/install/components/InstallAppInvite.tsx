@@ -10,14 +10,17 @@ import {
   useInstallState,
   wasInviteDismissed,
 } from "@/features/install/model/install-store";
+import { usePlayer } from "@/features/player/components/PlayerProvider";
 
 const noopSubscribe = () => () => {};
 
 // One-time invitation to install the app, shown as a small card in the
 // corner. Once the user installs or closes it, it never comes back on this
-// browser; the option stays available in Minha conta.
+// browser; the option stays available in Minha conta. It steps aside while
+// the player is open, so it never covers the player controls.
 export function InstallAppInvite() {
   const { ready, installed, canPrompt, ios } = useInstallState();
+  const playerOpen = Boolean(usePlayer().current);
   // Read on the client only (the server render never shows the invite).
   const dismissedBefore = useSyncExternalStore(
     noopSubscribe,
@@ -27,7 +30,9 @@ export function InstallAppInvite() {
   const [closed, setClosed] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  if (!ready || installed || dismissedBefore || closed) return null;
+  if (!ready || installed || dismissedBefore || closed || playerOpen) {
+    return null;
+  }
   if (!canPrompt && !ios) return null;
 
   function close() {

@@ -34,6 +34,11 @@ type Documents = {
     "\n  query UserPermissions($id: ID!) {\n    userPermissions(id: $id) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": typeof types.UserPermissionsDocument,
     "\n  mutation SetUserPermissions($input: SetUserPermissionsInput!) {\n    setUserPermissions(input: $input) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": typeof types.SetUserPermissionsDocument,
     "\n  query AuditLogs($filter: AuditFilterInput, $page: PageInput) {\n    auditLogs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        actorId\n        actorName\n        action\n        entity\n        entityId\n        before\n        after\n        ip\n        createdAt\n      }\n    }\n  }\n": typeof types.AuditLogsDocument,
+    "\n  fragment ArtistFields on Artist {\n    id\n    name\n    archived\n    createdAt\n  }\n": typeof types.ArtistFieldsFragmentDoc,
+    "\n  query Artists($includeArchived: Boolean!) {\n    artists(includeArchived: $includeArchived) {\n      ...ArtistFields\n    }\n  }\n": typeof types.ArtistsDocument,
+    "\n  query ArtistsPage($filter: ArtistFilterInput, $page: PageInput) {\n    artistsPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        name\n        archived\n        createdAt\n        songCount\n      }\n    }\n  }\n": typeof types.ArtistsPageDocument,
+    "\n  mutation CreateArtist($input: ArtistInput!) {\n    createArtist(input: $input) {\n      ...ArtistFields\n    }\n  }\n": typeof types.CreateArtistDocument,
+    "\n  mutation UpdateArtist($id: ID!, $input: ArtistInput!) {\n    updateArtist(id: $id, input: $input) {\n      ...ArtistFields\n    }\n  }\n": typeof types.UpdateArtistDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": typeof types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
@@ -48,10 +53,13 @@ type Documents = {
     "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": typeof types.SendBroadcastDocument,
     "\n  query BandDashboard {\n    bandDashboard {\n      activeMembers\n      awayMembers\n      upcomingEvents\n      eventsWithoutRoster\n      pendingAcks\n      swapRequests\n      pendingAbsences\n      absentToday\n      failedNotifications\n    }\n  }\n": typeof types.BandDashboardDocument,
     "\n  fragment EventFields on Event {\n    id\n    title\n    type\n    status\n    callTime\n    startsAt\n    endsAt\n    venueId\n    uniform\n    requester\n    documentRef\n    notes\n    cancellationReason\n    venue {\n      ...VenueFields\n    }\n  }\n": typeof types.EventFieldsFragmentDoc,
-    "\n  fragment VenueFields on Venue {\n    id\n    name\n    address\n    city\n    mapsUrl\n    notes\n    archived\n  }\n": typeof types.VenueFieldsFragmentDoc,
+    "\n  fragment VenueFields on Venue {\n    id\n    name\n    zipCode\n    street\n    number\n    complement\n    district\n    city\n    state\n    fullAddress\n    mapsUrl\n    notes\n    archived\n  }\n": typeof types.VenueFieldsFragmentDoc,
+    "\n  query EventsPage($filter: EventPageFilterInput, $page: PageInput) {\n    eventsPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...EventFields\n        setlistCount\n        rosterSummary {\n          status\n          assignments\n        }\n      }\n    }\n  }\n": typeof types.EventsPageDocument,
+    "\n  query VenuesPage($filter: VenueFilterInput, $page: PageInput) {\n    venuesPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...VenueFields\n      }\n    }\n  }\n": typeof types.VenuesPageDocument,
+    "\n  query ZipCodeAddress($zipCode: String!) {\n    zipCodeAddress(zipCode: $zipCode) {\n      zipCode\n      street\n      district\n      city\n      state\n    }\n  }\n": typeof types.ZipCodeAddressDocument,
     "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n    }\n  }\n": typeof types.EventsDocument,
     "\n  query UpcomingEvents($limit: Int!) {\n    upcomingEvents(limit: $limit) {\n      ...EventFields\n    }\n  }\n": typeof types.UpcomingEventsDocument,
-    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n": typeof types.EventDocument,
+    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n": typeof types.EventDocument,
     "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n": typeof types.CreateEventDocument,
     "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n": typeof types.UpdateEventDocument,
     "\n  mutation ChangeEventStatus($id: ID!, $status: EventStatus!, $reason: String) {\n    changeEventStatus(id: $id, status: $status, reason: $reason) {\n      ...EventFields\n    }\n  }\n": typeof types.ChangeEventStatusDocument,
@@ -77,9 +85,9 @@ type Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": typeof types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": typeof types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
-    "\n  fragment SongFields on Song {\n    id\n    title\n    artist\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": typeof types.SongFieldsFragmentDoc,
+    "\n  fragment SongFields on Song {\n    id\n    title\n    artistId\n    artist {\n      id\n      name\n    }\n    stage\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": typeof types.SongFieldsFragmentDoc,
     "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n": typeof types.MediaAssetFieldsFragmentDoc,
-    "\n  query Songs($filter: SongFilterInput, $page: PageInput) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n      }\n    }\n    songTags\n  }\n": typeof types.SongsDocument,
+    "\n  query Songs($filter: SongFilterInput, $page: PageInput, $archived: Boolean!) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n        media {\n          id\n          kind\n          title\n          youtubeVideoId\n        }\n      }\n    }\n    songTags\n    songTitles(archived: $archived)\n    artists(includeArchived: false) {\n      id\n      name\n      archived\n    }\n  }\n": typeof types.SongsDocument,
     "\n  query Song($id: ID!) {\n    song(id: $id) {\n      ...SongFields\n      media {\n        ...MediaAssetFields\n      }\n    }\n  }\n": typeof types.SongDocument,
     "\n  mutation CreateSong($input: SongInput!) {\n    createSong(input: $input) {\n      ...SongFields\n    }\n  }\n": typeof types.CreateSongDocument,
     "\n  mutation UpdateSong($id: ID!, $input: SongInput!) {\n    updateSong(id: $id, input: $input) {\n      ...SongFields\n    }\n  }\n": typeof types.UpdateSongDocument,
@@ -91,6 +99,8 @@ type Documents = {
     "\n  mutation RemoveMedia($id: ID!) {\n    removeMedia(id: $id)\n  }\n": typeof types.RemoveMediaDocument,
     "\n  query AudioPlaybackUrl($assetId: ID!) {\n    audioPlaybackUrl(assetId: $assetId)\n  }\n": typeof types.AudioPlaybackUrlDocument,
     "\n  query AudioDownloadUrl($assetId: ID!) {\n    audioDownloadUrl(assetId: $assetId)\n  }\n": typeof types.AudioDownloadUrlDocument,
+    "\n  query FindLyrics($artist: String!, $title: String!) {\n    findLyrics(artist: $artist, title: $title) {\n      artist\n      title\n      lyrics\n      sourceUrl\n    }\n  }\n": typeof types.FindLyricsDocument,
+    "\n  query SearchYoutube($query: String!) {\n    searchYoutube(query: $query) {\n      videoId\n      title\n      channelTitle\n      thumbnailUrl\n      publishedAt\n      durationSeconds\n    }\n  }\n": typeof types.SearchYoutubeDocument,
     "\n  fragment AssignmentFields on Assignment {\n    userId\n    role\n    instrumentId\n    instrumentName\n    notes\n    overrideReason\n    ackStatus\n    ackNote\n    ackAt\n    person {\n      name\n      warName\n      rank\n      section\n    }\n  }\n": typeof types.AssignmentFieldsFragmentDoc,
     "\n  fragment RosterFields on Roster {\n    eventId\n    status\n    version\n    publishedAt\n    uncoveredSections\n    assignments {\n      ...AssignmentFields\n    }\n  }\n": typeof types.RosterFieldsFragmentDoc,
     "\n  query EventRoster($eventId: ID!) {\n    eventRoster(eventId: $eventId) {\n      ...RosterFields\n    }\n  }\n": typeof types.EventRosterDocument,
@@ -120,6 +130,11 @@ const documents: Documents = {
     "\n  query UserPermissions($id: ID!) {\n    userPermissions(id: $id) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": types.UserPermissionsDocument,
     "\n  mutation SetUserPermissions($input: SetUserPermissionsInput!) {\n    setUserPermissions(input: $input) {\n      effective\n      defaults\n      overrides {\n        permission\n        allowed\n      }\n    }\n  }\n": types.SetUserPermissionsDocument,
     "\n  query AuditLogs($filter: AuditFilterInput, $page: PageInput) {\n    auditLogs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        actorId\n        actorName\n        action\n        entity\n        entityId\n        before\n        after\n        ip\n        createdAt\n      }\n    }\n  }\n": types.AuditLogsDocument,
+    "\n  fragment ArtistFields on Artist {\n    id\n    name\n    archived\n    createdAt\n  }\n": types.ArtistFieldsFragmentDoc,
+    "\n  query Artists($includeArchived: Boolean!) {\n    artists(includeArchived: $includeArchived) {\n      ...ArtistFields\n    }\n  }\n": types.ArtistsDocument,
+    "\n  query ArtistsPage($filter: ArtistFilterInput, $page: PageInput) {\n    artistsPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        name\n        archived\n        createdAt\n        songCount\n      }\n    }\n  }\n": types.ArtistsPageDocument,
+    "\n  mutation CreateArtist($input: ArtistInput!) {\n    createArtist(input: $input) {\n      ...ArtistFields\n    }\n  }\n": types.CreateArtistDocument,
+    "\n  mutation UpdateArtist($id: ID!, $input: ArtistInput!) {\n    updateArtist(id: $id, input: $input) {\n      ...ArtistFields\n    }\n  }\n": types.UpdateArtistDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
@@ -134,10 +149,13 @@ const documents: Documents = {
     "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": types.SendBroadcastDocument,
     "\n  query BandDashboard {\n    bandDashboard {\n      activeMembers\n      awayMembers\n      upcomingEvents\n      eventsWithoutRoster\n      pendingAcks\n      swapRequests\n      pendingAbsences\n      absentToday\n      failedNotifications\n    }\n  }\n": types.BandDashboardDocument,
     "\n  fragment EventFields on Event {\n    id\n    title\n    type\n    status\n    callTime\n    startsAt\n    endsAt\n    venueId\n    uniform\n    requester\n    documentRef\n    notes\n    cancellationReason\n    venue {\n      ...VenueFields\n    }\n  }\n": types.EventFieldsFragmentDoc,
-    "\n  fragment VenueFields on Venue {\n    id\n    name\n    address\n    city\n    mapsUrl\n    notes\n    archived\n  }\n": types.VenueFieldsFragmentDoc,
+    "\n  fragment VenueFields on Venue {\n    id\n    name\n    zipCode\n    street\n    number\n    complement\n    district\n    city\n    state\n    fullAddress\n    mapsUrl\n    notes\n    archived\n  }\n": types.VenueFieldsFragmentDoc,
+    "\n  query EventsPage($filter: EventPageFilterInput, $page: PageInput) {\n    eventsPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...EventFields\n        setlistCount\n        rosterSummary {\n          status\n          assignments\n        }\n      }\n    }\n  }\n": types.EventsPageDocument,
+    "\n  query VenuesPage($filter: VenueFilterInput, $page: PageInput) {\n    venuesPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...VenueFields\n      }\n    }\n  }\n": types.VenuesPageDocument,
+    "\n  query ZipCodeAddress($zipCode: String!) {\n    zipCodeAddress(zipCode: $zipCode) {\n      zipCode\n      street\n      district\n      city\n      state\n    }\n  }\n": types.ZipCodeAddressDocument,
     "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n    }\n  }\n": types.EventsDocument,
     "\n  query UpcomingEvents($limit: Int!) {\n    upcomingEvents(limit: $limit) {\n      ...EventFields\n    }\n  }\n": types.UpcomingEventsDocument,
-    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n": types.EventDocument,
+    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n": types.EventDocument,
     "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n": types.CreateEventDocument,
     "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n": types.UpdateEventDocument,
     "\n  mutation ChangeEventStatus($id: ID!, $status: EventStatus!, $reason: String) {\n    changeEventStatus(id: $id, status: $status, reason: $reason) {\n      ...EventFields\n    }\n  }\n": types.ChangeEventStatusDocument,
@@ -163,9 +181,9 @@ const documents: Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
-    "\n  fragment SongFields on Song {\n    id\n    title\n    artist\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": types.SongFieldsFragmentDoc,
+    "\n  fragment SongFields on Song {\n    id\n    title\n    artistId\n    artist {\n      id\n      name\n    }\n    stage\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": types.SongFieldsFragmentDoc,
     "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n": types.MediaAssetFieldsFragmentDoc,
-    "\n  query Songs($filter: SongFilterInput, $page: PageInput) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n      }\n    }\n    songTags\n  }\n": types.SongsDocument,
+    "\n  query Songs($filter: SongFilterInput, $page: PageInput, $archived: Boolean!) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n        media {\n          id\n          kind\n          title\n          youtubeVideoId\n        }\n      }\n    }\n    songTags\n    songTitles(archived: $archived)\n    artists(includeArchived: false) {\n      id\n      name\n      archived\n    }\n  }\n": types.SongsDocument,
     "\n  query Song($id: ID!) {\n    song(id: $id) {\n      ...SongFields\n      media {\n        ...MediaAssetFields\n      }\n    }\n  }\n": types.SongDocument,
     "\n  mutation CreateSong($input: SongInput!) {\n    createSong(input: $input) {\n      ...SongFields\n    }\n  }\n": types.CreateSongDocument,
     "\n  mutation UpdateSong($id: ID!, $input: SongInput!) {\n    updateSong(id: $id, input: $input) {\n      ...SongFields\n    }\n  }\n": types.UpdateSongDocument,
@@ -177,6 +195,8 @@ const documents: Documents = {
     "\n  mutation RemoveMedia($id: ID!) {\n    removeMedia(id: $id)\n  }\n": types.RemoveMediaDocument,
     "\n  query AudioPlaybackUrl($assetId: ID!) {\n    audioPlaybackUrl(assetId: $assetId)\n  }\n": types.AudioPlaybackUrlDocument,
     "\n  query AudioDownloadUrl($assetId: ID!) {\n    audioDownloadUrl(assetId: $assetId)\n  }\n": types.AudioDownloadUrlDocument,
+    "\n  query FindLyrics($artist: String!, $title: String!) {\n    findLyrics(artist: $artist, title: $title) {\n      artist\n      title\n      lyrics\n      sourceUrl\n    }\n  }\n": types.FindLyricsDocument,
+    "\n  query SearchYoutube($query: String!) {\n    searchYoutube(query: $query) {\n      videoId\n      title\n      channelTitle\n      thumbnailUrl\n      publishedAt\n      durationSeconds\n    }\n  }\n": types.SearchYoutubeDocument,
     "\n  fragment AssignmentFields on Assignment {\n    userId\n    role\n    instrumentId\n    instrumentName\n    notes\n    overrideReason\n    ackStatus\n    ackNote\n    ackAt\n    person {\n      name\n      warName\n      rank\n      section\n    }\n  }\n": types.AssignmentFieldsFragmentDoc,
     "\n  fragment RosterFields on Roster {\n    eventId\n    status\n    version\n    publishedAt\n    uncoveredSections\n    assignments {\n      ...AssignmentFields\n    }\n  }\n": types.RosterFieldsFragmentDoc,
     "\n  query EventRoster($eventId: ID!) {\n    eventRoster(eventId: $eventId) {\n      ...RosterFields\n    }\n  }\n": types.EventRosterDocument,
@@ -266,6 +286,26 @@ export function graphql(source: "\n  query AuditLogs($filter: AuditFilterInput, 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  fragment ArtistFields on Artist {\n    id\n    name\n    archived\n    createdAt\n  }\n"): typeof import('./graphql').ArtistFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Artists($includeArchived: Boolean!) {\n    artists(includeArchived: $includeArchived) {\n      ...ArtistFields\n    }\n  }\n"): typeof import('./graphql').ArtistsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ArtistsPage($filter: ArtistFilterInput, $page: PageInput) {\n    artistsPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        name\n        archived\n        createdAt\n        songCount\n      }\n    }\n  }\n"): typeof import('./graphql').ArtistsPageDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateArtist($input: ArtistInput!) {\n    createArtist(input: $input) {\n      ...ArtistFields\n    }\n  }\n"): typeof import('./graphql').CreateArtistDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateArtist($id: ID!, $input: ArtistInput!) {\n    updateArtist(id: $id, input: $input) {\n      ...ArtistFields\n    }\n  }\n"): typeof import('./graphql').UpdateArtistDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n      }\n    }\n  }\n"): typeof import('./graphql').LoginDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -322,7 +362,19 @@ export function graphql(source: "\n  fragment EventFields on Event {\n    id\n  
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment VenueFields on Venue {\n    id\n    name\n    address\n    city\n    mapsUrl\n    notes\n    archived\n  }\n"): typeof import('./graphql').VenueFieldsFragmentDoc;
+export function graphql(source: "\n  fragment VenueFields on Venue {\n    id\n    name\n    zipCode\n    street\n    number\n    complement\n    district\n    city\n    state\n    fullAddress\n    mapsUrl\n    notes\n    archived\n  }\n"): typeof import('./graphql').VenueFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query EventsPage($filter: EventPageFilterInput, $page: PageInput) {\n    eventsPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...EventFields\n        setlistCount\n        rosterSummary {\n          status\n          assignments\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EventsPageDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query VenuesPage($filter: VenueFilterInput, $page: PageInput) {\n    venuesPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...VenueFields\n      }\n    }\n  }\n"): typeof import('./graphql').VenuesPageDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ZipCodeAddress($zipCode: String!) {\n    zipCodeAddress(zipCode: $zipCode) {\n      zipCode\n      street\n      district\n      city\n      state\n    }\n  }\n"): typeof import('./graphql').ZipCodeAddressDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -334,7 +386,7 @@ export function graphql(source: "\n  query UpcomingEvents($limit: Int!) {\n    u
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EventDocument;
+export function graphql(source: "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EventDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -438,7 +490,7 @@ export function graphql(source: "\n  mutation SendTestPush {\n    sendTestPush\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment SongFields on Song {\n    id\n    title\n    artist\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n"): typeof import('./graphql').SongFieldsFragmentDoc;
+export function graphql(source: "\n  fragment SongFields on Song {\n    id\n    title\n    artistId\n    artist {\n      id\n      name\n    }\n    stage\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n"): typeof import('./graphql').SongFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -446,7 +498,7 @@ export function graphql(source: "\n  fragment MediaAssetFields on MediaAsset {\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Songs($filter: SongFilterInput, $page: PageInput) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n      }\n    }\n    songTags\n  }\n"): typeof import('./graphql').SongsDocument;
+export function graphql(source: "\n  query Songs($filter: SongFilterInput, $page: PageInput, $archived: Boolean!) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n        media {\n          id\n          kind\n          title\n          youtubeVideoId\n        }\n      }\n    }\n    songTags\n    songTitles(archived: $archived)\n    artists(includeArchived: false) {\n      id\n      name\n      archived\n    }\n  }\n"): typeof import('./graphql').SongsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -491,6 +543,14 @@ export function graphql(source: "\n  query AudioPlaybackUrl($assetId: ID!) {\n  
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query AudioDownloadUrl($assetId: ID!) {\n    audioDownloadUrl(assetId: $assetId)\n  }\n"): typeof import('./graphql').AudioDownloadUrlDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query FindLyrics($artist: String!, $title: String!) {\n    findLyrics(artist: $artist, title: $title) {\n      artist\n      title\n      lyrics\n      sourceUrl\n    }\n  }\n"): typeof import('./graphql').FindLyricsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SearchYoutube($query: String!) {\n    searchYoutube(query: $query) {\n      videoId\n      title\n      channelTitle\n      thumbnailUrl\n      publishedAt\n      durationSeconds\n    }\n  }\n"): typeof import('./graphql').SearchYoutubeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -26,6 +26,7 @@ export type RosterQuery = {
   instrumentId?: string;
   withProfile?: boolean;
   page: number;
+  limit?: number;
 };
 
 export const membersService = {
@@ -43,7 +44,7 @@ export const membersService = {
           instrumentId: query.instrumentId,
           withProfile: query.withProfile,
         },
-        page: { page: query.page, limit: 30 },
+        page: { page: query.page, limit: query.limit ?? 10 },
       },
     });
     return roster;

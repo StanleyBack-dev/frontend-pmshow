@@ -10,6 +10,16 @@ export const inputClasses = cn(
   "disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-soft",
 );
 
+/** The "*" after the label of a required field (the input carries
+ * `required` / `aria-required` for assistive technology). */
+export function RequiredMark() {
+  return (
+    <span aria-hidden className="ml-0.5 text-danger">
+      *
+    </span>
+  );
+}
+
 export const labelClasses =
   "mb-1.5 block text-[11px] font-semibold tracking-[0.08em] text-muted uppercase";
 
@@ -42,6 +52,7 @@ export function Field({
     <div className={className}>
       <label htmlFor={inputId} className={labelClasses}>
         {label}
+        {props.required && <RequiredMark />}
       </label>
       <div className="relative">
         {icon && (

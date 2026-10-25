@@ -49,6 +49,11 @@ export type CandidateBlocker =
   /** Sem cadastro ativo na banda. */
   | 'NO_PROFILE';
 
+/** Próximos (a partir de agora) ou passados. */
+export type EventPeriod =
+  | 'PAST'
+  | 'UPCOMING';
+
 export type EventStatus =
   | 'CANCELADO'
   | 'CONFIRMADO'
@@ -157,6 +162,11 @@ export type SongCategory =
   | 'POP_ROCK'
   | 'SAMBA_PAGODE'
   | 'SERTANEJO';
+
+/** NOVA: a banda ainda vai aprender; CONHECIDA: já toca. */
+export type SongStage =
+  | 'CONHECIDA'
+  | 'NOVA';
 
 /** Perfil de acesso: Músico, Gestor ou Administrador geral. */
 export type UserGroup =
