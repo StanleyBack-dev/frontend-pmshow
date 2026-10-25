@@ -28,7 +28,7 @@ export function BandDashboardPanel({
       tone: "accent" as const,
     },
     {
-      href: "/agenda",
+      href: "/eventos",
       label: "Eventos em 30 dias",
       value: dashboard.upcomingEvents,
       hint:
@@ -42,7 +42,7 @@ export function BandDashboardPanel({
           : ("success" as const),
     },
     {
-      href: "/agenda",
+      href: "/eventos",
       label: "Ciências pendentes",
       value: dashboard.pendingAcks,
       hint:

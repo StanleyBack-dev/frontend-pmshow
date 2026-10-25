@@ -17,9 +17,11 @@ import {
 import {
   CATEGORY_LABELS,
   formatDuration,
+  STAGE_LABELS,
 } from "@/features/repertoire/model/repertoire-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { BackendError } from "@/server/http/backend-error";
+import { artistsService } from "@/server/services/artists.service";
 import { repertoireService } from "@/server/services/repertoire.service";
 import { can } from "@/shared/lib/access";
 
@@ -37,9 +39,14 @@ export default async function SongPage({
 
   const { id } = await params;
   if (!UUID.test(id)) notFound();
-  const song = await authed(async (token) => {
+  const canManage = can(user, "REPERTOIRE_MANAGE");
+  const [song, artists] = await authed(async (token) => {
     try {
-      return await repertoireService.song(token, id);
+      return await Promise.all([
+        repertoireService.song(token, id),
+        // Options of the edit form (only managers can edit).
+        canManage ? artistsService.list(token) : [],
+      ]);
     } catch (error) {
       if (error instanceof BackendError && error.code === "SONG_NOT_FOUND") {
         notFound();
@@ -48,12 +55,11 @@ export default async function SongPage({
     }
   });
 
-  const canManage = can(user, "REPERTOIRE_MANAGE");
   const canUpload = can(user, "MEDIA_UPLOAD") && !song.archivedAt;
   const audios = song.media.filter((item) => item.kind === "AUDIO");
   const videos = song.media.filter((item) => item.kind === "VIDEO");
   const details = [
-    ["Compositor / intérprete", song.artist],
+    ["Cantor / banda", song.artist?.name],
     ["Arranjo", song.arranger],
     ["Tonalidade", song.musicalKey],
     ["Andamento", song.bpm ? `${song.bpm} BPM` : null],
@@ -84,6 +90,9 @@ export default async function SongPage({
           description={
             <span className="inline-flex flex-wrap items-center gap-1.5">
               <Badge tone="accent">{CATEGORY_LABELS[song.category]}</Badge>
+              <Badge tone={STAGE_LABELS[song.stage].tone}>
+                {STAGE_LABELS[song.stage].short}
+              </Badge>
               {song.tags.map((tag) => (
                 <Link
                   key={tag}
@@ -97,7 +106,9 @@ export default async function SongPage({
           action={
             canManage ? (
               <span className="flex gap-2">
-                {!song.archivedAt && <EditSongButton song={song} />}
+                {!song.archivedAt && (
+                  <EditSongButton song={song} artists={artists} />
+                )}
                 <ArchiveSongButton song={song} />
               </span>
             ) : undefined
@@ -129,6 +140,7 @@ export default async function SongPage({
         <CardBody className="space-y-4">
           <AudioList
             songTitle={song.title}
+            lyrics={song.lyrics}
             audios={audios}
             canDownload={can(user, "MEDIA_DOWNLOAD")}
             canManage={canUpload}

@@ -81,6 +81,7 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <Select
           label="Para"
+          required
           value={audience}
           options={AUDIENCES.map((value) => ({
             value,
@@ -91,6 +92,7 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
         {audience === "NAIPE" && (
           <Select
             label="Naipe"
+            required
             placeholder="Escolha"
             value={section}
             options={SECTIONS.map((value) => ({
@@ -103,6 +105,7 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
         {audience === "ESCALA_EVENTO" && (
           <Select
             label="Evento"
+            required
             placeholder={events.length ? "Escolha" : "Nenhum evento próximo"}
             value={eventId}
             options={events.map((event) => ({
@@ -115,6 +118,7 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
       </div>
       <Field
         label="Título"
+        required
         maxLength={120}
         value={title}
         onChange={(e) => {
@@ -124,6 +128,7 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
       />
       <TextArea
         label="Mensagem"
+        required
         rows={5}
         maxLength={2000}
         value={body}

@@ -85,10 +85,10 @@ export default async function EventPage({
   return (
     <div className="space-y-6">
       <Link
-        href="/agenda"
+        href="/eventos"
         className="inline-flex items-center gap-1 text-sm text-muted hover:text-fg"
       >
-        <ArrowLeft className="size-4" /> Agenda
+        <ArrowLeft className="size-4" /> Eventos
       </Link>
 
       {event.status === "CANCELADO" && (
@@ -132,11 +132,7 @@ export default async function EventPage({
             {event.venue ? (
               <div className="text-fg">
                 <p className="font-medium">{event.venue.name}</p>
-                <p className="text-muted">
-                  {[event.venue.address, event.venue.city]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
+                <p className="text-muted">{event.venue.fullAddress}</p>
                 {event.venue.mapsUrl && (
                   <a
                     href={event.venue.mapsUrl}
@@ -204,7 +200,7 @@ export default async function EventPage({
                   )}
                   {canBuildRoster && open && (
                     <Link
-                      href={`/agenda/${event.id}/escala`}
+                      href={`/eventos/${event.id}/escala`}
                       className={buttonClasses("secondary", "sm")}
                     >
                       <ClipboardList className="size-4" />
@@ -236,8 +232,8 @@ export default async function EventPage({
         </Card>
       )}
 
-      <Card>
-        <CardHeader title="Setlist" />
+      <Card id="musicas" className="scroll-mt-20">
+        <CardHeader title="Lista de músicas" />
         <CardBody>
           <Setlist
             eventId={event.id}

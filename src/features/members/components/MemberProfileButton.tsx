@@ -31,6 +31,13 @@ import type {
   Section,
 } from "@/shared/contracts/members";
 import { ApiClientError } from "@/shared/lib/api-client";
+import {
+  maskPhone,
+  maskRegistration,
+  maskWarName,
+  phoneError,
+  registrationError,
+} from "@/shared/lib/masks";
 
 type Form = Omit<MemberProfileInput, "registration" | "phone" | "notes"> & {
   registration: string;
@@ -69,6 +76,8 @@ export function MemberProfileButton({
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Form>(() => fromProfile(profile));
   const [error, setError] = useState<string | null>(null);
+  // Field errors show once the field was left (or on save).
+  const [touched, setTouched] = useState({ registration: false, phone: false });
   const [pending, setPending] = useState(false);
   const set = <K extends keyof Form>(key: K, value: Form[K]) =>
     setForm((current) => ({ ...current, [key]: value }));
@@ -100,6 +109,10 @@ export function MemberProfileButton({
   }
 
   async function submit() {
+    if (phoneError(form.phone) || registrationError(form.registration)) {
+      setTouched({ registration: true, phone: true });
+      return setError("Corrija os campos destacados.");
+    }
     setPending(true);
     setError(null);
     try {
@@ -172,6 +185,7 @@ export function MemberProfileButton({
           <div className="grid gap-4 sm:grid-cols-2">
             <Select
               label="Posto / graduação"
+              required
               value={form.rank}
               onChange={(event) => set("rank", event.target.value as Rank)}
               options={RANKS.map((value) => ({
@@ -181,14 +195,18 @@ export function MemberProfileButton({
             />
             <Field
               label="Nome de guerra"
+              required
               placeholder="Ex.: SILVA"
               value={form.warName}
-              onChange={(event) => set("warName", event.target.value)}
+              onChange={(event) =>
+                set("warName", maskWarName(event.target.value))
+              }
             />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Select
               label="Naipe"
+              required
               value={form.section}
               onChange={(event) =>
                 set("section", event.target.value as Section)
@@ -200,6 +218,7 @@ export function MemberProfileButton({
             />
             <Select
               label="Situação"
+              required
               value={form.status}
               onChange={(event) =>
                 set("status", event.target.value as MemberStatus)
@@ -213,15 +232,29 @@ export function MemberProfileButton({
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="Matrícula"
+              autoCapitalize="characters"
+              placeholder="Letras e números"
               value={form.registration}
-              onChange={(event) => set("registration", event.target.value)}
+              onChange={(event) =>
+                set("registration", maskRegistration(event.target.value))
+              }
+              onBlur={() => setTouched((t) => ({ ...t, registration: true }))}
+              error={
+                (touched.registration &&
+                  registrationError(form.registration)) ||
+                undefined
+              }
             />
             <Field
               label="Telefone"
+              type="tel"
               inputMode="tel"
+              autoComplete="tel-national"
               placeholder="(62) 99999-0000"
               value={form.phone}
-              onChange={(event) => set("phone", event.target.value)}
+              onChange={(event) => set("phone", maskPhone(event.target.value))}
+              onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
+              error={(touched.phone && phoneError(form.phone)) || undefined}
             />
           </div>
 

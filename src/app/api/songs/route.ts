@@ -10,12 +10,13 @@ export const GET = bffRoute(async (request) => {
     search,
     archived: false,
     page: 1,
+    limit: 15,
   });
   return NextResponse.json(
     songs.items.slice(0, 15).map((song) => ({
       id: song.id,
       title: song.title,
-      artist: song.artist,
+      artist: song.artist?.name ?? null,
       musicalKey: song.musicalKey,
     })),
   );

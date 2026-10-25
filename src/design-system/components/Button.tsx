@@ -3,7 +3,7 @@ import { Spinner } from "@/design-system/components/Spinner";
 import { cn } from "@/design-system/utils/cn";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
-export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 const variants: Record<ButtonVariant, string> = {
   // Solid PM green: the main action.
@@ -21,6 +21,8 @@ const sizes: Record<ButtonSize, string> = {
   sm: "h-8 px-3 text-xs gap-1.5",
   md: "h-9 px-4 text-[13px] gap-2",
   lg: "h-11 px-6 text-sm gap-2",
+  // Square, icon-only (give it an aria-label).
+  icon: "size-9 shrink-0",
 };
 
 export function buttonClasses(

@@ -6,22 +6,58 @@ import {
   createVenueDocument,
   eventDocument,
   eventsDocument,
+  eventsPageDocument,
   setEventSetlistDocument,
   upcomingEventsDocument,
   updateEventDocument,
   updateVenueDocument,
   venuesDocument,
+  venuesPageDocument,
+  zipCodeAddressDocument,
 } from "@/server/graphql/operations/events.operations";
+import type { Paginated } from "@/shared/contracts/api";
 import type {
   BandEvent,
   EventInput,
+  EventListItem,
+  EventPeriod,
   EventStatus,
+  EventType,
   EventWithSetlist,
   Venue,
   VenueInput,
+  ZipCodeAddress,
 } from "@/shared/contracts/events";
 
+export type EventPageQuery = {
+  search?: string;
+  type?: EventType;
+  status?: EventStatus;
+  period?: EventPeriod;
+  page: number;
+  limit: number;
+};
+
 export const eventsService = {
+  async page(
+    token: string,
+    query: EventPageQuery,
+  ): Promise<Paginated<EventListItem>> {
+    const { eventsPage } = await backendGraphql(eventsPageDocument, {
+      token,
+      variables: {
+        filter: {
+          search: query.search || undefined,
+          type: query.type,
+          statuses: query.status ? [query.status] : undefined,
+          period: query.period,
+        },
+        page: { page: query.page, limit: query.limit },
+      },
+    });
+    return eventsPage;
+  },
+
   async list(
     token: string,
     range: { from: string; to: string },
@@ -91,6 +127,31 @@ export const eventsService = {
       token,
       variables: { id, input: { items } },
     });
+  },
+
+  async venuesPage(
+    token: string,
+    query: { search?: string; archived: boolean; page: number; limit: number },
+  ): Promise<Paginated<Venue>> {
+    const { venuesPage } = await backendGraphql(venuesPageDocument, {
+      token,
+      variables: {
+        filter: { search: query.search || undefined, archived: query.archived },
+        page: { page: query.page, limit: query.limit },
+      },
+    });
+    return venuesPage;
+  },
+
+  async zipCodeAddress(
+    token: string,
+    zipCode: string,
+  ): Promise<ZipCodeAddress | null> {
+    const { zipCodeAddress } = await backendGraphql(zipCodeAddressDocument, {
+      token,
+      variables: { zipCode },
+    });
+    return zipCodeAddress ?? null;
   },
 
   async venues(token: string, includeArchived = false): Promise<Venue[]> {

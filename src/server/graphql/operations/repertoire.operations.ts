@@ -4,7 +4,12 @@ export const songFieldsFragment = graphql(`
   fragment SongFields on Song {
     id
     title
-    artist
+    artistId
+    artist {
+      id
+      name
+    }
+    stage
     arranger
     category
     musicalKey
@@ -36,7 +41,7 @@ export const mediaAssetFieldsFragment = graphql(`
 `);
 
 export const songsDocument = graphql(`
-  query Songs($filter: SongFilterInput, $page: PageInput) {
+  query Songs($filter: SongFilterInput, $page: PageInput, $archived: Boolean!) {
     songs(filter: $filter, page: $page) {
       total
       page
@@ -44,9 +49,21 @@ export const songsDocument = graphql(`
       totalPages
       items {
         ...SongFields
+        media {
+          id
+          kind
+          title
+          youtubeVideoId
+        }
       }
     }
     songTags
+    songTitles(archived: $archived)
+    artists(includeArchived: false) {
+      id
+      name
+      archived
+    }
   }
 `);
 
@@ -139,5 +156,29 @@ export const audioPlaybackUrlDocument = graphql(`
 export const audioDownloadUrlDocument = graphql(`
   query AudioDownloadUrl($assetId: ID!) {
     audioDownloadUrl(assetId: $assetId)
+  }
+`);
+
+export const findLyricsDocument = graphql(`
+  query FindLyrics($artist: String!, $title: String!) {
+    findLyrics(artist: $artist, title: $title) {
+      artist
+      title
+      lyrics
+      sourceUrl
+    }
+  }
+`);
+
+export const searchYoutubeDocument = graphql(`
+  query SearchYoutube($query: String!) {
+    searchYoutube(query: $query) {
+      videoId
+      title
+      channelTitle
+      thumbnailUrl
+      publishedAt
+      durationSeconds
+    }
   }
 `);

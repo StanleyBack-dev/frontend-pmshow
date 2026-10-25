@@ -16,6 +16,8 @@ type ModalProps = {
   footer?: ReactNode;
   /** Blocks closing (Esc / backdrop) while an action is in flight. */
   busy?: boolean;
+  /** "lg" for dialogs that show a list (e.g. search results). */
+  size?: "md" | "lg";
 };
 
 // Centered dialog for short, focused steps (confirmations, a reason to
@@ -31,6 +33,7 @@ export function Modal({
   children,
   footer,
   busy = false,
+  size = "md",
 }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -38,7 +41,13 @@ export function Modal({
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // showModal() focuses the first control (the close button); a field
+      // marked data-autofocus takes the focus instead (React's autoFocus
+      // runs before the dialog opens and is lost).
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
@@ -54,7 +63,10 @@ export function Modal({
       onClick={(event) => {
         if (event.target === ref.current && !busy) onClose();
       }}
-      className="m-auto w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-lg border border-border bg-surface p-0 text-fg shadow-pop backdrop:bg-black/55 backdrop:backdrop-blur-sm"
+      className={cn(
+        "m-auto w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-border bg-surface p-0 text-fg shadow-pop backdrop:bg-black/55 backdrop:backdrop-blur-sm",
+        size === "lg" ? "max-w-2xl" : "max-w-md",
+      )}
     >
       <div className="flex items-center gap-3 border-b border-chrome-line bg-chrome px-5 py-4">
         {icon && (

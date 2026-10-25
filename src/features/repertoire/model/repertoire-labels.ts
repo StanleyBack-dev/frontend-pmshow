@@ -1,4 +1,5 @@
-import type { SongCategory } from "@/shared/contracts/repertoire";
+import type { Tone } from "@/design-system";
+import type { SongCategory, SongStage } from "@/shared/contracts/repertoire";
 
 export const CATEGORY_LABELS: Record<SongCategory, string> = {
   HINO: "Hino",
@@ -17,20 +18,21 @@ export const CATEGORY_LABELS: Record<SongCategory, string> = {
 
 export const CATEGORIES = Object.keys(CATEGORY_LABELS) as SongCategory[];
 
+export const STAGE_LABELS: Record<
+  SongStage,
+  { label: string; short: string; tone: Tone }
+> = {
+  NOVA: { label: "Nova (para aprender)", short: "Nova", tone: "gold" },
+  CONHECIDA: { label: "Já tocamos", short: "Já tocamos", tone: "success" },
+};
+
+export const STAGES = Object.keys(STAGE_LABELS) as SongStage[];
+
 /** 245 → "4:05". */
 export function formatDuration(seconds: number | null | undefined): string {
   if (!seconds || seconds < 0) return "—";
   const minutes = Math.floor(seconds / 60);
   return `${minutes}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
-}
-
-/** "4:05" or "245" → 245; null when empty or not a duration. */
-export function parseDuration(value: string): number | null {
-  const text = value.trim();
-  if (!text) return null;
-  const match = /^(\d{1,2}):([0-5]\d)$/.exec(text);
-  if (match) return Number(match[1]) * 60 + Number(match[2]);
-  return /^\d{1,4}$/.test(text) ? Number(text) : Number.NaN;
 }
 
 export function formatBytes(bytes: number | null | undefined): string {

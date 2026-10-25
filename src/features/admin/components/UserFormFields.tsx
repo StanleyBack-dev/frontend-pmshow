@@ -6,6 +6,7 @@ import {
   GROUP_LABELS,
 } from "@/features/access/model/access-labels";
 import type { UserGroup, UserInput } from "@/shared/contracts/api";
+import { maskUsername, usernameError } from "@/shared/lib/masks";
 
 export function UserFormFields({
   value,
@@ -43,8 +44,9 @@ export function UserFormFields({
           required
           value={value.username}
           onChange={(event) =>
-            set("username", event.target.value.toLowerCase().trim())
+            set("username", maskUsername(event.target.value))
           }
+          error={usernameError(value.username) ?? undefined}
         />
         <p className="mt-1.5 text-xs text-soft">
           3 a 32 caracteres: letras minúsculas, números, ponto, hífen ou
@@ -54,6 +56,7 @@ export function UserFormFields({
       <div>
         <Select
           label="Grupo"
+          required
           value={value.group}
           onChange={(event) => set("group", event.target.value as UserGroup)}
           options={assignableGroups.map((group) => ({

@@ -40,7 +40,7 @@ export function EventRow({ event }: { event: BandEvent }) {
   const cancelled = event.status === "CANCELADO";
   return (
     <Link
-      href={`/agenda/${event.id}`}
+      href={`/eventos/${event.id}`}
       className="flex items-start gap-3 px-4 py-3 hover:bg-surface-muted"
     >
       <span className="w-12 shrink-0 pt-0.5 text-sm font-semibold text-accent tabular-nums">

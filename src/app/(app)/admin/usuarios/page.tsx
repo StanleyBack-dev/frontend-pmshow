@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Users } from "lucide-react";
 import {
   Card,
@@ -13,16 +12,19 @@ import {
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { GROUP_LABELS, GROUPS } from "@/features/access/model/access-labels";
 import { CreateUserButton } from "@/features/admin/components/CreateUserButton";
-import { UserStatusBadges } from "@/features/admin/components/UserStatusBadges";
+import { UsersTable } from "@/features/admin/components/UsersTable";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { adminService } from "@/server/services/admin.service";
 import { assignableGroups, can } from "@/shared/lib/access";
-import { formatDateTime } from "@/shared/lib/format";
 import {
   buildHref,
   firstParam,
   oneOf,
+  DEFAULT_PAGE_SIZE,
+  PAGE_SIZES,
   pageParam,
+  pageSizeParam,
+  pageSizeQuery,
   type RawSearchParams,
 } from "@/shared/lib/search-params";
 
@@ -43,6 +45,15 @@ export default async function UsersPage({
   const group = oneOf(firstParam(params, "grupo"), GROUPS);
   const status = oneOf(firstParam(params, "status"), STATUSES);
   const page = pageParam(params);
+  const pageSize = pageSizeParam(params);
+  const hrefWith = (overrides: Record<string, string | number | undefined>) =>
+    buildHref("/admin/usuarios", {
+      busca: search,
+      grupo: group,
+      status,
+      "por-pagina": pageSizeQuery(pageSize),
+      ...overrides,
+    });
 
   const users = await authed((token) =>
     adminService.listUsers(token, {
@@ -50,6 +61,7 @@ export default async function UsersPage({
       group,
       active: status === undefined ? undefined : status === "ativos",
       page,
+      limit: pageSize,
     }),
   );
   const filtered = Boolean(search || group || status);
@@ -64,6 +76,9 @@ export default async function UsersPage({
           role="search"
           className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
         >
+          {pageSize !== DEFAULT_PAGE_SIZE && (
+            <input type="hidden" name="por-pagina" value={pageSize} />
+          )}
           <Field
             label="Buscar"
             name="busca"
@@ -111,70 +126,18 @@ export default async function UsersPage({
             }
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="text-xs text-soft uppercase">
-                <tr className="border-b border-border">
-                  <th className="px-4 py-3 font-medium">Nome</th>
-                  <th className="px-4 py-3 font-medium">Grupo</th>
-                  <th className="px-4 py-3 font-medium">Situação</th>
-                  <th className="hidden px-4 py-3 font-medium md:table-cell">
-                    Último acesso
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.items.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-b border-border last:border-0 hover:bg-surface-muted"
-                  >
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/admin/usuarios/${item.id}`}
-                        className="font-medium text-fg hover:text-accent"
-                      >
-                        {item.name}
-                      </Link>
-                      <p className="text-xs text-soft">
-                        {item.username} · {item.email}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3 text-muted">
-                      {GROUP_LABELS[item.group]}
-                    </td>
-                    <td className="px-4 py-3">
-                      <UserStatusBadges user={item} />
-                    </td>
-                    <td className="hidden px-4 py-3 text-muted md:table-cell">
-                      {item.lastLoginAt
-                        ? formatDateTime(item.lastLoginAt)
-                        : "Nunca"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <UsersTable users={users.items} canAudit={can(user, "AUDIT_READ")} />
         )}
 
-        {users.totalPages > 1 && (
-          <div className="border-t border-border p-4">
-            <Pagination
-              page={users.page}
-              totalPages={users.totalPages}
-              total={users.total}
-              hrefFor={(target) =>
-                buildHref("/admin/usuarios", {
-                  busca: search,
-                  grupo: group,
-                  status,
-                  page: target,
-                })
-              }
-            />
-          </div>
-        )}
+        <Pagination
+          page={users.page}
+          totalPages={users.totalPages}
+          total={users.total}
+          pageSize={pageSize}
+          hrefFor={(target) => hrefWith({ page: target })}
+          pageSizes={PAGE_SIZES}
+          pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+        />
       </Card>
     </>
   );

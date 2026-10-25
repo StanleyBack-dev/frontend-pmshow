@@ -104,6 +104,7 @@ export function AckActions({
           </p>
           <TextArea
             label="Motivo"
+            required
             rows={3}
             maxLength={300}
             value={note}

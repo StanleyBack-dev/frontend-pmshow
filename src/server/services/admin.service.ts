@@ -25,6 +25,7 @@ import type {
 } from "@/shared/contracts/api";
 
 export type UserListQuery = {
+  limit?: number;
   search?: string;
   group?: UserGroup;
   active?: boolean;
@@ -46,7 +47,7 @@ export const adminService = {
           group: query.group,
           active: query.active,
         },
-        page: { page: query.page, limit: PAGE_SIZE },
+        page: { page: query.page, limit: query.limit ?? PAGE_SIZE },
       },
     });
     return users;
@@ -145,10 +146,27 @@ export const adminService = {
     return setUserPermissions;
   },
 
-  async auditLogs(token: string, page: number): Promise<Paginated<AuditEntry>> {
+  /** The trail of one record, newest first (at most 50 entries). */
+  async recordAudit(
+    token: string,
+    entity: string,
+    entityId: string,
+  ): Promise<AuditEntry[]> {
     const { auditLogs } = await backendGraphql(auditLogsDocument, {
       token,
-      variables: { page: { page, limit: 30 } },
+      variables: { filter: { entity, entityId }, page: { page: 1, limit: 50 } },
+    });
+    return auditLogs.items;
+  },
+
+  async auditLogs(
+    token: string,
+    page: number,
+    limit = 10,
+  ): Promise<Paginated<AuditEntry>> {
+    const { auditLogs } = await backendGraphql(auditLogsDocument, {
+      token,
+      variables: { page: { page, limit } },
     });
     return auditLogs;
   },

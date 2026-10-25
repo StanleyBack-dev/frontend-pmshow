@@ -45,7 +45,13 @@ export function Drawer({
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // showModal() focuses the first control (the close button); a field
+      // marked data-autofocus takes the focus instead (React's autoFocus
+      // runs before the dialog opens and is lost).
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 

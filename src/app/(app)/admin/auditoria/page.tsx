@@ -10,7 +10,10 @@ import { can } from "@/shared/lib/access";
 import { formatDateTime } from "@/shared/lib/format";
 import {
   buildHref,
+  PAGE_SIZES,
   pageParam,
+  pageSizeParam,
+  pageSizeQuery,
   type RawSearchParams,
 } from "@/shared/lib/search-params";
 
@@ -24,8 +27,17 @@ export default async function AuditPage({
   const user = await getSessionUser();
   if (!can(user, "AUDIT_READ")) return <AccessDenied />;
 
-  const page = pageParam(await searchParams);
-  const logs = await authed((token) => adminService.auditLogs(token, page));
+  const params = await searchParams;
+  const page = pageParam(params);
+  const pageSize = pageSizeParam(params);
+  const logs = await authed((token) =>
+    adminService.auditLogs(token, page, pageSize),
+  );
+  const hrefWith = (overrides: Record<string, string | number | undefined>) =>
+    buildHref("/admin/auditoria", {
+      "por-pagina": pageSizeQuery(pageSize),
+      ...overrides,
+    });
 
   return (
     <Card>
@@ -81,18 +93,15 @@ export default async function AuditPage({
           </table>
         </div>
       )}
-      {logs.totalPages > 1 && (
-        <div className="border-t border-border p-4">
-          <Pagination
-            page={logs.page}
-            totalPages={logs.totalPages}
-            total={logs.total}
-            hrefFor={(target) =>
-              buildHref("/admin/auditoria", { page: target })
-            }
-          />
-        </div>
-      )}
+      <Pagination
+        page={logs.page}
+        totalPages={logs.totalPages}
+        total={logs.total}
+        pageSize={pageSize}
+        hrefFor={(target) => hrefWith({ page: target })}
+        pageSizes={PAGE_SIZES}
+        pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+      />
     </Card>
   );
 }

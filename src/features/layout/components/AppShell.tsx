@@ -128,12 +128,15 @@ export function AppShell({
   user,
   showAdmin,
   unreadNotifications,
+  bottomBar,
   children,
 }: {
   user: Pick<SessionUser, "name" | "group" | "permissions">;
   showAdmin: boolean;
   /** Server-side count; the bell keeps it fresh afterwards. */
   unreadNotifications: number;
+  /** Bar pinned to the bottom of the content column (the audio player). */
+  bottomBar?: ReactNode;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -352,7 +355,7 @@ export function AppShell({
 
       <div
         className={cn(
-          "flex min-w-0 flex-col transition-[margin] duration-200",
+          "flex min-h-dvh min-w-0 flex-col transition-[margin] duration-200",
           collapsed ? "lg:ml-[68px]" : "lg:ml-64",
         )}
       >
@@ -375,9 +378,10 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-7xl min-w-0 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <main className="mx-auto w-full max-w-7xl min-w-0 flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
           {children}
         </main>
+        {bottomBar}
       </div>
 
       <InstallAppInvite />

@@ -66,6 +66,17 @@ export type PermissionMatrix = {
   overrides: { permission: Permission; allowed: boolean }[];
 };
 
+/** Records whose trail the tables show (entity names of the audit log). */
+export const AUDITED_ENTITIES = [
+  "song",
+  "artist",
+  "user",
+  "member",
+  "event",
+  "venue",
+] as const;
+export type AuditedEntity = (typeof AUDITED_ENTITIES)[number];
+
 export type AuditEntry = {
   id: string;
   actorId: string | null;

@@ -245,9 +245,7 @@ function drawEventHeader(
     [
       "Local",
       event.venue
-        ? [event.venue.name, event.venue.address, event.venue.city]
-            .filter(Boolean)
-            .join(" — ")
+        ? `${event.venue.name} — ${event.venue.fullAddress}`
         : "A definir",
     ],
     ...(event.uniform

@@ -6,9 +6,11 @@ import {
   audioPlaybackUrlDocument,
   confirmAudioUploadDocument,
   createSongDocument,
+  findLyricsDocument,
   removeMediaDocument,
   renameMediaDocument,
   requestAudioUploadDocument,
+  searchYoutubeDocument,
   setSongArchivedDocument,
   songDocument,
   songsDocument,
@@ -16,40 +18,84 @@ import {
 } from "@/server/graphql/operations/repertoire.operations";
 import type { Paginated } from "@/shared/contracts/api";
 import type {
+  Artist,
   AudioUploadTicket,
+  LyricsResult,
   MediaAsset,
   Song,
   SongCategory,
   SongInput,
+  SongListItem,
+  SongStage,
   SongWithMedia,
+  YoutubeVideoResult,
 } from "@/shared/contracts/repertoire";
 
 export type SongListQuery = {
   search?: string;
+  title?: string;
+  artistId?: string;
+  stage?: SongStage;
   category?: SongCategory;
   tag?: string;
   archived: boolean;
   page: number;
+  /** Page size (default 10, the backend allows up to 100). */
+  limit?: number;
+};
+
+export type SongListPage = {
+  songs: Paginated<SongListItem>;
+  tags: string[];
+  titles: string[];
+  artists: Artist[];
 };
 
 export const repertoireService = {
-  async songs(
-    token: string,
-    query: SongListQuery,
-  ): Promise<{ songs: Paginated<Song>; tags: string[] }> {
-    const { songs, songTags } = await backendGraphql(songsDocument, {
-      token,
-      variables: {
-        filter: {
-          search: query.search || undefined,
-          category: query.category,
-          tag: query.tag,
+  async songs(token: string, query: SongListQuery): Promise<SongListPage> {
+    const { songs, songTags, songTitles, artists } = await backendGraphql(
+      songsDocument,
+      {
+        token,
+        variables: {
+          filter: {
+            search: query.search || undefined,
+            title: query.title || undefined,
+            artistId: query.artistId,
+            stage: query.stage,
+            category: query.category,
+            tag: query.tag,
+            archived: query.archived,
+          },
+          page: { page: query.page, limit: query.limit ?? 10 },
           archived: query.archived,
         },
-        page: { page: query.page, limit: 30 },
       },
+    );
+    return { songs, tags: songTags, titles: songTitles, artists };
+  },
+
+  async findLyrics(
+    token: string,
+    artist: string,
+    title: string,
+  ): Promise<LyricsResult | null> {
+    const { findLyrics } = await backendGraphql(findLyricsDocument, {
+      token,
+      variables: { artist, title },
     });
-    return { songs, tags: songTags };
+    return findLyrics ?? null;
+  },
+
+  async searchYoutube(
+    token: string,
+    query: string,
+  ): Promise<YoutubeVideoResult[]> {
+    const { searchYoutube } = await backendGraphql(searchYoutubeDocument, {
+      token,
+      variables: { query },
+    });
+    return searchYoutube;
   },
 
   async song(token: string, id: string): Promise<SongWithMedia> {

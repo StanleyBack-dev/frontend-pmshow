@@ -57,12 +57,14 @@ export function InstrumentsManager({
       >
         <Field
           label="Novo instrumento ou função"
+          required
           className="flex-1"
           value={name}
           onChange={(event) => setName(event.target.value)}
         />
         <Select
           label="Naipe"
+          required
           className="sm:w-44"
           value={section}
           onChange={(event) => setSection(event.target.value as Section)}

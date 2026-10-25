@@ -1,13 +1,16 @@
 import {
   Bell,
+  CalendarClock,
   CalendarDays,
   CalendarOff,
   CircleUserRound,
   ClipboardList,
   House,
   ListMusic,
+  MapPin,
   type LucideIcon,
   Megaphone,
+  MicVocal,
   Settings,
   ShieldCheck,
   Users,
@@ -35,6 +38,18 @@ export const PRIMARY_NAV: NavItem[] = [
     permission: "EVENTS_READ",
   },
   {
+    href: "/eventos",
+    label: "Eventos",
+    icon: CalendarClock,
+    permission: "EVENTS_READ",
+  },
+  {
+    href: "/locais",
+    label: "Locais",
+    icon: MapPin,
+    permission: "EVENTS_MANAGE",
+  },
+  {
     href: "/escalas",
     label: "Minhas escalas",
     icon: ClipboardList,
@@ -44,6 +59,12 @@ export const PRIMARY_NAV: NavItem[] = [
     href: "/repertorio",
     label: "Repertório",
     icon: ListMusic,
+    permission: "REPERTOIRE_READ",
+  },
+  {
+    href: "/cantores",
+    label: "Cantores e bandas",
+    icon: MicVocal,
     permission: "REPERTOIRE_READ",
   },
   {

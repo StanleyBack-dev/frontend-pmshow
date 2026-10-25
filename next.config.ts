@@ -31,6 +31,27 @@ const nextConfig: NextConfig = {
     // YouTube video thumbnails on the song page.
     remotePatterns: [new URL("https://i.ytimg.com/vi/**")],
   },
+  // Event pages (and venues) moved from the agenda to their own menus:
+  // links already sent by e-mail / in notifications keep working.
+  async redirects() {
+    return [
+      {
+        source: "/agenda/locais",
+        destination: "/locais",
+        permanent: true,
+      },
+      {
+        source: "/eventos/locais",
+        destination: "/locais",
+        permanent: true,
+      },
+      {
+        source: "/agenda/:id([0-9a-fA-F-]{36})/:rest*",
+        destination: "/eventos/:id/:rest*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

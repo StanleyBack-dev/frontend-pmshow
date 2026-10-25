@@ -24,10 +24,11 @@ export const notificationsService = {
     token: string,
     unreadOnly: boolean,
     page: number,
+    limit = 10,
   ): Promise<NotificationPage> {
     const { myNotifications } = await backendGraphql(myNotificationsDocument, {
       token,
-      variables: { unreadOnly, page: { page, limit: 20 } },
+      variables: { unreadOnly, page: { page, limit } },
     });
     return myNotifications;
   },

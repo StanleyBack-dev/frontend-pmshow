@@ -9,11 +9,14 @@ export {
 } from "./components/Button";
 export { Card, CardBody, CardHeader } from "./components/Card";
 export { Combobox, type ComboboxOption } from "./components/Combobox";
+export { DataTable, type DataTableColumn } from "./components/DataTable";
 export { Drawer } from "./components/Drawer";
 export { EmptyState } from "./components/EmptyState";
 export { Field, inputClasses, labelClasses } from "./components/Field";
 export { FilterActions } from "./components/FilterActions";
 export { FilterPanel } from "./components/FilterPanel";
+export { FormSection } from "./components/FormSection";
+export { Hint } from "./components/Hint";
 export { LinkPending } from "./components/LinkPending";
 export { Modal } from "./components/Modal";
 export { PageHeader } from "./components/PageHeader";

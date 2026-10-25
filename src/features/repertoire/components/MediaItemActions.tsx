@@ -91,6 +91,7 @@ export function MediaItemActions({ asset }: { asset: MediaAsset }) {
           {mode === "rename" ? (
             <Field
               label="Título"
+              required
               value={title}
               onChange={(event) => setTitle(event.target.value)}
             />

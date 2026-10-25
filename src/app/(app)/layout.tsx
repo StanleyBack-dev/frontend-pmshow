@@ -27,10 +27,10 @@ export default async function AppLayout({
         user={user}
         showAdmin={canAny(user, ...ADMIN_AREA_PERMISSIONS)}
         unreadNotifications={unread}
+        bottomBar={<MiniPlayer />}
       >
         {children}
       </AppShell>
-      <MiniPlayer />
     </PlayerProvider>
   );
 }

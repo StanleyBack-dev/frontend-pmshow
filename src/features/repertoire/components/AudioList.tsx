@@ -15,11 +15,13 @@ import type { MediaAsset } from "@/shared/contracts/repertoire";
 
 export function AudioList({
   songTitle,
+  lyrics,
   audios,
   canDownload,
   canManage,
 }: {
   songTitle: string;
+  lyrics: string | null;
   audios: MediaAsset[];
   canDownload: boolean;
   canManage: boolean;
@@ -29,6 +31,7 @@ export function AudioList({
     assetId: audio.id,
     title: audio.title,
     songTitle,
+    lyrics: { title: songTitle, text: lyrics },
   }));
 
   if (audios.length === 0) {

@@ -1,24 +1,23 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ListMusic } from "lucide-react";
 import {
-  Badge,
   Card,
+  cn,
   EmptyState,
-  Field,
   FilterActions,
   FilterPanel,
   PageHeader,
   Pagination,
-  SegmentedNav,
   Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { NewSongButton } from "@/features/repertoire/components/SongButtons";
+import { SongsTable } from "@/features/repertoire/components/SongsTable";
 import {
   CATEGORIES,
   CATEGORY_LABELS,
-  formatDuration,
+  STAGE_LABELS,
+  STAGES,
 } from "@/features/repertoire/model/repertoire-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { repertoireService } from "@/server/services/repertoire.service";
@@ -27,11 +26,17 @@ import {
   buildHref,
   firstParam,
   oneOf,
+  DEFAULT_PAGE_SIZE,
+  PAGE_SIZES,
   pageParam,
+  pageSizeParam,
+  pageSizeQuery,
   type RawSearchParams,
 } from "@/shared/lib/search-params";
 
 export const metadata: Metadata = { title: "Repertório" };
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function RepertoirePage({
   searchParams,
@@ -43,22 +48,41 @@ export default async function RepertoirePage({
   const canManage = can(user, "REPERTOIRE_MANAGE");
 
   const params = await searchParams;
-  const search = firstParam(params, "busca")?.slice(0, 100) ?? "";
+  const title = firstParam(params, "titulo")?.slice(0, 200) || undefined;
+  const artistParam = firstParam(params, "artista");
+  const artistId =
+    artistParam && UUID.test(artistParam) ? artistParam : undefined;
+  const stage = oneOf(firstParam(params, "situacao"), STAGES);
   const category = oneOf(firstParam(params, "categoria"), CATEGORIES);
   const tag = firstParam(params, "tag")?.slice(0, 30) || undefined;
   const archived = canManage && firstParam(params, "arquivadas") === "1";
   const page = pageParam(params);
+  const pageSize = pageSizeParam(params);
 
-  const { songs, tags } = await authed((token) =>
-    repertoireService.songs(token, { search, category, tag, archived, page }),
+  const { songs, tags, titles, artists } = await authed((token) =>
+    repertoireService.songs(token, {
+      title,
+      artistId,
+      stage,
+      category,
+      tag,
+      archived,
+      page,
+      limit: pageSize,
+    }),
   );
-  const filtered = Boolean(search || category || tag);
+  const filtered = Boolean(title || artistId || stage || category || tag);
+  // The archive is one more filter (managers only).
+  const filtersActive = filtered || archived;
   const hrefWith = (overrides: Record<string, string | number | undefined>) =>
     buildHref("/repertorio", {
-      busca: search,
+      titulo: title,
+      artista: artistId,
+      situacao: stage,
       categoria: category,
       tag,
       arquivadas: archived ? "1" : undefined,
+      "por-pagina": pageSizeQuery(pageSize),
       ...overrides,
     });
 
@@ -67,40 +91,57 @@ export default async function RepertoirePage({
       <PageHeader
         title="Repertório"
         description="Músicas da banda com áudios para ouvir e vídeos para assistir."
-        actions={canManage ? <NewSongButton /> : undefined}
+        actions={canManage ? <NewSongButton artists={artists} /> : undefined}
       />
 
-      {canManage && (
-        <div className="mb-4">
-          <SegmentedNav
-            label="Situação das músicas"
-            items={[
-              {
-                label: "No repertório",
-                href: hrefWith({ arquivadas: undefined, page: 1 }),
-                active: !archived,
-              },
-              {
-                label: "Arquivadas",
-                href: hrefWith({ arquivadas: "1", page: 1 }),
-                active: archived,
-              },
-            ]}
-          />
-        </div>
-      )}
-
-      <FilterPanel hasActiveFilters={filtered}>
+      <FilterPanel hasActiveFilters={filtersActive}>
         <form
           role="search"
-          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+          className={cn(
+            "grid gap-3 sm:grid-cols-2",
+            canManage ? "lg:grid-cols-6" : "lg:grid-cols-5",
+          )}
         >
-          {archived && <input type="hidden" name="arquivadas" value="1" />}
-          <Field
-            label="Buscar"
-            name="busca"
-            defaultValue={search}
-            placeholder="Título ou compositor"
+          {pageSize !== DEFAULT_PAGE_SIZE && (
+            <input type="hidden" name="por-pagina" value={pageSize} />
+          )}
+          {canManage && (
+            <Select
+              label="Exibir"
+              name="arquivadas"
+              defaultValue={archived ? "1" : ""}
+              placeholder="No repertório"
+              options={[{ value: "1", label: "Arquivadas" }]}
+            />
+          )}
+          <Select
+            label="Título"
+            name="titulo"
+            defaultValue={title ?? ""}
+            placeholder="Todos"
+            options={titles.map((value) => ({ value, label: value }))}
+            disabled={titles.length === 0}
+          />
+          <Select
+            label="Cantor / banda"
+            name="artista"
+            defaultValue={artistId ?? ""}
+            placeholder="Todos"
+            options={artists.map((artist) => ({
+              value: artist.id,
+              label: artist.name,
+            }))}
+            disabled={artists.length === 0}
+          />
+          <Select
+            label="Situação"
+            name="situacao"
+            defaultValue={stage ?? ""}
+            placeholder="Todas"
+            options={STAGES.map((value) => ({
+              value,
+              label: STAGE_LABELS[value].label,
+            }))}
           />
           <Select
             label="Categoria"
@@ -122,12 +163,15 @@ export default async function RepertoirePage({
           />
           <FilterActions
             clearHref={hrefWith({
-              busca: undefined,
+              titulo: undefined,
+              artista: undefined,
+              situacao: undefined,
               categoria: undefined,
               tag: undefined,
+              arquivadas: undefined,
               page: undefined,
             })}
-            hasActiveFilters={filtered}
+            hasActiveFilters={filtersActive}
           />
         </form>
       </FilterPanel>
@@ -152,44 +196,23 @@ export default async function RepertoirePage({
             }
           />
         ) : (
-          <ul className="divide-y divide-border">
-            {songs.items.map((song) => (
-              <li key={song.id}>
-                <Link
-                  href={`/repertorio/${song.id}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-surface-muted"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-fg">{song.title}</p>
-                    <p className="truncate text-sm text-muted">
-                      {[
-                        song.artist,
-                        song.musicalKey && `Tom: ${song.musicalKey}`,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ") || "—"}
-                    </p>
-                  </div>
-                  <Badge tone="neutral">{CATEGORY_LABELS[song.category]}</Badge>
-                  <span className="hidden w-12 text-right text-sm text-soft tabular-nums sm:inline">
-                    {formatDuration(song.durationSeconds)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <SongsTable
+            songs={songs.items}
+            artists={artists}
+            canEdit={canManage && !archived}
+            canAudit={can(user, "AUDIT_READ")}
+          />
         )}
 
-        {songs.totalPages > 1 && (
-          <div className="border-t border-border p-4">
-            <Pagination
-              page={songs.page}
-              totalPages={songs.totalPages}
-              total={songs.total}
-              hrefFor={(target) => hrefWith({ page: target })}
-            />
-          </div>
-        )}
+        <Pagination
+          page={songs.page}
+          totalPages={songs.totalPages}
+          total={songs.total}
+          pageSize={pageSize}
+          hrefFor={(target) => hrefWith({ page: target })}
+          pageSizes={PAGE_SIZES}
+          pageSizeHref={(size) => hrefWith({ "por-pagina": size, page: 1 })}
+        />
       </Card>
     </>
   );

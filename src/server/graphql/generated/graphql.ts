@@ -55,6 +55,21 @@ export type AddYoutubeVideoInput = {
   title?: string | null | undefined;
 };
 
+export type ArtistFilterInput = {
+  /** Arquivados (só gestão). */
+  archived?: boolean | null | undefined;
+  /** Parte do nome (sem acento). */
+  search?: string | null | undefined;
+  /** true: só com músicas; false: só sem músicas. */
+  withSongs?: boolean | null | undefined;
+};
+
+export type ArtistInput = {
+  /** Só na edição. */
+  archived?: boolean | null | undefined;
+  name: string;
+};
+
 export type AssignmentInput = {
   instrumentId?: string | number | null | undefined;
   notes?: string | null | undefined;
@@ -150,6 +165,19 @@ export type EventInput = {
   uniform?: string | null | undefined;
   venueId?: string | number | null | undefined;
 };
+
+export type EventPageFilterInput = {
+  period?: EventPeriod | null | undefined;
+  /** Parte do título (sem acento). */
+  search?: string | null | undefined;
+  statuses?: Array<EventStatus> | null | undefined;
+  type?: EventType | null | undefined;
+};
+
+/** Próximos (a partir de agora) ou passados. */
+export type EventPeriod =
+  | 'PAST'
+  | 'UPCOMING';
 
 export type EventStatus =
   | 'CANCELADO'
@@ -342,23 +370,35 @@ export type SongCategory =
 export type SongFilterInput = {
   /** Arquivadas (exige REPERTOIRE_MANAGE). */
   archived?: boolean;
+  artistId?: string | number | null | undefined;
   category?: SongCategory | null | undefined;
+  /** Parte do título ou do artista. */
   search?: string | null | undefined;
+  stage?: SongStage | null | undefined;
   tag?: string | null | undefined;
+  /** Título exato (sem caixa/acentos). */
+  title?: string | null | undefined;
 };
 
 export type SongInput = {
   arranger?: string | null | undefined;
-  artist?: string | null | undefined;
+  artistId?: string | number | null | undefined;
   bpm?: number | null | undefined;
   category: SongCategory;
   durationSeconds?: number | null | undefined;
   lyrics?: string | null | undefined;
   musicalKey?: string | null | undefined;
   notes?: string | null | undefined;
+  /** Padrão: CONHECIDA. */
+  stage?: SongStage | null | undefined;
   tags?: Array<string>;
   title: string;
 };
+
+/** NOVA: a banda ainda vai aprender; CONHECIDA: já toca. */
+export type SongStage =
+  | 'CONHECIDA'
+  | 'NOVA';
 
 export type UpdateInstrumentInput = {
   archived?: boolean | null | undefined;
@@ -393,14 +433,31 @@ export type UserGroup =
   /** Músico */
   | 'USER';
 
+export type VenueFilterInput = {
+  /** Arquivados (padrão: ativos). */
+  archived?: boolean | null | undefined;
+  /** Nome, rua, bairro ou cidade. */
+  search?: string | null | undefined;
+};
+
 export type VenueInput = {
-  address?: string | null | undefined;
   archived?: boolean | null | undefined;
   /** Padrão: Goiânia. */
   city?: string | null | undefined;
+  complement?: string | null | undefined;
+  /** Bairro. */
+  district?: string | null | undefined;
   mapsUrl?: string | null | undefined;
   name: string;
   notes?: string | null | undefined;
+  /** Número ou S/N. */
+  number?: string | null | undefined;
+  /** UF. Padrão: GO. */
+  state?: string | null | undefined;
+  /** Logradouro. */
+  street?: string | null | undefined;
+  /** CEP (8 números). */
+  zipCode?: string | null | undefined;
 };
 
 export type VerifyRecoveryCodeInput = {
@@ -536,6 +593,38 @@ export type AuditLogsQueryVariables = Exact<{
 
 export type AuditLogsQuery = { auditLogs: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, actorId: string | null, actorName: string | null, action: string, entity: string, entityId: string | null, before: Record<string, unknown> | null, after: Record<string, unknown> | null, ip: string | null, createdAt: string }> } };
 
+export type ArtistFieldsFragment = { id: string, name: string, archived: boolean, createdAt: string };
+
+export type ArtistsQueryVariables = Exact<{
+  includeArchived: boolean;
+}>;
+
+
+export type ArtistsQuery = { artists: Array<{ id: string, name: string, archived: boolean, createdAt: string }> };
+
+export type ArtistsPageQueryVariables = Exact<{
+  filter?: ArtistFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type ArtistsPageQuery = { artistsPage: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, archived: boolean, createdAt: string, songCount: number }> } };
+
+export type CreateArtistMutationVariables = Exact<{
+  input: ArtistInput;
+}>;
+
+
+export type CreateArtistMutation = { createArtist: { id: string, name: string, archived: boolean, createdAt: string } };
+
+export type UpdateArtistMutationVariables = Exact<{
+  id: string | number;
+  input: ArtistInput;
+}>;
+
+
+export type UpdateArtistMutation = { updateArtist: { id: string, name: string, archived: boolean, createdAt: string } };
+
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
@@ -614,37 +703,60 @@ export type BandDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type BandDashboardQuery = { bandDashboard: { activeMembers: number, awayMembers: number, upcomingEvents: number, eventsWithoutRoster: number, pendingAcks: number, swapRequests: number, pendingAbsences: number, absentToday: number, failedNotifications: number } };
 
-export type EventFieldsFragment = { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null };
+export type EventFieldsFragment = { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null };
 
-export type VenueFieldsFragment = { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean };
+export type VenueFieldsFragment = { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean };
+
+export type EventsPageQueryVariables = Exact<{
+  filter?: EventPageFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type EventsPageQuery = { eventsPage: { total: number, page: number, limit: number, totalPages: number, items: Array<{ setlistCount: number, id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, rosterSummary: { status: RosterStatus, assignments: number } | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> } };
+
+export type VenuesPageQueryVariables = Exact<{
+  filter?: VenueFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type VenuesPageQuery = { venuesPage: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean }> } };
+
+export type ZipCodeAddressQueryVariables = Exact<{
+  zipCode: string;
+}>;
+
+
+export type ZipCodeAddressQuery = { zipCodeAddress: { zipCode: string, street: string | null, district: string | null, city: string, state: string } | null };
 
 export type EventsQueryVariables = Exact<{
   filter?: EventFilterInput | null | undefined;
 }>;
 
 
-export type EventsQuery = { events: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
+export type EventsQuery = { events: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
 
 export type UpcomingEventsQueryVariables = Exact<{
   limit: number;
 }>;
 
 
-export type UpcomingEventsQuery = { upcomingEvents: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
+export type UpcomingEventsQuery = { upcomingEvents: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
 
 export type EventQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type EventQuery = { event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, setlist: Array<{ position: number, songId: string, notes: string | null, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string }> } | null }>, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type EventQuery = { event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, setlist: Array<{ position: number, songId: string, notes: string | null, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, lyrics: string | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string }> } | null }>, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type CreateEventMutationVariables = Exact<{
   input: EventInput;
 }>;
 
 
-export type CreateEventMutation = { createEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type CreateEventMutation = { createEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type UpdateEventMutationVariables = Exact<{
   id: string | number;
@@ -652,7 +764,7 @@ export type UpdateEventMutationVariables = Exact<{
 }>;
 
 
-export type UpdateEventMutation = { updateEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type UpdateEventMutation = { updateEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type ChangeEventStatusMutationVariables = Exact<{
   id: string | number;
@@ -661,7 +773,7 @@ export type ChangeEventStatusMutationVariables = Exact<{
 }>;
 
 
-export type ChangeEventStatusMutation = { changeEventStatus: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type ChangeEventStatusMutation = { changeEventStatus: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type SetEventSetlistMutationVariables = Exact<{
   id: string | number;
@@ -676,14 +788,14 @@ export type VenuesQueryVariables = Exact<{
 }>;
 
 
-export type VenuesQuery = { venues: Array<{ id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean }> };
+export type VenuesQuery = { venues: Array<{ id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean }> };
 
 export type CreateVenueMutationVariables = Exact<{
   input: VenueInput;
 }>;
 
 
-export type CreateVenueMutation = { createVenue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } };
+export type CreateVenueMutation = { createVenue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } };
 
 export type UpdateVenueMutationVariables = Exact<{
   id: string | number;
@@ -691,7 +803,7 @@ export type UpdateVenueMutationVariables = Exact<{
 }>;
 
 
-export type UpdateVenueMutation = { updateVenue: { id: string, name: string, address: string | null, city: string, mapsUrl: string | null, notes: string | null, archived: boolean } };
+export type UpdateVenueMutation = { updateVenue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } };
 
 export type MemberProfileFieldsFragment = { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }> };
 
@@ -807,31 +919,32 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type SendTestPushMutation = { sendTestPush: number };
 
-export type SongFieldsFragment = { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string };
+export type SongFieldsFragment = { id: string, title: string, artistId: string | null, stage: SongStage, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, artist: { id: string, name: string } | null };
 
 export type MediaAssetFieldsFragment = { id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string };
 
 export type SongsQueryVariables = Exact<{
   filter?: SongFilterInput | null | undefined;
   page?: PageInput | null | undefined;
+  archived: boolean;
 }>;
 
 
-export type SongsQuery = { songTags: Array<string>, songs: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string }> } };
+export type SongsQuery = { songTags: Array<string>, songTitles: Array<string>, songs: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, title: string, artistId: string | null, stage: SongStage, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, media: Array<{ id: string, kind: MediaKind, title: string, youtubeVideoId: string | null }>, artist: { id: string, name: string } | null }> }, artists: Array<{ id: string, name: string, archived: boolean }> };
 
 export type SongQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type SongQuery = { song: { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, media: Array<{ id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string }> } };
+export type SongQuery = { song: { id: string, title: string, artistId: string | null, stage: SongStage, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, media: Array<{ id: string, songId: string, kind: MediaKind, status: MediaStatus, title: string, mimeType: string | null, sizeBytes: number | null, durationSeconds: number | null, youtubeVideoId: string | null, thumbnailUrl: string | null, createdAt: string }>, artist: { id: string, name: string } | null } };
 
 export type CreateSongMutationVariables = Exact<{
   input: SongInput;
 }>;
 
 
-export type CreateSongMutation = { createSong: { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string } };
+export type CreateSongMutation = { createSong: { id: string, title: string, artistId: string | null, stage: SongStage, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, artist: { id: string, name: string } | null } };
 
 export type UpdateSongMutationVariables = Exact<{
   id: string | number;
@@ -839,7 +952,7 @@ export type UpdateSongMutationVariables = Exact<{
 }>;
 
 
-export type UpdateSongMutation = { updateSong: { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string } };
+export type UpdateSongMutation = { updateSong: { id: string, title: string, artistId: string | null, stage: SongStage, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, artist: { id: string, name: string } | null } };
 
 export type SetSongArchivedMutationVariables = Exact<{
   id: string | number;
@@ -847,7 +960,7 @@ export type SetSongArchivedMutationVariables = Exact<{
 }>;
 
 
-export type SetSongArchivedMutation = { setSongArchived: { id: string, title: string, artist: string | null, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string } };
+export type SetSongArchivedMutation = { setSongArchived: { id: string, title: string, artistId: string | null, stage: SongStage, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, artist: { id: string, name: string } | null } };
 
 export type AddYoutubeVideoMutationVariables = Exact<{
   input: AddYoutubeVideoInput;
@@ -898,6 +1011,21 @@ export type AudioDownloadUrlQueryVariables = Exact<{
 
 
 export type AudioDownloadUrlQuery = { audioDownloadUrl: string };
+
+export type FindLyricsQueryVariables = Exact<{
+  artist: string;
+  title: string;
+}>;
+
+
+export type FindLyricsQuery = { findLyrics: { artist: string, title: string, lyrics: string, sourceUrl: string | null } | null };
+
+export type SearchYoutubeQueryVariables = Exact<{
+  query: string;
+}>;
+
+
+export type SearchYoutubeQuery = { searchYoutube: Array<{ videoId: string, title: string, channelTitle: string, thumbnailUrl: string, publishedAt: string | null, durationSeconds: number | null }> };
 
 export type AssignmentFieldsFragment = { userId: string, role: AssignmentRole, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, section: Section } | null };
 
@@ -996,6 +1124,14 @@ export const UserAccountFieldsFragmentDoc = new TypedDocumentString(`
   createdAt
 }
     `, {"fragmentName":"UserAccountFields"}) as unknown as TypedDocumentString<UserAccountFieldsFragment, unknown>;
+export const ArtistFieldsFragmentDoc = new TypedDocumentString(`
+    fragment ArtistFields on Artist {
+  id
+  name
+  archived
+  createdAt
+}
+    `, {"fragmentName":"ArtistFields"}) as unknown as TypedDocumentString<ArtistFieldsFragment, unknown>;
 export const BroadcastFieldsFragmentDoc = new TypedDocumentString(`
     fragment BroadcastFields on Broadcast {
   id
@@ -1014,8 +1150,14 @@ export const VenueFieldsFragmentDoc = new TypedDocumentString(`
     fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1043,8 +1185,14 @@ export const EventFieldsFragmentDoc = new TypedDocumentString(`
     fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1071,7 +1219,12 @@ export const SongFieldsFragmentDoc = new TypedDocumentString(`
     fragment SongFields on Song {
   id
   title
-  artist
+  artistId
+  artist {
+    id
+    name
+  }
+  stage
   arranger
   category
   musicalKey
@@ -1487,6 +1640,59 @@ export const AuditLogsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AuditLogsQuery, AuditLogsQueryVariables>;
+export const ArtistsDocument = new TypedDocumentString(`
+    query Artists($includeArchived: Boolean!) {
+  artists(includeArchived: $includeArchived) {
+    ...ArtistFields
+  }
+}
+    fragment ArtistFields on Artist {
+  id
+  name
+  archived
+  createdAt
+}`) as unknown as TypedDocumentString<ArtistsQuery, ArtistsQueryVariables>;
+export const ArtistsPageDocument = new TypedDocumentString(`
+    query ArtistsPage($filter: ArtistFilterInput, $page: PageInput) {
+  artistsPage(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      id
+      name
+      archived
+      createdAt
+      songCount
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ArtistsPageQuery, ArtistsPageQueryVariables>;
+export const CreateArtistDocument = new TypedDocumentString(`
+    mutation CreateArtist($input: ArtistInput!) {
+  createArtist(input: $input) {
+    ...ArtistFields
+  }
+}
+    fragment ArtistFields on Artist {
+  id
+  name
+  archived
+  createdAt
+}`) as unknown as TypedDocumentString<CreateArtistMutation, CreateArtistMutationVariables>;
+export const UpdateArtistDocument = new TypedDocumentString(`
+    mutation UpdateArtist($id: ID!, $input: ArtistInput!) {
+  updateArtist(id: $id, input: $input) {
+    ...ArtistFields
+  }
+}
+    fragment ArtistFields on Artist {
+  id
+  name
+  archived
+  createdAt
+}`) as unknown as TypedDocumentString<UpdateArtistMutation, UpdateArtistMutationVariables>;
 export const LoginDocument = new TypedDocumentString(`
     mutation Login($input: LoginInput!) {
   login(input: $input) {
@@ -1618,6 +1824,94 @@ export const BandDashboardDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<BandDashboardQuery, BandDashboardQueryVariables>;
+export const EventsPageDocument = new TypedDocumentString(`
+    query EventsPage($filter: EventPageFilterInput, $page: PageInput) {
+  eventsPage(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      ...EventFields
+      setlistCount
+      rosterSummary {
+        status
+        assignments
+      }
+    }
+  }
+}
+    fragment EventFields on Event {
+  id
+  title
+  type
+  status
+  callTime
+  startsAt
+  endsAt
+  venueId
+  uniform
+  requester
+  documentRef
+  notes
+  cancellationReason
+  venue {
+    ...VenueFields
+  }
+}
+fragment VenueFields on Venue {
+  id
+  name
+  zipCode
+  street
+  number
+  complement
+  district
+  city
+  state
+  fullAddress
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<EventsPageQuery, EventsPageQueryVariables>;
+export const VenuesPageDocument = new TypedDocumentString(`
+    query VenuesPage($filter: VenueFilterInput, $page: PageInput) {
+  venuesPage(filter: $filter, page: $page) {
+    total
+    page
+    limit
+    totalPages
+    items {
+      ...VenueFields
+    }
+  }
+}
+    fragment VenueFields on Venue {
+  id
+  name
+  zipCode
+  street
+  number
+  complement
+  district
+  city
+  state
+  fullAddress
+  mapsUrl
+  notes
+  archived
+}`) as unknown as TypedDocumentString<VenuesPageQuery, VenuesPageQueryVariables>;
+export const ZipCodeAddressDocument = new TypedDocumentString(`
+    query ZipCodeAddress($zipCode: String!) {
+  zipCodeAddress(zipCode: $zipCode) {
+    zipCode
+    street
+    district
+    city
+    state
+  }
+}
+    `) as unknown as TypedDocumentString<ZipCodeAddressQuery, ZipCodeAddressQueryVariables>;
 export const EventsDocument = new TypedDocumentString(`
     query Events($filter: EventFilterInput) {
   events(filter: $filter) {
@@ -1645,8 +1939,14 @@ export const EventsDocument = new TypedDocumentString(`
 fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1678,8 +1978,14 @@ export const UpcomingEventsDocument = new TypedDocumentString(`
 fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1697,6 +2003,7 @@ export const EventDocument = new TypedDocumentString(`
         title
         musicalKey
         durationSeconds
+        lyrics
         archivedAt
         media {
           id
@@ -1728,8 +2035,14 @@ export const EventDocument = new TypedDocumentString(`
 fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1761,8 +2074,14 @@ export const CreateEventDocument = new TypedDocumentString(`
 fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1794,8 +2113,14 @@ export const UpdateEventDocument = new TypedDocumentString(`
 fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1827,8 +2152,14 @@ export const ChangeEventStatusDocument = new TypedDocumentString(`
 fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1850,8 +2181,14 @@ export const VenuesDocument = new TypedDocumentString(`
     fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1865,8 +2202,14 @@ export const CreateVenueDocument = new TypedDocumentString(`
     fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -1880,8 +2223,14 @@ export const UpdateVenueDocument = new TypedDocumentString(`
     fragment VenueFields on Venue {
   id
   name
-  address
+  zipCode
+  street
+  number
+  complement
+  district
   city
+  state
+  fullAddress
   mapsUrl
   notes
   archived
@@ -2086,7 +2435,7 @@ export const SendTestPushDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<SendTestPushMutation, SendTestPushMutationVariables>;
 export const SongsDocument = new TypedDocumentString(`
-    query Songs($filter: SongFilterInput, $page: PageInput) {
+    query Songs($filter: SongFilterInput, $page: PageInput, $archived: Boolean!) {
   songs(filter: $filter, page: $page) {
     total
     page
@@ -2094,14 +2443,31 @@ export const SongsDocument = new TypedDocumentString(`
     totalPages
     items {
       ...SongFields
+      media {
+        id
+        kind
+        title
+        youtubeVideoId
+      }
     }
   }
   songTags
+  songTitles(archived: $archived)
+  artists(includeArchived: false) {
+    id
+    name
+    archived
+  }
 }
     fragment SongFields on Song {
   id
   title
-  artist
+  artistId
+  artist {
+    id
+    name
+  }
+  stage
   arranger
   category
   musicalKey
@@ -2126,7 +2492,12 @@ export const SongDocument = new TypedDocumentString(`
     fragment SongFields on Song {
   id
   title
-  artist
+  artistId
+  artist {
+    id
+    name
+  }
+  stage
   arranger
   category
   musicalKey
@@ -2161,7 +2532,12 @@ export const CreateSongDocument = new TypedDocumentString(`
     fragment SongFields on Song {
   id
   title
-  artist
+  artistId
+  artist {
+    id
+    name
+  }
+  stage
   arranger
   category
   musicalKey
@@ -2183,7 +2559,12 @@ export const UpdateSongDocument = new TypedDocumentString(`
     fragment SongFields on Song {
   id
   title
-  artist
+  artistId
+  artist {
+    id
+    name
+  }
+  stage
   arranger
   category
   musicalKey
@@ -2205,7 +2586,12 @@ export const SetSongArchivedDocument = new TypedDocumentString(`
     fragment SongFields on Song {
   id
   title
-  artist
+  artistId
+  artist {
+    id
+    name
+  }
+  stage
   arranger
   category
   musicalKey
@@ -2316,6 +2702,28 @@ export const AudioDownloadUrlDocument = new TypedDocumentString(`
   audioDownloadUrl(assetId: $assetId)
 }
     `) as unknown as TypedDocumentString<AudioDownloadUrlQuery, AudioDownloadUrlQueryVariables>;
+export const FindLyricsDocument = new TypedDocumentString(`
+    query FindLyrics($artist: String!, $title: String!) {
+  findLyrics(artist: $artist, title: $title) {
+    artist
+    title
+    lyrics
+    sourceUrl
+  }
+}
+    `) as unknown as TypedDocumentString<FindLyricsQuery, FindLyricsQueryVariables>;
+export const SearchYoutubeDocument = new TypedDocumentString(`
+    query SearchYoutube($query: String!) {
+  searchYoutube(query: $query) {
+    videoId
+    title
+    channelTitle
+    thumbnailUrl
+    publishedAt
+    durationSeconds
+  }
+}
+    `) as unknown as TypedDocumentString<SearchYoutubeQuery, SearchYoutubeQueryVariables>;
 export const EventRosterDocument = new TypedDocumentString(`
     query EventRoster($eventId: ID!) {
   eventRoster(eventId: $eventId) {

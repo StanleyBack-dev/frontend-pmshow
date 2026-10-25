@@ -103,7 +103,7 @@ export default async function HomePage() {
                     {pendingAck.slice(0, 4).map((item) => (
                       <li key={item.eventId}>
                         <Link
-                          href={`/agenda/${item.eventId}`}
+                          href={`/eventos/${item.eventId}`}
                           className="font-medium text-fg hover:text-accent"
                         >
                           {item.event?.title}
