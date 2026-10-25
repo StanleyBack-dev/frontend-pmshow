@@ -162,8 +162,8 @@ export type EventInput = {
   startsAt: string;
   title: string;
   type: EventType;
-  uniform?: string | null | undefined;
-  venueId?: string | number | null | undefined;
+  uniform: EventUniform;
+  venueId: string | number;
 };
 
 export type EventPageFilterInput = {
@@ -187,6 +187,7 @@ export type EventStatus =
 
 /** Tipo de apresentação ou compromisso. */
 export type EventType =
+  | 'BAILE'
   | 'CULTO_MISSA'
   | 'DESFILE'
   | 'ENSAIO'
@@ -194,6 +195,15 @@ export type EventType =
   | 'OUTRO'
   | 'SHOW'
   | 'SOLENIDADE';
+
+/** Uniforme da PMGO (ou paisano, sem uniforme). */
+export type EventUniform =
+  | 'OPERACIONAL_4A'
+  | 'OPERACIONAL_4B'
+  | 'OPERACIONAL_4C'
+  | 'PAISANO'
+  | 'SOCIAL'
+  | 'TUNICA';
 
 export type LoginInput = {
   /** Usuário ou e-mail. */
@@ -703,7 +713,7 @@ export type BandDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type BandDashboardQuery = { bandDashboard: { activeMembers: number, awayMembers: number, upcomingEvents: number, eventsWithoutRoster: number, pendingAcks: number, swapRequests: number, pendingAbsences: number, absentToday: number, failedNotifications: number } };
 
-export type EventFieldsFragment = { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null };
+export type EventFieldsFragment = { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null };
 
 export type VenueFieldsFragment = { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean };
 
@@ -713,7 +723,7 @@ export type EventsPageQueryVariables = Exact<{
 }>;
 
 
-export type EventsPageQuery = { eventsPage: { total: number, page: number, limit: number, totalPages: number, items: Array<{ setlistCount: number, id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, rosterSummary: { status: RosterStatus, assignments: number } | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> } };
+export type EventsPageQuery = { eventsPage: { total: number, page: number, limit: number, totalPages: number, items: Array<{ setlistCount: number, id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, rosterSummary: { status: RosterStatus, assignments: number } | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> } };
 
 export type VenuesPageQueryVariables = Exact<{
   filter?: VenueFilterInput | null | undefined;
@@ -735,28 +745,28 @@ export type EventsQueryVariables = Exact<{
 }>;
 
 
-export type EventsQuery = { events: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
+export type EventsQuery = { events: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
 
 export type UpcomingEventsQueryVariables = Exact<{
   limit: number;
 }>;
 
 
-export type UpcomingEventsQuery = { upcomingEvents: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
+export type UpcomingEventsQuery = { upcomingEvents: Array<{ id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null }> };
 
 export type EventQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type EventQuery = { event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, setlist: Array<{ position: number, songId: string, notes: string | null, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, lyrics: string | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string }> } | null }>, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type EventQuery = { event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, setlist: Array<{ position: number, songId: string, notes: string | null, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, lyrics: string | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string }> } | null }>, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type CreateEventMutationVariables = Exact<{
   input: EventInput;
 }>;
 
 
-export type CreateEventMutation = { createEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type CreateEventMutation = { createEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type UpdateEventMutationVariables = Exact<{
   id: string | number;
@@ -764,7 +774,7 @@ export type UpdateEventMutationVariables = Exact<{
 }>;
 
 
-export type UpdateEventMutation = { updateEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type UpdateEventMutation = { updateEvent: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type ChangeEventStatusMutationVariables = Exact<{
   id: string | number;
@@ -773,7 +783,7 @@ export type ChangeEventStatusMutationVariables = Exact<{
 }>;
 
 
-export type ChangeEventStatusMutation = { changeEventStatus: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: string | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type ChangeEventStatusMutation = { changeEventStatus: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type SetEventSetlistMutationVariables = Exact<{
   id: string | number;

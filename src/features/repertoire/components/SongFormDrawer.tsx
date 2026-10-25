@@ -55,7 +55,8 @@ type FormState = {
   /** Singer / band suggested by a video, created only when saving. */
   newArtistName: string;
   arranger: string;
-  category: SongCategory;
+  /** "" until chosen: the category is required. */
+  category: SongCategory | "";
   stage: SongStage;
   musicalKey: string;
   bpm: string;
@@ -70,7 +71,7 @@ const fromSong = (song?: Song): FormState => ({
   artistId: song?.artistId ?? "",
   newArtistName: "",
   arranger: song?.arranger ?? "",
-  category: song?.category ?? "HINO",
+  category: song?.category ?? "",
   stage: song?.stage ?? "CONHECIDA",
   musicalKey: song?.musicalKey ?? "",
   bpm: song?.bpm ? String(song.bpm) : "",
@@ -83,13 +84,14 @@ const fromSong = (song?: Song): FormState => ({
 function toInput(form: FormState): SongInput | string {
   const invalid = durationError(form.duration) ?? bpmError(form.bpm);
   if (invalid) return "Corrija os campos destacados.";
+  if (!form.category) return "Escolha a categoria da música.";
   const durationSeconds = durationToSeconds(form.duration);
   const bpm = form.bpm ? Number(form.bpm) : null;
   return {
     title: form.title,
     artistId: form.artistId || null,
     arranger: form.arranger || null,
-    category: form.category,
+    category: form.category as SongCategory,
     stage: form.stage,
     musicalKey: form.musicalKey || null,
     bpm,
@@ -440,6 +442,12 @@ export function SongFormDrawer({
           <Select
             label="Categoria"
             required
+            placeholder="Selecione"
+            error={
+              touched.artist && !form.category
+                ? "Escolha a categoria da música."
+                : undefined
+            }
             value={form.category}
             onChange={(event) =>
               set("category", event.target.value as SongCategory)

@@ -32,11 +32,14 @@ import {
 import {
   EVENT_TYPES,
   EVENT_TYPE_LABELS,
+  UNIFORMS,
+  UNIFORM_LABELS,
 } from "@/features/events/model/event-labels";
 import type {
   BandEvent,
   EventInput,
   EventType,
+  EventUniform,
   Venue,
 } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
@@ -52,7 +55,7 @@ type Form = {
   startTime: string;
   endTime: string;
   venueId: string;
-  uniform: string;
+  uniform: EventUniform | "";
   requester: string;
   documentRef: string;
   notes: string;
@@ -76,6 +79,9 @@ const fromEvent = (event?: BandEvent): Form => ({
   documentRef: event?.documentRef ?? "",
   notes: event?.notes ?? "",
 });
+
+const VENUE_REQUIRED = "Escolha o local ou cadastre um novo no “+”.";
+const UNIFORM_REQUIRED = "Escolha o uniforme.";
 
 /** "2026-11-15" → "2026-11-16". */
 function nextDay(date: string): string {
@@ -134,6 +140,9 @@ function toInput(form: Form): EventInput | string {
   const errors = scheduleErrors(form);
   const firstError = errors.date ?? errors.startTime ?? errors.callTime;
   if (firstError) return firstError;
+  if (!form.venueId) return VENUE_REQUIRED;
+  if (!form.uniform) return UNIFORM_REQUIRED;
+  const uniform = form.uniform;
   const startsAt = fromLocalInput(`${form.date}T${form.startTime}`);
   if (!startsAt) return "Data ou horário inválido.";
   const endDate = endsNextDay(form) ? nextDay(form.date) : form.date;
@@ -145,8 +154,8 @@ function toInput(form: Form): EventInput | string {
       : null,
     startsAt,
     endsAt: form.endTime ? fromLocalInput(`${endDate}T${form.endTime}`) : null,
-    venueId: form.venueId || null,
-    uniform: form.uniform || null,
+    venueId: form.venueId,
+    uniform,
     requester: form.requester || null,
     documentRef: form.documentRef || null,
     notes: form.notes || null,
@@ -333,9 +342,11 @@ function EventFormDrawer({
         >
           <Select
             label="Onde"
+            required
             value={form.venueId}
             onChange={(e) => set("venueId", e.target.value)}
-            placeholder="A definir"
+            placeholder="Selecione"
+            error={submitted && !form.venueId ? VENUE_REQUIRED : undefined}
             options={venueOptions.map((venue) => ({
               value: venue.id,
               label: `${venue.name} · ${venue.city}/${venue.state}`,
@@ -379,14 +390,20 @@ function EventFormDrawer({
         <FormSection
           icon={<FileText />}
           title="Detalhes do pedido"
-          description="Opcional: traje, quem pediu a apresentação e o documento."
+          description="O uniforme da banda; quem pediu e o documento são opcionais."
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field
-              label="Uniforme / traje"
-              placeholder="Ex.: 1º uniforme"
+            <Select
+              label="Uniforme"
+              required
               value={form.uniform}
-              onChange={(e) => set("uniform", e.target.value)}
+              onChange={(e) => set("uniform", e.target.value as EventUniform)}
+              placeholder="Selecione"
+              options={UNIFORMS.map((value) => ({
+                value,
+                label: UNIFORM_LABELS[value],
+              }))}
+              error={submitted && !form.uniform ? UNIFORM_REQUIRED : undefined}
             />
             <Field
               label="Solicitante"

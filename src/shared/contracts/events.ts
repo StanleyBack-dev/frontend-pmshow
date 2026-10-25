@@ -1,6 +1,10 @@
-import type { EventStatus, EventType } from "@/shared/graphql/schema-enums";
+import type {
+  EventStatus,
+  EventType,
+  EventUniform,
+} from "@/shared/graphql/schema-enums";
 
-export type { EventStatus, EventType };
+export type { EventStatus, EventType, EventUniform };
 
 export type Venue = {
   id: string;
@@ -40,7 +44,8 @@ export type BandEvent = {
   startsAt: string;
   endsAt: string | null;
   venueId: string | null;
-  uniform: string | null;
+  /** null only on events created before the uniform list. */
+  uniform: EventUniform | null;
   requester: string | null;
   documentRef: string | null;
   notes: string | null;
@@ -85,8 +90,8 @@ export type EventInput = {
   callTime: string | null;
   startsAt: string;
   endsAt: string | null;
-  venueId: string | null;
-  uniform: string | null;
+  venueId: string;
+  uniform: EventUniform;
   requester: string | null;
   documentRef: string | null;
   notes: string | null;

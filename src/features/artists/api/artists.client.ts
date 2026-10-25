@@ -7,6 +7,9 @@ const json = (method: string, body: unknown): RequestInit => ({
 });
 
 export const artistsClient = {
+  /** Active singers / bands, by name. */
+  list: () => apiRequest<Artist[]>("/artists"),
+
   create: (name: string) =>
     apiRequest<Artist>("/artists", json("POST", { name })),
 

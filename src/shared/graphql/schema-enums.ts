@@ -62,6 +62,7 @@ export type EventStatus =
 
 /** Tipo de apresentação ou compromisso. */
 export type EventType =
+  | 'BAILE'
   | 'CULTO_MISSA'
   | 'DESFILE'
   | 'ENSAIO'
@@ -69,6 +70,15 @@ export type EventType =
   | 'OUTRO'
   | 'SHOW'
   | 'SOLENIDADE';
+
+/** Uniforme da PMGO (ou paisano, sem uniforme). */
+export type EventUniform =
+  | 'OPERACIONAL_4A'
+  | 'OPERACIONAL_4B'
+  | 'OPERACIONAL_4C'
+  | 'PAISANO'
+  | 'SOCIAL'
+  | 'TUNICA';
 
 export type MediaKind =
   | 'AUDIO'

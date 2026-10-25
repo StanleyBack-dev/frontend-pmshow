@@ -1,10 +1,15 @@
 import type { Tone } from "@/design-system";
-import type { EventStatus, EventType } from "@/shared/contracts/events";
+import type {
+  EventStatus,
+  EventType,
+  EventUniform,
+} from "@/shared/contracts/events";
 
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   SHOW: "Show",
   DESFILE: "Desfile",
   SOLENIDADE: "Solenidade",
+  BAILE: "Baile",
   FORMATURA: "Formatura",
   ENSAIO: "Ensaio",
   CULTO_MISSA: "Culto / missa",
@@ -12,6 +17,18 @@ export const EVENT_TYPE_LABELS: Record<EventType, string> = {
 };
 
 export const EVENT_TYPES = Object.keys(EVENT_TYPE_LABELS) as EventType[];
+
+// PMGO uniforms (RUPMGO); paisano is plain clothes, without uniform.
+export const UNIFORM_LABELS: Record<EventUniform, string> = {
+  OPERACIONAL_4A: "4º A – operacional (gandola)",
+  OPERACIONAL_4B: "4º B – operacional",
+  OPERACIONAL_4C: "4º C – operacional",
+  TUNICA: "Túnica",
+  SOCIAL: "Social",
+  PAISANO: "Paisano (traje civil)",
+};
+
+export const UNIFORMS = Object.keys(UNIFORM_LABELS) as EventUniform[];
 
 export const EVENT_PERIODS = {
   proximos: { label: "Próximos", period: "UPCOMING" },

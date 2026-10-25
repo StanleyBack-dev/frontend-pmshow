@@ -17,6 +17,7 @@ import { Setlist } from "@/features/events/components/Setlist";
 import {
   EVENT_STATUS,
   EVENT_TYPE_LABELS,
+  UNIFORM_LABELS,
 } from "@/features/events/model/event-labels";
 import { AckActions } from "@/features/rosters/components/AckActions";
 import { RosterList } from "@/features/rosters/components/RosterList";
@@ -77,7 +78,7 @@ export default async function EventPage({
     ],
   ];
   const details: [string, string | null][] = [
-    ["Uniforme / traje", event.uniform],
+    ["Uniforme", event.uniform && UNIFORM_LABELS[event.uniform]],
     ["Solicitante", event.requester],
     ["Ofício / documento", event.documentRef],
   ];

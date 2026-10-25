@@ -1,7 +1,11 @@
 import "server-only";
 import { z } from "zod";
 import { enumLike, optionalText } from "@/server/http/schemas/fields";
-import type { EventStatus, EventType } from "@/shared/contracts/events";
+import type {
+  EventStatus,
+  EventType,
+  EventUniform,
+} from "@/shared/contracts/events";
 
 /** ISO instant with offset, as built by shared/lib/datetime. */
 const instant = z.iso.datetime({ offset: true });
@@ -12,11 +16,8 @@ export const eventInputSchema = z.object({
   callTime: instant.nullish().transform((value) => value ?? null),
   startsAt: instant,
   endsAt: instant.nullish().transform((value) => value ?? null),
-  venueId: z
-    .uuid()
-    .nullish()
-    .transform((value) => value ?? null),
-  uniform: optionalText(160),
+  venueId: z.uuid(),
+  uniform: enumLike<EventUniform>(),
   requester: optionalText(160),
   documentRef: optionalText(80),
   notes: optionalText(2000),

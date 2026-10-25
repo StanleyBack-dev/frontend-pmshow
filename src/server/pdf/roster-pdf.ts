@@ -7,6 +7,7 @@ import {
   type PDFFont,
   type PDFPage,
 } from "pdf-lib";
+import { UNIFORM_LABELS } from "@/features/events/model/event-labels";
 import { RANK_LABELS } from "@/features/members/model/member-labels";
 import {
   ROLE_LABELS,
@@ -249,7 +250,7 @@ function drawEventHeader(
         : "A definir",
     ],
     ...(event.uniform
-      ? ([["Uniforme", event.uniform]] as [string, string][])
+      ? ([["Uniforme", UNIFORM_LABELS[event.uniform]]] as [string, string][])
       : []),
     ...(event.documentRef
       ? ([["Documento", event.documentRef]] as [string, string][])
