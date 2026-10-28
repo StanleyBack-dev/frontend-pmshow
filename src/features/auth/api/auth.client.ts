@@ -27,6 +27,15 @@ export const authClient = {
       body: JSON.stringify({ name, email }),
     }),
 
+  setPhoto: (photo: string) =>
+    apiRequest<{ photoUrl: string }>("/me/photo", {
+      method: "PUT",
+      body: JSON.stringify({ photo }),
+    }),
+
+  removePhoto: () =>
+    apiRequest<{ ok: true }>("/me/photo", { method: "DELETE" }),
+
   requestRecovery: (login: string) =>
     apiRequest<{ ok: true }>("/auth/recovery/request", post({ login })),
 

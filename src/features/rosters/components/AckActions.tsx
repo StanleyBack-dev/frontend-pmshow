@@ -3,29 +3,32 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Repeat } from "lucide-react";
-import { Alert, Button, Modal, TextArea } from "@/design-system";
+import { Button, Modal, TextArea, cn } from "@/design-system";
 import { rostersClient } from "@/features/rosters/api/rosters.client";
 import type { AckStatus } from "@/shared/contracts/rosters";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 // The member's answer to a published roster: "ciente" in one tap, or a
 // request to be replaced (with the reason, sent to the manager).
 export function AckActions({
   eventId,
   status,
+  stacked = false,
 }: {
   eventId: string;
   status: AckStatus;
+  /** One button under the other (narrow table column). */
+  stacked?: boolean;
 }) {
   const router = useRouter();
   const [swapOpen, setSwapOpen] = useState(false);
   const [note, setNote] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState<"ack" | "swap" | null>(null);
 
   async function answer(kind: "ack" | "swap") {
     setPending(kind);
-    setError(null);
     try {
       await rostersClient.acknowledge(
         eventId,
@@ -35,7 +38,7 @@ export function AckActions({
       setSwapOpen(false);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError ? cause.message : "Não foi possível.",
       );
     }
@@ -44,8 +47,12 @@ export function AckActions({
 
   return (
     <div className="space-y-2">
-      {error && !swapOpen && <Alert tone="danger">{error}</Alert>}
-      <div className="flex flex-wrap gap-2">
+      <div
+        className={cn(
+          "flex gap-2 whitespace-nowrap",
+          stacked && "flex-col items-stretch",
+        )}
+      >
         {status !== "CIENTE" && (
           <Button
             size="sm"
@@ -63,7 +70,6 @@ export function AckActions({
             icon={<Repeat className="size-4" />}
             onClick={() => {
               setNote("");
-              setError(null);
               setSwapOpen(true);
             }}
           >
@@ -97,7 +103,6 @@ export function AckActions({
         }
       >
         <div className="space-y-3">
-          {error && <Alert tone="danger">{error}</Alert>}
           <p>
             O gestor que publicou a escala recebe o seu pedido. Você continua
             escalado até ele alterar a escala.

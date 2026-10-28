@@ -10,12 +10,13 @@ const querySchema = z.object({
   id: idSchema,
 });
 
-// Audit trail of one record (info button of the tables): ?entidade=&id=
+// Creation and last change of one record (info button of the tables):
+// ?entidade=&id=
 export const GET = bffRoute(async (request) => {
   const { entidade, id } = querySchema.parse(
     Object.fromEntries(request.nextUrl.searchParams),
   );
   return NextResponse.json(
-    await adminService.recordAudit(await requireToken(), entidade, id),
+    await adminService.recordStamp(await requireToken(), entidade, id),
   );
 });

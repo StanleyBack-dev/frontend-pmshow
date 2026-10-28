@@ -27,12 +27,29 @@ export const NOTIFICATION_TYPE_LABELS: Record<
   },
   ROSTER_SWAP_REQUESTED: {
     label: "Pedido de troca",
+    description: "Para gestores: alguém de uma escala pediu para ser trocado.",
+  },
+  ROSTER_SWAP_DECLINED: {
+    label: "Troca não aceita",
     description:
-      "Para gestores: alguém da escala que você publicou pediu troca.",
+      "Seu pedido de troca não foi aceito e você continua na escala.",
   },
   ABSENCE_REVIEWED: {
     label: "Resposta de indisponibilidade",
     description: "Seu pedido de indisponibilidade foi aprovado ou recusado.",
+  },
+  ABSENCE_REQUESTED: {
+    label: "Indisponibilidade para analisar",
+    description:
+      "Para os gestores: um integrante pediu uma indisponibilidade e aguarda aprovação.",
+  },
+  DUTY_SCHEDULED: {
+    label: "Expediente lançado",
+    description: "Seus dias e horários de expediente da semana ou do mês.",
+  },
+  DUTY_CANCELLED: {
+    label: "Expediente cancelado",
+    description: "Um expediente em que você estava foi cancelado.",
   },
   EVENT_REMINDER: {
     label: "Lembrete de evento",
@@ -42,6 +59,11 @@ export const NOTIFICATION_TYPE_LABELS: Record<
   BROADCAST: {
     label: "Comunicados",
     description: "Avisos gerais enviados pelos gestores da banda.",
+  },
+  ENROLLMENT_SUBMITTED: {
+    label: "Novo cadastro",
+    description:
+      "Para o administrador geral: alguém enviou o cadastro pelo link e aguarda aprovação.",
   },
 };
 

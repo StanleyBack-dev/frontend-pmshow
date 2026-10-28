@@ -3,16 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, UserPlus } from "lucide-react";
-import {
-  Alert,
-  Button,
-  Field,
-  Drawer,
-  Select,
-  TextArea,
-  cn,
-} from "@/design-system";
+import { Button, Field, Drawer, Select, TextArea } from "@/design-system";
 import { membersClient } from "@/features/members/api/members.client";
+import { FunctionChoices } from "@/features/members/components/FunctionChoices";
+import { InstrumentChoices } from "@/features/members/components/InstrumentChoices";
 import {
   RANKS,
   RANK_LABELS,
@@ -23,6 +17,7 @@ import {
   formatPhone,
 } from "@/features/members/model/member-labels";
 import type {
+  BandFunction,
   Instrument,
   MemberProfile,
   MemberProfileInput,
@@ -38,6 +33,7 @@ import {
   phoneError,
   registrationError,
 } from "@/shared/lib/masks";
+import { useToast } from "@/shared/toast/useToast";
 
 type Form = Omit<MemberProfileInput, "registration" | "phone" | "notes"> & {
   registration: string;
@@ -58,6 +54,7 @@ const fromProfile = (profile: MemberProfile | null): Form => ({
       instrumentId,
       primary,
     })) ?? [],
+  functionIds: profile?.functions.map((item) => item.functionId) ?? [],
 });
 
 // Creates or edits a member's band profile (MEMBERS_MANAGE).
@@ -66,55 +63,30 @@ export function MemberProfileButton({
   name,
   profile,
   instruments,
+  functions,
 }: {
   userId: string;
   name: string;
   profile: MemberProfile | null;
   instruments: Instrument[];
+  functions: BandFunction[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Form>(() => fromProfile(profile));
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   // Field errors show once the field was left (or on save).
   const [touched, setTouched] = useState({ registration: false, phone: false });
   const [pending, setPending] = useState(false);
   const set = <K extends keyof Form>(key: K, value: Form[K]) =>
     setForm((current) => ({ ...current, [key]: value }));
 
-  const selected = new Map(
-    form.instruments.map((item) => [item.instrumentId, item.primary]),
-  );
-
-  function toggleInstrument(id: string) {
-    set(
-      "instruments",
-      selected.has(id)
-        ? form.instruments.filter((item) => item.instrumentId !== id)
-        : [
-            ...form.instruments,
-            { instrumentId: id, primary: form.instruments.length === 0 },
-          ],
-    );
-  }
-
-  function makePrimary(id: string) {
-    set(
-      "instruments",
-      form.instruments.map((item) => ({
-        ...item,
-        primary: item.instrumentId === id,
-      })),
-    );
-  }
-
   async function submit() {
     if (phoneError(form.phone) || registrationError(form.registration)) {
       setTouched({ registration: true, phone: true });
-      return setError("Corrija os campos destacados.");
+      return showError("Corrija os campos destacados.");
     }
     setPending(true);
-    setError(null);
     try {
       await membersClient.saveProfile(userId, {
         ...form,
@@ -125,7 +97,7 @@ export function MemberProfileButton({
       setOpen(false);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar o cadastro.",
@@ -148,7 +120,6 @@ export function MemberProfileButton({
         }
         onClick={() => {
           setForm(fromProfile(profile));
-          setError(null);
           setOpen(true);
         }}
       >
@@ -181,7 +152,6 @@ export function MemberProfileButton({
         }
       >
         <div className="space-y-4">
-          {error && <Alert tone="danger">{error}</Alert>}
           <div className="grid gap-4 sm:grid-cols-2">
             <Select
               label="Posto / graduação"
@@ -258,59 +228,17 @@ export function MemberProfileButton({
             />
           </div>
 
-          <fieldset>
-            <legend className="mb-1.5 text-sm font-medium text-fg">
-              Instrumentos / funções
-            </legend>
-            <p className="mb-2 text-xs text-soft">
-              Marque os que a pessoa toca ou exerce; a estrela indica o
-              principal.
-            </p>
-            <div className="grid max-h-56 gap-1.5 overflow-y-auto sm:grid-cols-2">
-              {instruments.map((instrument) => {
-                const checked = selected.has(instrument.id);
-                const primary = selected.get(instrument.id) === true;
-                return (
-                  <div
-                    key={instrument.id}
-                    className={cn(
-                      "flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm",
-                      checked
-                        ? "border-accent bg-accent-soft"
-                        : "border-border",
-                    )}
-                  >
-                    <label className="flex flex-1 cursor-pointer items-center gap-2">
-                      <input
-                        type="checkbox"
-                        className="size-4 accent-[var(--accent)]"
-                        checked={checked}
-                        onChange={() => toggleInstrument(instrument.id)}
-                      />
-                      <span className="text-fg">{instrument.name}</span>
-                    </label>
-                    {checked && (
-                      <button
-                        type="button"
-                        onClick={() => makePrimary(instrument.id)}
-                        aria-pressed={primary}
-                        aria-label={`Tornar ${instrument.name} o principal`}
-                        title="Principal"
-                        className={cn(
-                          "text-base leading-none",
-                          primary
-                            ? "text-brand-gold-ink"
-                            : "text-soft hover:text-fg",
-                        )}
-                      >
-                        {primary ? "★" : "☆"}
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </fieldset>
+          <InstrumentChoices
+            instruments={instruments}
+            value={form.instruments}
+            onChange={(value) => set("instruments", value)}
+          />
+
+          <FunctionChoices
+            functions={functions}
+            value={form.functionIds}
+            onChange={(value) => set("functionIds", value)}
+          />
 
           <TextArea
             label="Observações"

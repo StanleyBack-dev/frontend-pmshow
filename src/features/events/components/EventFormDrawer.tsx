@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  ArrowUpRight,
   CalendarDays,
+  ClipboardList,
   FileText,
   Flag,
   ListMusic,
@@ -12,7 +15,6 @@ import {
   Plus,
 } from "lucide-react";
 import {
-  Alert,
   Button,
   Drawer,
   Field,
@@ -23,6 +25,7 @@ import {
 } from "@/design-system";
 import { eventsClient } from "@/features/events/api/events.client";
 import { VenueFormDrawer } from "@/features/events/components/VenueFormDrawer";
+import { RosterModal } from "@/features/rosters/components/RosterModal";
 import {
   SongListEditor,
   toSongListItems,
@@ -32,15 +35,19 @@ import {
 import {
   EVENT_TYPES,
   EVENT_TYPE_LABELS,
+  UNIFORMS,
+  UNIFORM_LABELS,
 } from "@/features/events/model/event-labels";
 import type {
   BandEvent,
   EventInput,
   EventType,
+  EventUniform,
   Venue,
 } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { fromLocalInput, toLocalInput } from "@/shared/lib/datetime";
+import { useToast } from "@/shared/toast/useToast";
 
 // One date and three times: the band's day reads like the order of the
 // event (arrive, start, end), without repeating the date three times.
@@ -52,7 +59,7 @@ type Form = {
   startTime: string;
   endTime: string;
   venueId: string;
-  uniform: string;
+  uniform: EventUniform | "";
   requester: string;
   documentRef: string;
   notes: string;
@@ -76,6 +83,9 @@ const fromEvent = (event?: BandEvent): Form => ({
   documentRef: event?.documentRef ?? "",
   notes: event?.notes ?? "",
 });
+
+const VENUE_REQUIRED = "Escolha o local ou cadastre um novo no “+”.";
+const UNIFORM_REQUIRED = "Escolha o uniforme.";
 
 /** "2026-11-15" → "2026-11-16". */
 function nextDay(date: string): string {
@@ -134,6 +144,9 @@ function toInput(form: Form): EventInput | string {
   const errors = scheduleErrors(form);
   const firstError = errors.date ?? errors.startTime ?? errors.callTime;
   if (firstError) return firstError;
+  if (!form.venueId) return VENUE_REQUIRED;
+  if (!form.uniform) return UNIFORM_REQUIRED;
+  const uniform = form.uniform;
   const startsAt = fromLocalInput(`${form.date}T${form.startTime}`);
   if (!startsAt) return "Data ou horário inválido.";
   const endDate = endsNextDay(form) ? nextDay(form.date) : form.date;
@@ -145,26 +158,31 @@ function toInput(form: Form): EventInput | string {
       : null,
     startsAt,
     endsAt: form.endTime ? fromLocalInput(`${endDate}T${form.endTime}`) : null,
-    venueId: form.venueId || null,
-    uniform: form.uniform || null,
+    venueId: form.venueId,
+    uniform,
     requester: form.requester || null,
     documentRef: form.documentRef || null,
     notes: form.notes || null,
   };
 }
 
-function EventFormDrawer({
+export function EventFormDrawer({
   event,
   venues,
+  canBuildRoster = false,
+  canPublishRoster = false,
   onClose,
 }: {
   event?: BandEvent;
   venues: Venue[];
+  /** Shows "Montar escala" (existing events still open). */
+  canBuildRoster?: boolean;
+  canPublishRoster?: boolean;
   onClose: () => void;
 }) {
   const router = useRouter();
   const [form, setForm] = useState<Form>(() => fromEvent(event));
-  const [error, setError] = useState<string | null>(null);
+  const { showError, showSuccess } = useToast();
   const [pending, setPending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   // The list of songs: loaded for an existing event, saved with it.
@@ -186,31 +204,35 @@ function EventFormDrawer({
   );
   const errors = scheduleErrors(form);
   const summary = scheduleSummary(form);
+  const [rosterOpen, setRosterOpen] = useState(false);
+  const rosterOpenable =
+    canBuildRoster &&
+    event !== undefined &&
+    (event.status === "PLANEJADO" || event.status === "CONFIRMADO");
+  const closeRoster = useCallback(() => setRosterOpen(false), []);
 
   async function submit() {
     setSubmitted(true);
     const input = toInput(form);
-    if (typeof input === "string") return setError(input);
+    if (typeof input === "string") return showError(input);
     setPending(true);
-    setError(null);
     try {
-      const songs = songList.rows ?? [];
+      // The list of songs goes with the event: one request, one transaction.
+      const songs = toSongListItems(songList.rows ?? []);
       if (event) {
-        await eventsClient.update(event.id, input);
-        if (songsChanged) {
-          await eventsClient.setSetlist(event.id, toSongListItems(songs));
-        }
-        router.refresh();
+        await eventsClient.update(event.id, {
+          ...input,
+          ...(songsChanged ? { setlist: songs } : {}),
+        });
+        showSuccess("Evento salvo.");
       } else {
-        const created = await eventsClient.create(input);
-        if (songs.length > 0) {
-          await eventsClient.setSetlist(created.id, toSongListItems(songs));
-        }
-        router.push(`/eventos/${created.id}`);
+        await eventsClient.create({ ...input, setlist: songs });
+        showSuccess("Evento criado.", "Ele já aparece na lista e na agenda.");
       }
+      router.refresh();
       onClose();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar o evento.",
@@ -228,7 +250,7 @@ function EventFormDrawer({
       subtitle={
         event
           ? undefined
-          : "Depois de criar, monte a escala na página do evento."
+          : "Depois de criar, monte a escala pela coluna Escala da lista."
       }
       busy={pending}
       footer={
@@ -246,6 +268,34 @@ function EventFormDrawer({
         </>
       }
     >
+      {event && (
+        <Link
+          href={`/eventos/${event.id}`}
+          className="mb-4 inline-flex items-center gap-1 text-sm text-accent hover:underline"
+        >
+          Abrir página do evento <ArrowUpRight className="size-4" />
+        </Link>
+      )}
+      {rosterOpenable && (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-lg border border-accent-border bg-accent-soft p-4">
+          <span className="grid size-9 shrink-0 place-items-center rounded-md bg-accent text-accent-fg">
+            <ClipboardList className="size-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-fg">Escala da banda</p>
+            <p className="text-xs text-muted">
+              Escolha quem vai tocar neste evento e a função de cada um.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            icon={<ClipboardList className="size-4" />}
+            onClick={() => setRosterOpen(true)}
+          >
+            Montar escala
+          </Button>
+        </div>
+      )}
       <form
         className="space-y-5"
         onSubmit={(e) => {
@@ -253,8 +303,6 @@ function EventFormDrawer({
           void submit();
         }}
       >
-        {error && <Alert tone="danger">{error}</Alert>}
-
         <FormSection
           icon={<Flag />}
           title="O evento"
@@ -333,9 +381,11 @@ function EventFormDrawer({
         >
           <Select
             label="Onde"
+            required
             value={form.venueId}
             onChange={(e) => set("venueId", e.target.value)}
-            placeholder="A definir"
+            placeholder="Selecione"
+            error={submitted && !form.venueId ? VENUE_REQUIRED : undefined}
             options={venueOptions.map((venue) => ({
               value: venue.id,
               label: `${venue.name} · ${venue.city}/${venue.state}`,
@@ -364,11 +414,10 @@ function EventFormDrawer({
           title="Lista de músicas"
           description="O que a banda vai tocar, na ordem. Pode ficar para depois."
         >
-          {songList.error && <Alert tone="danger">{songList.error}</Alert>}
           {songList.rows ? (
             <SongListEditor rows={songList.rows} onChange={changeSongs} />
           ) : (
-            !songList.error && (
+            !songList.failed && (
               <div className="grid place-items-center py-4">
                 <Spinner size="sm" />
               </div>
@@ -379,14 +428,20 @@ function EventFormDrawer({
         <FormSection
           icon={<FileText />}
           title="Detalhes do pedido"
-          description="Opcional: traje, quem pediu a apresentação e o documento."
+          description="O uniforme da banda; quem pediu e o documento são opcionais."
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field
-              label="Uniforme / traje"
-              placeholder="Ex.: 1º uniforme"
+            <Select
+              label="Uniforme"
+              required
               value={form.uniform}
-              onChange={(e) => set("uniform", e.target.value)}
+              onChange={(e) => set("uniform", e.target.value as EventUniform)}
+              placeholder="Selecione"
+              options={UNIFORMS.map((value) => ({
+                value,
+                label: UNIFORM_LABELS[value],
+              }))}
+              error={submitted && !form.uniform ? UNIFORM_REQUIRED : undefined}
             />
             <Field
               label="Solicitante"
@@ -410,6 +465,14 @@ function EventFormDrawer({
           />
         </FormSection>
       </form>
+      {rosterOpen && event && (
+        <RosterModal
+          eventId={event.id}
+          eventTitle={event.title}
+          canPublish={canPublishRoster}
+          onClose={closeRoster}
+        />
+      )}
       {creatingVenue && (
         <VenueFormDrawer
           onClose={() => setCreatingVenue(false)}
@@ -440,43 +503,16 @@ export function NewEventButton({ venues }: { venues: Venue[] }) {
   );
 }
 
-// Pencil at the start of an events-page row (the row is not clickable).
-export function EditEventIconButton({
-  event,
-  venues,
-}: {
-  event: BandEvent;
-  venues: Venue[];
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label={`Editar ${event.title}`}
-        title="Editar evento"
-        className="grid size-8 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg"
-      >
-        <Pencil aria-hidden className="size-4" />
-      </button>
-      {open && (
-        <EventFormDrawer
-          event={event}
-          venues={venues}
-          onClose={() => setOpen(false)}
-        />
-      )}
-    </>
-  );
-}
-
 export function EditEventButton({
   event,
   venues,
+  canBuildRoster = false,
+  canPublishRoster = false,
 }: {
   event: BandEvent;
   venues: Venue[];
+  canBuildRoster?: boolean;
+  canPublishRoster?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -493,6 +529,8 @@ export function EditEventButton({
         <EventFormDrawer
           event={event}
           venues={venues}
+          canBuildRoster={canBuildRoster}
+          canPublishRoster={canPublishRoster}
           onClose={() => setOpen(false)}
         />
       )}

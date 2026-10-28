@@ -8,6 +8,7 @@ import type {
   VenueInput,
   ZipCodeAddress,
 } from "@/shared/contracts/events";
+import type { SongCategory } from "@/shared/contracts/repertoire";
 
 const json = (method: string, body: unknown): RequestInit => ({
   method,
@@ -18,7 +19,14 @@ export type SongOption = {
   id: string;
   title: string;
   artist: string | null;
+  category: SongCategory;
   musicalKey: string | null;
+};
+
+export type SongPickerFilter = {
+  q?: string;
+  category?: SongCategory;
+  artistId?: string;
 };
 
 export const eventsClient = {
@@ -40,8 +48,14 @@ export const eventsClient = {
   setSetlist: (id: string, items: { songId: string; notes: string | null }[]) =>
     apiRequest<{ ok: true }>(`/events/${id}/setlist`, json("PUT", { items })),
 
-  searchSongs: (query: string) =>
-    apiRequest<SongOption[]>(`/songs?q=${encodeURIComponent(query)}`),
+  /** Songs of the repertoire for the list of songs (up to 100). */
+  searchSongs: (filter: SongPickerFilter) => {
+    const params = new URLSearchParams();
+    if (filter.q) params.set("q", filter.q);
+    if (filter.category) params.set("categoria", filter.category);
+    if (filter.artistId) params.set("artista", filter.artistId);
+    return apiRequest<SongOption[]>(`/songs?${params}`);
+  },
 
   /** Street, district, city and UF of a CEP (8 digits). */
   zipCode: (cep: string) =>

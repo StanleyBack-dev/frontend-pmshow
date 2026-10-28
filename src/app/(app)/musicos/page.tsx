@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Guitar, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import {
   Card,
   EmptyState,
@@ -10,7 +9,6 @@ import {
   PageHeader,
   Pagination,
   Select,
-  buttonClasses,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { MembersTable } from "@/features/members/components/MembersTable";
@@ -21,6 +19,7 @@ import {
   STATUS_LABELS,
 } from "@/features/members/model/member-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
+import { bandFunctionsService } from "@/server/services/band-functions.service";
 import { membersService } from "@/server/services/members.service";
 import { can } from "@/shared/lib/access";
 import {
@@ -55,6 +54,11 @@ export default async function MembersPage({
   const instrumentParam = firstParam(params, "instrumento");
   const instrumentId =
     instrumentParam && UUID.test(instrumentParam) ? instrumentParam : undefined;
+  const functionParam = firstParam(params, "funcao");
+  const functionId =
+    canManage && functionParam && UUID.test(functionParam)
+      ? functionParam
+      : undefined;
   const pending = firstParam(params, "sem-cadastro") === "1";
   const page = pageParam(params);
   const pageSize = pageSizeParam(params);
@@ -64,44 +68,38 @@ export default async function MembersPage({
       naipe: section,
       situacao: status,
       instrumento: instrumentId,
+      funcao: functionId,
       "sem-cadastro": pending ? "1" : undefined,
       "por-pagina": pageSizeQuery(pageSize),
       ...overrides,
     });
 
-  const [roster, instruments] = await authed((token) =>
+  const [roster, instruments, functions] = await authed((token) =>
     Promise.all([
       membersService.roster(token, {
         search,
         section,
         status,
         instrumentId,
+        functionId,
         withProfile: pending ? false : undefined,
         page,
         limit: pageSize,
       }),
       membersService.instruments(token),
+      // The function catalog is for who manages (Gestor, Administrador geral).
+      canManage ? bandFunctionsService.list(token, true) : Promise.resolve([]),
     ]),
   );
   const filtered = Boolean(
-    search || section || status || instrumentId || pending,
+    search || section || status || instrumentId || functionId || pending,
   );
 
   return (
     <>
       <PageHeader
         title="Músicos"
-        description="Integrantes da banda: posto, naipe, instrumentos e situação."
-        actions={
-          canManage ? (
-            <Link
-              href="/musicos/instrumentos"
-              className={buttonClasses("secondary")}
-            >
-              <Guitar className="size-4" /> Instrumentos
-            </Link>
-          ) : undefined
-        }
+        description="Integrantes da banda: posto, naipe, instrumentos, funções e situação."
       />
       <FilterPanel hasActiveFilters={filtered}>
         <form
@@ -138,6 +136,18 @@ export default async function MembersPage({
               label: instrument.name,
             }))}
           />
+          {canManage && (
+            <Select
+              label="Função"
+              name="funcao"
+              defaultValue={functionId ?? ""}
+              placeholder="Todas"
+              options={functions.map((item) => ({
+                value: item.id,
+                label: item.archived ? `${item.name} (arquivada)` : item.name,
+              }))}
+            />
+          )}
           <Select
             label="Situação"
             name="situacao"
@@ -181,8 +191,8 @@ export default async function MembersPage({
           <MembersTable
             roster={roster.items}
             instruments={instruments}
+            functions={functions}
             canManage={canManage}
-            canAudit={can(user, "AUDIT_READ")}
           />
         )}
 

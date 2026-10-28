@@ -16,7 +16,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import { Button, cn, Modal, Spinner } from "@/design-system";
+import { Avatar, Button, cn, Modal, Spinner } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { authClient } from "@/features/auth/api/auth.client";
 import { InstallAppInvite } from "@/features/install/components/InstallAppInvite";
@@ -25,6 +25,7 @@ import { MenuSearch } from "@/features/layout/components/MenuSearch";
 import {
   ACCOUNT_NAV,
   ADMIN_NAV,
+  canSee,
   isActive,
   PRIMARY_NAV,
   type NavItem,
@@ -69,6 +70,9 @@ function NavPendingHint() {
     <Spinner size="sm" className="ml-auto" label="Carregando página" />
   ) : null;
 }
+
+/** Only the first name: "Stanley Barbosa" → "Stanley". */
+const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? "";
 
 function NavLink({
   item,
@@ -131,7 +135,7 @@ export function AppShell({
   bottomBar,
   children,
 }: {
-  user: Pick<SessionUser, "name" | "group" | "permissions">;
+  user: Pick<SessionUser, "name" | "group" | "permissions" | "photoUrl">;
   showAdmin: boolean;
   /** Server-side count; the bell keeps it fresh afterwards. */
   unreadNotifications: number;
@@ -151,9 +155,7 @@ export function AppShell({
     () => false,
   );
 
-  const primary = PRIMARY_NAV.filter(
-    (item) => !item.permission || user.permissions.includes(item.permission),
-  );
+  const primary = PRIMARY_NAV.filter((item) => canSee(item, user.permissions));
   const account = showAdmin ? [...ACCOUNT_NAV, ADMIN_NAV] : ACCOUNT_NAV;
   const accountActive = account.some((item) => isActive(pathname, item));
 
@@ -180,6 +182,11 @@ export function AppShell({
   }, [mobileOpen]);
 
   const closeMobile = () => setMobileOpen(false);
+
+  function openLogout() {
+    closeMobile();
+    setLogoutOpen(true);
+  }
 
   async function logout() {
     setLeaving(true);
@@ -229,7 +236,7 @@ export function AppShell({
                 PM <span className="text-brand-gold">SHOW</span>
               </span>
               <span className="block truncate text-[10px] tracking-[0.16em] text-brand-gold uppercase">
-                {user.name}
+                {firstName(user.name)}
               </span>
             </span>
           </Link>
@@ -300,10 +307,19 @@ export function AppShell({
                   : "text-chrome-muted hover:bg-chrome-hover hover:text-chrome-fg",
               )}
             >
-              <CircleUserRound
-                aria-hidden
-                className="size-[18px] text-chrome-subtle"
-              />
+              {user.photoUrl ? (
+                <Avatar
+                  name={user.name}
+                  src={user.photoUrl}
+                  size="sm"
+                  className="size-6 ring-1 ring-chrome-line"
+                />
+              ) : (
+                <CircleUserRound
+                  aria-hidden
+                  className="size-[18px] text-chrome-subtle"
+                />
+              )}
               <span className="min-w-0 flex-1 text-left">
                 <span className="block">Conta</span>
                 <span className="block truncate text-[11px] font-normal text-chrome-subtle">
@@ -329,27 +345,33 @@ export function AppShell({
                     onNavigate={closeMobile}
                   />
                 ))}
+                <button
+                  type="button"
+                  onClick={openLogout}
+                  className="group flex w-full items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium text-chrome-muted transition-colors hover:bg-chrome-hover hover:text-chrome-fg"
+                >
+                  <LogOut
+                    aria-hidden
+                    className="size-[18px] shrink-0 text-chrome-subtle group-hover:text-brand-gold"
+                  />
+                  <span className="flex-1 text-left">Sair</span>
+                </button>
               </div>
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              closeMobile();
-              setLogoutOpen(true);
-            }}
-            title={collapsed ? "Sair" : undefined}
-            className={cn(
-              "mt-0.5 flex w-full items-center gap-3 rounded-md py-2 text-[13px] font-medium text-chrome-muted transition-colors hover:bg-chrome-hover hover:text-chrome-fg",
-              collapsed ? "px-3 lg:justify-center lg:px-0" : "px-3",
-            )}
-          >
-            <LogOut aria-hidden className="size-[18px] shrink-0" />
-            <span className={cn("flex-1 text-left", collapsed && "lg:sr-only")}>
-              Sair
-            </span>
-          </button>
+          {/* The icon rail hides the "Conta" section: Sair stays reachable. */}
+          {collapsed && (
+            <button
+              type="button"
+              onClick={openLogout}
+              title="Sair"
+              aria-label="Sair"
+              className="mt-0.5 hidden w-full items-center justify-center rounded-md py-2 text-chrome-muted transition-colors hover:bg-chrome-hover hover:text-chrome-fg lg:flex"
+            >
+              <LogOut aria-hidden className="size-[18px] shrink-0" />
+            </button>
+          )}
         </div>
       </aside>
 
@@ -382,9 +404,10 @@ export function AppShell({
           {children}
         </main>
         {bottomBar}
+        {/* Inside the column: on phones it takes room at the end of the page
+            instead of covering the last items. */}
+        <InstallAppInvite />
       </div>
-
-      <InstallAppInvite />
 
       <Modal
         open={logoutOpen}

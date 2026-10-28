@@ -200,7 +200,6 @@ export default async function RepertoirePage({
             songs={songs.items}
             artists={artists}
             canEdit={canManage && !archived}
-            canAudit={can(user, "AUDIT_READ")}
           />
         )}
 

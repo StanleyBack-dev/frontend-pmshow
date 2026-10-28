@@ -1,6 +1,10 @@
-import type { EventStatus, EventType } from "@/shared/graphql/schema-enums";
+import type {
+  EventStatus,
+  EventType,
+  EventUniform,
+} from "@/shared/graphql/schema-enums";
 
-export type { EventStatus, EventType };
+export type { EventStatus, EventType, EventUniform };
 
 export type Venue = {
   id: string;
@@ -40,12 +44,21 @@ export type BandEvent = {
   startsAt: string;
   endsAt: string | null;
   venueId: string | null;
-  uniform: string | null;
+  /** null only on events created before the uniform list. */
+  uniform: EventUniform | null;
   requester: string | null;
   documentRef: string | null;
   notes: string | null;
   cancellationReason: string | null;
   venue: Venue | null;
+};
+
+/** An agenda entry: the event and my line on its published roster. */
+export type AgendaEvent = BandEvent & {
+  myAssignment: {
+    functionName: string | null;
+    instrumentName: string | null;
+  } | null;
 };
 
 /** Upcoming (from now on) or past events. */
@@ -85,11 +98,13 @@ export type EventInput = {
   callTime: string | null;
   startsAt: string;
   endsAt: string | null;
-  venueId: string | null;
-  uniform: string | null;
+  venueId: string;
+  uniform: EventUniform;
   requester: string | null;
   documentRef: string | null;
   notes: string | null;
+  /** The list of songs, saved with the event; omitted = keep it. */
+  setlist?: { songId: string; notes: string | null }[];
 };
 
 export type VenueInput = {

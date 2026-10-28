@@ -5,6 +5,8 @@ import {
   cancelAbsenceDocument,
   myAbsencesDocument,
   registerAbsenceDocument,
+  absenceAttachmentUrlDocument,
+  requestAbsenceAttachmentUploadsDocument,
   requestAbsenceDocument,
   reviewAbsenceDocument,
 } from "@/server/graphql/operations/absences.operations";
@@ -12,6 +14,7 @@ import type {
   Absence,
   AbsenceInput,
   AbsenceStatus,
+  AttachmentUpload,
 } from "@/shared/contracts/absences";
 
 export const absencesService = {
@@ -29,6 +32,35 @@ export const absencesService = {
       variables: { filter },
     });
     return absences;
+  },
+
+  async requestAttachmentUploads(
+    token: string,
+    files: { fileName: string; mimeType: string; sizeBytes: number }[],
+  ): Promise<AttachmentUpload[]> {
+    const { requestAbsenceAttachmentUploads } = await backendGraphql(
+      requestAbsenceAttachmentUploadsDocument,
+      { token, variables: { files } },
+    );
+    return requestAbsenceAttachmentUploads.map((item) => ({
+      storageKey: item.storageKey,
+      upload: {
+        url: item.upload.url,
+        fields: item.upload.fields as Record<string, string>,
+      },
+    }));
+  },
+
+  async attachmentUrl(
+    token: string,
+    id: string,
+    download: boolean,
+  ): Promise<string> {
+    const { absenceAttachmentUrl } = await backendGraphql(
+      absenceAttachmentUrlDocument,
+      { token, variables: { id, download } },
+    );
+    return absenceAttachmentUrl;
   },
 
   async request(token: string, input: AbsenceInput): Promise<Absence> {

@@ -145,18 +145,14 @@ export function zipCodeError(value: string): string | null {
     : "O CEP tem 8 números (ex.: 74000-000).";
 }
 
-/** House number: digits and one letter ("12A"), or "S/N". */
+/** House number: digits only (up to 6); "S/N" comes from the checkbox. */
 export function maskAddressNumber(value: string): string {
-  const text = value.toUpperCase().replace(/\s/g, "");
-  // "S", "S/", "SN" and "S/N" lead to "S/N" (sem número).
-  if (text === "SN") return "S/N";
-  if (/^S\/?N?$/.test(text)) return text;
-  return text.replace(/[^0-9A-Z]/g, "").slice(0, 7);
+  return digitsOf(value).slice(0, 6);
 }
 
 export function addressNumberError(value: string): string | null {
-  if (!value) return null;
-  return /^(\d{1,6}[A-Z]?|S\/N)$/.test(value)
+  if (!value || value === "S/N") return null;
+  return /^[1-9]\d{0,5}$/.test(value)
     ? null
-    : "Use números (ex.: 123 ou 12A) ou S/N.";
+    : "Use só números (ex.: 123) ou marque “Sem número”.";
 }

@@ -1,5 +1,9 @@
 import { apiRequest } from "@/shared/lib/api-client";
-import type { Absence, AbsenceInput } from "@/shared/contracts/absences";
+import type {
+  Absence,
+  AbsenceInput,
+  AttachmentUpload,
+} from "@/shared/contracts/absences";
 
 const post = (body?: unknown): RequestInit => ({
   method: "POST",
@@ -7,6 +11,19 @@ const post = (body?: unknown): RequestInit => ({
 });
 
 export const absencesClient = {
+  /** Signed forms to send the files of a request straight to storage. */
+  attachmentUploads: (files: File[]) =>
+    apiRequest<AttachmentUpload[]>(
+      "/absences/attachments",
+      post({
+        files: files.map((file) => ({
+          fileName: file.name,
+          mimeType: file.type,
+          sizeBytes: file.size,
+        })),
+      }),
+    ),
+
   request: (input: AbsenceInput) =>
     apiRequest<Absence>("/absences", post(input)),
 
@@ -18,3 +35,9 @@ export const absencesClient = {
 
   cancel: (id: string) => apiRequest<Absence>(`/absences/${id}/cancel`, post()),
 };
+
+/** The short-lived storage link of an attachment (opens or saves it). */
+export const attachmentUrl = (id: string, download = false) =>
+  apiRequest<{ url: string }>(
+    `/absences/attachments/${id}?formato=json${download ? "&baixar=1" : ""}`,
+  ).then((result) => result.url);

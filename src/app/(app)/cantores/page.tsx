@@ -158,11 +158,7 @@ export default async function ArtistsPage({
             }
           />
         ) : (
-          <ArtistsTable
-            artists={artists.items}
-            canManage={canManage}
-            canAudit={can(user, "AUDIT_READ")}
-          />
+          <ArtistsTable artists={artists.items} canManage={canManage} />
         )}
 
         <Pagination

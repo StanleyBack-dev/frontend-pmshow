@@ -3,19 +3,14 @@
 import Link from "next/link";
 import { DataTable, type DataTableColumn } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
+import { CopyShareValue } from "@/features/admin/components/CopyShareValue";
 import { UserStatusBadges } from "@/features/admin/components/UserStatusBadges";
 import { auditColumn } from "@/features/audit/components/RecordAudit";
 import type { UserAccount } from "@/shared/contracts/api";
 import { formatDateTime } from "@/shared/lib/format";
 
 // Accounts of the admin area (amoremio table, with the audit column).
-export function UsersTable({
-  users,
-  canAudit,
-}: {
-  users: UserAccount[];
-  canAudit: boolean;
-}) {
+export function UsersTable({ users }: { users: UserAccount[] }) {
   const audit = auditColumn((user: UserAccount) => ({
     entity: "user" as const,
     id: user.id,
@@ -37,14 +32,16 @@ export function UsersTable({
       ),
     },
     {
-      key: "login",
-      label: "Usuário / e-mail",
-      mobile: "subtitle",
+      key: "username",
+      label: "Usuário",
       render: (user) => (
-        <span className="text-muted">
-          {user.username} · {user.email}
-        </span>
+        <CopyShareValue value={user.username} label="Usuário" />
       ),
+    },
+    {
+      key: "email",
+      label: "E-mail",
+      render: (user) => <CopyShareValue value={user.email} label="E-mail" />,
     },
     {
       key: "group",
@@ -68,9 +65,9 @@ export function UsersTable({
   return (
     <DataTable
       rows={users}
-      columns={canAudit ? [...columns, audit.column] : columns}
+      columns={[...columns, audit.column]}
       getId={(user) => user.id}
-      renderExpanded={canAudit ? audit.renderExpanded : undefined}
+      renderExpanded={audit.renderExpanded}
     />
   );
 }

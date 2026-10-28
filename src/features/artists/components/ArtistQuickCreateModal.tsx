@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Alert, Button, Field, Modal } from "@/design-system";
+import { Button, Field, Modal } from "@/design-system";
 import { artistsClient } from "@/features/artists/api/artists.client";
 import type { Artist } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 // Registers a singer / band without leaving the song form.
 export function ArtistQuickCreateModal({
@@ -19,16 +20,15 @@ export function ArtistQuickCreateModal({
   initialName?: string;
 }) {
   const [name, setName] = useState(initialName);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function submit() {
     setPending(true);
-    setError(null);
     try {
       onCreated(await artistsClient.create(name));
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível cadastrar.",
@@ -65,7 +65,6 @@ export function ArtistQuickCreateModal({
           if (name.trim().length >= 2) void submit();
         }}
       >
-        {error && <Alert tone="danger">{error}</Alert>}
         <Field
           label="Nome"
           required

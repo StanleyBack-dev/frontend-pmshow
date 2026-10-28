@@ -42,7 +42,8 @@ export function BandDashboardPanel({
           : ("success" as const),
     },
     {
-      href: "/eventos",
+      // Swap requests first: the list where they are solved.
+      href: dashboard.swapRequests > 0 ? "/escalas?aba=trocas" : "/eventos",
       label: "Ciências pendentes",
       value: dashboard.pendingAcks,
       hint:
@@ -75,20 +76,20 @@ export function BandDashboardPanel({
 
   return (
     <section aria-label="Painel da banda" className="space-y-3">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         {cards.map(({ href, ...card }) => (
           <Link
             key={card.label}
             href={href}
-            className="block rounded-xl transition-opacity hover:opacity-90"
+            className="block h-full rounded-xl transition-opacity hover:opacity-90"
           >
             <StatCard {...card} />
           </Link>
         ))}
       </div>
       {dashboard.failedNotifications > 0 && (
-        <p className="flex items-center gap-2 text-sm text-danger">
-          <AlertTriangle className="size-4" aria-hidden />
+        <p className="flex items-start gap-2 text-sm text-danger">
+          <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
           {plural(
             dashboard.failedNotifications,
             "notificação não pôde ser enviada",

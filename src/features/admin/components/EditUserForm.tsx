@@ -8,6 +8,7 @@ import { adminClient } from "@/features/admin/api/admin.client";
 import { UserFormFields } from "@/features/admin/components/UserFormFields";
 import type { UserAccount, UserGroup, UserInput } from "@/shared/contracts/api";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 export function EditUserForm({
   user,
@@ -24,7 +25,7 @@ export function EditUserForm({
     group: user.group,
   };
   const [form, setForm] = useState<UserInput>(initial);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [saved, setSaved] = useState(false);
   const [pending, setPending] = useState(false);
 
@@ -39,14 +40,13 @@ export function EditUserForm({
   async function submit(event: FormEvent) {
     event.preventDefault();
     setPending(true);
-    setError(null);
     setSaved(false);
     try {
       await adminClient.updateUser(user.id, changes);
       setSaved(true);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar.",
@@ -57,7 +57,6 @@ export function EditUserForm({
 
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
-      {error && <Alert tone="danger">{error}</Alert>}
       {saved && <Alert tone="success">Alterações salvas.</Alert>}
       {changes.group && (
         <Alert tone="info">

@@ -1,9 +1,29 @@
 import Link from "next/link";
 import { cn } from "@/design-system";
-import type { BandEvent } from "@/shared/contracts/events";
+import type { AgendaEvent } from "@/shared/contracts/events";
 import { formatTime, localDay } from "@/shared/lib/datetime";
 
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+// Cancelled in red; my working days in blue; events I am on in gold; the
+// rest of the band's events in green.
+const chipTone = (event: AgendaEvent) =>
+  event.status === "CANCELADO"
+    ? "bg-danger-soft text-danger line-through"
+    : event.type === "EXPEDIENTE"
+      ? "bg-info-soft text-info"
+      : event.myAssignment
+        ? "bg-brand-gold-soft text-brand-gold-ink font-medium"
+        : "bg-accent-soft text-accent";
+
+const dotTone = (event: AgendaEvent) =>
+  event.status === "CANCELADO"
+    ? "bg-danger"
+    : event.type === "EXPEDIENTE"
+      ? "bg-info"
+      : event.myAssignment
+        ? "bg-brand-gold"
+        : "bg-accent";
 const MAX_PER_DAY = 3;
 
 /**
@@ -18,7 +38,7 @@ export function MonthGrid({
 }: {
   month: string;
   today: string;
-  events: BandEvent[];
+  events: AgendaEvent[];
 }) {
   const [year, monthIndex] = month.split("-").map(Number);
   const firstWeekday = new Date(Date.UTC(year, monthIndex - 1, 1)).getUTCDay();
@@ -29,7 +49,7 @@ export function MonthGrid({
   ];
   while (cells.length % 7 !== 0) cells.push(null);
 
-  const byDay = new Map<string, BandEvent[]>();
+  const byDay = new Map<string, AgendaEvent[]>();
   for (const event of events) {
     const key = localDay(event.startsAt);
     byDay.set(key, [...(byDay.get(key) ?? []), event]);
@@ -80,12 +100,7 @@ export function MonthGrid({
                   {items.slice(0, 4).map((event) => (
                     <span
                       key={event.id}
-                      className={cn(
-                        "size-1.5 rounded-full",
-                        event.status === "CANCELADO"
-                          ? "bg-danger"
-                          : "bg-accent",
-                      )}
+                      className={cn("size-1.5 rounded-full", dotTone(event))}
                     />
                   ))}
                 </span>
@@ -97,10 +112,8 @@ export function MonthGrid({
                       href={`/eventos/${event.id}`}
                       title={event.title}
                       className={cn(
-                        "block truncate rounded px-1 py-0.5",
-                        event.status === "CANCELADO"
-                          ? "bg-danger-soft text-danger line-through"
-                          : "bg-accent-soft text-accent hover:underline",
+                        "block truncate rounded px-1 py-0.5 hover:underline",
+                        chipTone(event),
                       )}
                     >
                       {formatTime(event.startsAt)} {event.title}

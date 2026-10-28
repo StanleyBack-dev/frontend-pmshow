@@ -20,13 +20,11 @@ export function SongsTable({
   songs,
   artists,
   canEdit,
-  canAudit,
 }: {
   songs: SongListItem[];
   artists: Artist[];
   canEdit: boolean;
   /** Shows the audit column (desktop) / section (phones). */
-  canAudit: boolean;
 }) {
   const audit = auditColumn((song: SongListItem) => ({
     entity: "song" as const,
@@ -116,9 +114,9 @@ export function SongsTable({
   return (
     <DataTable
       rows={songs}
-      columns={canAudit ? [...columns, audit.column] : columns}
+      columns={[...columns, audit.column]}
       getId={(song) => song.id}
-      renderExpanded={canAudit ? audit.renderExpanded : undefined}
+      renderExpanded={audit.renderExpanded}
     />
   );
 }

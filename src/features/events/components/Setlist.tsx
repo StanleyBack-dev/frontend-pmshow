@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil, PlayCircle, Save } from "lucide-react";
-import { Alert, Button } from "@/design-system";
+import { Button } from "@/design-system";
 import { eventsClient } from "@/features/events/api/events.client";
 import {
   SongListEditor,
@@ -19,6 +19,7 @@ import {
 import { formatDuration } from "@/features/repertoire/model/repertoire-labels";
 import type { SetlistEntry } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 export function Setlist({
   eventId,
@@ -151,18 +152,17 @@ function SetlistEditor({
 }) {
   const router = useRouter();
   const [rows, setRows] = useState<SongListRow[]>(initial);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function save() {
     setPending(true);
-    setError(null);
     try {
       await eventsClient.setSetlist(eventId, toSongListItems(rows));
       router.refresh();
       onDone();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar a lista de músicas.",
@@ -173,7 +173,6 @@ function SetlistEditor({
 
   return (
     <div className="space-y-4">
-      {error && <Alert tone="danger">{error}</Alert>}
       <SongListEditor rows={rows} onChange={setRows} />
       <div className="flex gap-2">
         <Button

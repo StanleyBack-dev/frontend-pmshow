@@ -2,14 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, ListMusic, Plus, Save, X } from "lucide-react";
-import { Alert, Button, Field, Modal, Spinner } from "@/design-system";
+import { ArrowDown, ArrowUp, ListMusic, Save, X } from "lucide-react";
+import { Button, Combobox, Modal, Select, Spinner } from "@/design-system";
+import { artistsClient } from "@/features/artists/api/artists.client";
 import {
   eventsClient,
   type SongOption,
 } from "@/features/events/api/events.client";
+import {
+  CATEGORIES,
+  CATEGORY_LABELS,
+} from "@/features/repertoire/model/repertoire-labels";
 import type { SetlistEntry } from "@/shared/contracts/events";
+import type { Artist, SongCategory } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 /** A song in an event's list of songs (as edited, before saving). */
 export type SongListRow = {
@@ -31,9 +38,18 @@ export const toSongListItems = (rows: SongListRow[]) =>
 const rowButton =
   "grid size-8 shrink-0 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg disabled:opacity-30";
 
-// The list of songs of an event: search the repertoire to add, move up /
-// down, remove. Controlled: the caller decides when to save (event drawer,
-// the list dialog, the event page).
+type PickerFilter = "title" | "category" | "artist";
+
+const FILTERS: { value: PickerFilter; label: string }[] = [
+  { value: "title", label: "Título" },
+  { value: "category", label: "Categoria" },
+  { value: "artist", label: "Cantor / banda" },
+];
+
+// The list of songs of an event: a searchable select of the repertoire
+// (narrowed by title, category or singer / band) adds songs; move up /
+// down and remove. Controlled: the caller decides when to save (event
+// drawer, the list dialog, the event page).
 export function SongListEditor({
   rows,
   onChange,
@@ -41,24 +57,88 @@ export function SongListEditor({
   rows: SongListRow[];
   onChange: (rows: SongListRow[]) => void;
 }) {
+  const [filter, setFilter] = useState<PickerFilter>("title");
+  const [filterValue, setFilterValue] = useState("");
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SongOption[]>([]);
+  const [songs, setSongs] = useState<SongOption[]>([]);
+  const [loading, setLoading] = useState(false);
+  // The filter whose songs are on screen: until the songs of the chosen
+  // filter arrive, the select is locked (typing a title doesn't lock it).
+  const [loadedFilter, setLoadedFilter] = useState<string | null>(null);
+  const filterKey = `${filter}|${filterValue}`;
+  const blocked = loadedFilter !== filterKey;
+  const [artists, setArtists] = useState<Artist[]>([]);
 
-  // Debounced search in the repertoire.
+  // Singers / bands for the filter, once.
   useEffect(() => {
-    const term = query.trim();
-    if (term.length < 2) return;
+    let active = true;
+    artistsClient.list().then(
+      (result) => {
+        if (active) setArtists(result);
+      },
+      () => undefined,
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // The songs matching the filter and the typed text (debounced).
+  useEffect(() => {
+    let active = true;
     const timer = setTimeout(() => {
+      setLoading(true);
       eventsClient
-        .searchSongs(term)
-        .then(setResults)
-        .catch(() => setResults([]));
+        .searchSongs({
+          q: query.trim() || undefined,
+          category:
+            filter === "category" && filterValue
+              ? (filterValue as SongCategory)
+              : undefined,
+          artistId:
+            filter === "artist" && filterValue ? filterValue : undefined,
+        })
+        .then(
+          (result) => {
+            if (!active) return;
+            setSongs(result);
+            setLoadedFilter(filterKey);
+          },
+          () => {
+            if (!active) return;
+            setSongs([]);
+            setLoadedFilter(filterKey);
+          },
+        )
+        .finally(() => {
+          if (active) setLoading(false);
+        });
     }, 250);
-    return () => clearTimeout(timer);
-  }, [query]);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [filter, filterValue, filterKey, query]);
 
   const inList = new Set(rows.map((row) => row.songId));
-  const visibleResults = query.trim().length < 2 ? [] : results;
+  // Songs already in the list are not offered again.
+  const available = songs.filter((song) => !inList.has(song.id));
+  const options = available.map((song) => ({
+    value: song.id,
+    label: song.title,
+    description: [song.artist, CATEGORY_LABELS[song.category], song.musicalKey]
+      .filter(Boolean)
+      .join(" · "),
+  }));
+
+  function add(songId: string | null) {
+    const song = songs.find((item) => item.id === songId);
+    if (!song || inList.has(song.id)) return;
+    onChange([
+      ...rows,
+      { songId: song.id, title: song.title, detail: song.musicalKey },
+    ]);
+  }
 
   function move(index: number, delta: number) {
     const next = [...rows];
@@ -69,54 +149,76 @@ export function SongListEditor({
 
   return (
     <div className="space-y-3">
-      <div>
-        <Field
-          label="Adicionar música"
-          placeholder="Digite parte do título ou do cantor"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
+      <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
+        <Select
+          label="Filtrar por"
+          value={filter}
+          onChange={(event) => {
+            setFilter(event.target.value as PickerFilter);
+            setFilterValue("");
+          }}
+          options={FILTERS}
         />
-        {visibleResults.length > 0 && (
-          <ul className="mt-2 max-h-56 divide-y divide-border overflow-y-auto rounded-md border border-border">
-            {visibleResults.map((song) => (
-              <li
-                key={song.id}
-                className="flex items-center gap-2 px-3 py-1.5 text-[13px]"
-              >
-                <span className="min-w-0 flex-1 truncate text-fg">
-                  {song.title}
-                  {song.artist && (
-                    <span className="text-soft"> · {song.artist}</span>
-                  )}
-                </span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  disabled={inList.has(song.id)}
-                  icon={<Plus className="size-4" />}
-                  onClick={() =>
-                    onChange([
-                      ...rows,
-                      {
-                        songId: song.id,
-                        title: song.title,
-                        detail: song.musicalKey,
-                      },
-                    ])
-                  }
-                >
-                  {inList.has(song.id) ? "Já está" : "Adicionar"}
-                </Button>
-              </li>
-            ))}
-          </ul>
+        {filter === "category" ? (
+          <Select
+            label="Categoria"
+            value={filterValue}
+            onChange={(event) => setFilterValue(event.target.value)}
+            placeholder="Todas"
+            options={CATEGORIES.map((value) => ({
+              value,
+              label: CATEGORY_LABELS[value],
+            }))}
+          />
+        ) : filter === "artist" ? (
+          <Select
+            label="Cantor / banda"
+            value={filterValue}
+            onChange={(event) => setFilterValue(event.target.value)}
+            placeholder="Todos"
+            options={artists.map((artist) => ({
+              value: artist.id,
+              label: artist.name,
+            }))}
+          />
+        ) : (
+          <p className="self-end pb-2 text-xs text-soft">
+            Digite o título (ou o cantor) no campo abaixo.
+          </p>
         )}
       </div>
+
+      <Combobox
+        label="Adicionar música"
+        placeholder={
+          blocked
+            ? "Carregando músicas…"
+            : filter === "title"
+              ? "Busque pelo título"
+              : "Escolha na lista ou digite para filtrar"
+        }
+        disabled={blocked}
+        options={options}
+        value={null}
+        onSelect={add}
+        onInputChange={setQuery}
+        loading={loading}
+        emptyText={
+          songs.length > 0
+            ? "Todas as músicas encontradas já estão na lista"
+            : "Nenhuma música encontrada"
+        }
+        footer={
+          songs.length >= 100
+            ? "Mostrando as 100 primeiras: refine a busca."
+            : undefined
+        }
+      />
 
       {rows.length === 0 ? (
         <p className="flex items-center gap-2 rounded-md border border-dashed border-border px-3 py-4 text-[13px] text-soft">
           <ListMusic aria-hidden className="size-4" />
-          Nenhuma música na lista. Busque acima para adicionar.
+          Nenhuma música na lista. Escolha acima para adicionar.
         </p>
       ) : (
         <ol className="divide-y divide-border rounded-md border border-border">
@@ -176,7 +278,8 @@ export function SongListEditor({
 /** Loads an event's list of songs (rows) on the client. */
 export function useEventSongList(eventId: string | undefined) {
   const [rows, setRows] = useState<SongListRow[] | null>(eventId ? null : []);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const { showError } = useToast();
 
   useEffect(() => {
     if (!eventId) return;
@@ -187,7 +290,8 @@ export function useEventSongList(eventId: string | undefined) {
       },
       (cause: unknown) => {
         if (!active) return;
-        setError(
+        setFailed(true);
+        showError(
           cause instanceof ApiClientError
             ? cause.message
             : "Não foi possível carregar a lista de músicas.",
@@ -197,9 +301,9 @@ export function useEventSongList(eventId: string | undefined) {
     return () => {
       active = false;
     };
-  }, [eventId]);
+  }, [eventId, showError]);
 
-  return { rows, setRows, error };
+  return { rows, setRows, failed };
 }
 
 // Opened from the events table: only the event's list of songs, saved here.
@@ -213,20 +317,19 @@ export function SongListModal({
   onClose: () => void;
 }) {
   const router = useRouter();
-  const { rows, setRows, error: loadError } = useEventSongList(eventId);
-  const [error, setError] = useState<string | null>(null);
+  const { rows, setRows, failed } = useEventSongList(eventId);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function save() {
     if (!rows) return;
     setPending(true);
-    setError(null);
     try {
       await eventsClient.setSetlist(eventId, toSongListItems(rows));
       router.refresh();
       onClose();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar a lista de músicas.",
@@ -254,13 +357,10 @@ export function SongListModal({
       }
     >
       <div className="space-y-3">
-        {(loadError || error) && (
-          <Alert tone="danger">{loadError ?? error}</Alert>
-        )}
         {rows ? (
           <SongListEditor rows={rows} onChange={setRows} />
         ) : (
-          !loadError && (
+          !failed && (
             <div className="grid place-items-center py-6">
               <Spinner />
             </div>

@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCheck } from "lucide-react";
-import { Alert, Button, cn } from "@/design-system";
+import { Button, cn } from "@/design-system";
 import { notificationsClient } from "@/features/notifications/api/notifications.client";
 import { formatWhen } from "@/features/notifications/model/notification-labels";
 import type { AppNotification } from "@/shared/contracts/notifications";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 // Opening a notification marks it read and goes to what it is about.
 export function NotificationList({
@@ -19,7 +20,7 @@ export function NotificationList({
   now: string;
 }) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
   const reference = new Date(now);
   const unread = notifications.some((item) => !item.readAt);
@@ -34,12 +35,11 @@ export function NotificationList({
 
   async function markAll() {
     setPending(true);
-    setError(null);
     try {
       await notificationsClient.markAllRead();
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError ? cause.message : "Não foi possível.",
       );
     }
@@ -48,7 +48,6 @@ export function NotificationList({
 
   return (
     <div className="space-y-3">
-      {error && <Alert tone="danger">{error}</Alert>}
       {unread && (
         <div className="flex justify-end">
           <Button

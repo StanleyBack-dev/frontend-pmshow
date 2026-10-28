@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Archive, ArchiveRestore, Pencil, Plus } from "lucide-react";
-import { Alert, Button, Modal } from "@/design-system";
+import { Button, Modal } from "@/design-system";
 import { repertoireClient } from "@/features/repertoire/api/repertoire.client";
 import { SongFormDrawer } from "@/features/repertoire/components/SongFormDrawer";
 import type { Artist, Song } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 export function NewSongButton({ artists }: { artists: Artist[] }) {
   const [open, setOpen] = useState(false);
@@ -91,18 +92,17 @@ export function ArchiveSongButton({ song }: { song: Song }) {
   const router = useRouter();
   const archived = Boolean(song.archivedAt);
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function run() {
     setPending(true);
-    setError(null);
     try {
       await repertoireClient.setArchived(song.id, !archived);
       setOpen(false);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError ? cause.message : "Não foi possível.",
       );
     }
@@ -146,7 +146,6 @@ export function ArchiveSongButton({ song }: { song: Song }) {
         }
       >
         <div className="space-y-3">
-          {error && <Alert tone="danger">{error}</Alert>}
           <p>
             {archived
               ? "A música volta a aparecer no repertório."

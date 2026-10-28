@@ -7,6 +7,7 @@ import { LogIn, UserRound } from "lucide-react";
 import { Alert, Button, Field, PasswordField } from "@/design-system";
 import { authClient } from "@/features/auth/api/auth.client";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 export function LoginForm({
   next,
@@ -18,13 +19,12 @@ export function LoginForm({
   const router = useRouter();
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     setPending(true);
-    setError(null);
     try {
       const { mustChangePassword } = await authClient.login(login, password);
       router.replace(
@@ -32,7 +32,7 @@ export function LoginForm({
       );
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível entrar.",
@@ -43,10 +43,9 @@ export function LoginForm({
 
   return (
     <form onSubmit={submit} className="space-y-5" noValidate>
-      {expired && !error && (
+      {expired && (
         <Alert tone="warning">Sua sessão expirou. Entre novamente.</Alert>
       )}
-      {error && <Alert tone="danger">{error}</Alert>}
       <Field
         label="Usuário ou e-mail"
         name="login"

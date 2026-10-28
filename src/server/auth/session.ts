@@ -11,9 +11,12 @@ import { serverEnv } from "@/server/config/env";
 // - refresh cookie: the session's refresh token (lifetime of the session).
 // - reset cookie: the password-recovery reset token, between the "code" and
 //   the "new password" steps.
+// - enrollment cookie: the public sign-up form token, between the cohort
+//   code and sending the form.
 
 const EXPIRY_SKEW_MS = 30_000;
 const RESET_COOKIE_MAX_AGE = 15 * 60;
+const ENROLLMENT_COOKIE_MAX_AGE = 60 * 60;
 
 export type SessionTokens = {
   accessToken: string;
@@ -35,7 +38,12 @@ export type CookieSpec = {
 
 export function sessionCookieNames() {
   const base = serverEnv().SESSION_COOKIE_NAME;
-  return { access: base, refresh: `${base}_refresh`, reset: `${base}_reset` };
+  return {
+    access: base,
+    refresh: `${base}_refresh`,
+    reset: `${base}_reset`,
+    enrollment: `${base}_enrollment`,
+  };
 }
 
 function spec(
@@ -104,4 +112,23 @@ export async function takeResetToken(): Promise<string | null> {
   const value = store.get(name)?.value ?? null;
   store.delete(name);
   return value;
+}
+
+export async function writeEnrollmentToken(token: string): Promise<void> {
+  const store = await cookies();
+  store.set(
+    spec(sessionCookieNames().enrollment, token, {
+      maxAge: ENROLLMENT_COOKIE_MAX_AGE,
+    }),
+  );
+}
+
+export async function readEnrollmentToken(): Promise<string | null> {
+  const store = await cookies();
+  return store.get(sessionCookieNames().enrollment)?.value ?? null;
+}
+
+export async function clearEnrollmentToken(): Promise<void> {
+  const store = await cookies();
+  store.delete(sessionCookieNames().enrollment);
 }

@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Archive, ArchiveRestore, ExternalLink, Pencil } from "lucide-react";
-import { Alert, Badge, DataTable, type DataTableColumn } from "@/design-system";
+import { Badge, DataTable, type DataTableColumn } from "@/design-system";
 import { auditColumn } from "@/features/audit/components/RecordAudit";
 import { eventsClient } from "@/features/events/api/events.client";
 import { VenueFormDrawer } from "@/features/events/components/VenueFormDrawer";
 import type { Venue } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 const iconButton =
   "grid size-8 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg disabled:opacity-40";
@@ -18,16 +19,14 @@ const iconButton =
 export function VenuesTable({
   venues,
   canManage,
-  canAudit,
 }: {
   venues: Venue[];
   canManage: boolean;
-  canAudit: boolean;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState<Venue | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const audit = auditColumn((venue: Venue) => ({
     entity: "venue" as const,
     id: venue.id,
@@ -36,7 +35,6 @@ export function VenuesTable({
 
   async function toggleArchived(venue: Venue) {
     setBusyId(venue.id);
-    setError(null);
     try {
       await eventsClient.updateVenue(venue.id, {
         name: venue.name,
@@ -53,7 +51,7 @@ export function VenuesTable({
       });
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível alterar.",
@@ -163,16 +161,11 @@ export function VenuesTable({
 
   return (
     <>
-      {error && (
-        <div className="p-3">
-          <Alert tone="danger">{error}</Alert>
-        </div>
-      )}
       <DataTable
         rows={venues}
-        columns={canAudit ? [...columns, audit.column] : columns}
+        columns={[...columns, audit.column]}
         getId={(venue) => venue.id}
-        renderExpanded={canAudit ? audit.renderExpanded : undefined}
+        renderExpanded={audit.renderExpanded}
       />
       {editing && (
         <VenueFormDrawer

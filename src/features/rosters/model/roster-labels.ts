@@ -1,31 +1,27 @@
 import type { Tone } from "@/design-system";
+import { SECTIONS } from "@/features/members/model/member-labels";
+import type { Section } from "@/shared/contracts/members";
 import type {
   AckStatus,
-  AssignmentRole,
   CandidateBlocker,
   Roster,
 } from "@/shared/contracts/rosters";
 
-export const ROLE_LABELS: Record<AssignmentRole, string> = {
-  MUSICO: "Músico",
-  REGENTE: "Regente",
-  CHEFE_EQUIPE: "Chefe da equipe",
-  MOTORISTA: "Motorista",
-  SOM: "Som",
-  APOIO: "Apoio",
-};
+/** The function of whoever plays (seeded by the migration). */
+export const MUSICIAN_FUNCTION = "Músico";
 
-export const ROLES = Object.keys(ROLE_LABELS) as AssignmentRole[];
+/** Musicians (the "Músico" function, or none on old lines). */
+export const isMusicianFunction = (name: string | null | undefined) =>
+  !name || name.toLocaleLowerCase("pt-BR") === "músico";
 
-/** Order lines are listed in: leadership first. */
-export const ROLE_ORDER: Record<AssignmentRole, number> = {
-  REGENTE: 0,
-  CHEFE_EQUIPE: 1,
-  MUSICO: 2,
-  SOM: 3,
-  MOTORISTA: 4,
-  APOIO: 5,
-};
+/** "Regente / maestro · Trompete", "Músico · Trompete" or "Músico". */
+export const lineRole = (
+  functionName: string | null,
+  instrumentName: string | null,
+) =>
+  [functionName ?? MUSICIAN_FUNCTION, instrumentName]
+    .filter(Boolean)
+    .join(" · ");
 
 export const ACK_STATUS: Record<AckStatus, { label: string; tone: Tone }> = {
   PENDENTE: { label: "Aguardando ciência", tone: "warning" },
@@ -40,11 +36,19 @@ export const BLOCKER_LABELS: Record<CandidateBlocker, string> = {
   ABSENT: "Indisponível",
 };
 
-/** Leadership first, then by war name. */
+const sectionRank = (section: Section | undefined) =>
+  section ? SECTIONS.indexOf(section) : SECTIONS.length;
+
+/** Other functions first (by name), then musicians by section and name. */
 export function sortedLines(roster: Pick<Roster, "assignments">) {
   return [...roster.assignments].sort(
     (a, b) =>
-      ROLE_ORDER[a.role] - ROLE_ORDER[b.role] ||
+      Number(isMusicianFunction(a.functionName)) -
+        Number(isMusicianFunction(b.functionName)) ||
+      (isMusicianFunction(a.functionName) ? "" : a.functionName!).localeCompare(
+        isMusicianFunction(b.functionName) ? "" : b.functionName!,
+      ) ||
+      sectionRank(a.person?.section) - sectionRank(b.person?.section) ||
       (a.person?.warName ?? "").localeCompare(b.person?.warName ?? ""),
   );
 }

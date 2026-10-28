@@ -17,6 +17,7 @@ import {
 } from "@/server/graphql/operations/events.operations";
 import type { Paginated } from "@/shared/contracts/api";
 import type {
+  AgendaEvent,
   BandEvent,
   EventInput,
   EventListItem,
@@ -58,10 +59,11 @@ export const eventsService = {
     return eventsPage;
   },
 
+  /** The agenda: events of a period, with my line on each roster. */
   async list(
     token: string,
     range: { from: string; to: string },
-  ): Promise<BandEvent[]> {
+  ): Promise<AgendaEvent[]> {
     const { events } = await backendGraphql(eventsDocument, {
       token,
       variables: { filter: range },

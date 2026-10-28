@@ -35,6 +35,12 @@ const nextConfig: NextConfig = {
   // links already sent by e-mail / in notifications keep working.
   async redirects() {
     return [
+      // The audit page was dropped: each table shows its own history.
+      {
+        source: "/admin/auditoria",
+        destination: "/admin/usuarios",
+        permanent: true,
+      },
       {
         source: "/agenda/locais",
         destination: "/locais",

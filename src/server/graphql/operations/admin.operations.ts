@@ -121,25 +121,13 @@ export const setUserPermissionsDocument = graphql(`
   }
 `);
 
-export const auditLogsDocument = graphql(`
-  query AuditLogs($filter: AuditFilterInput, $page: PageInput) {
-    auditLogs(filter: $filter, page: $page) {
-      total
-      page
-      limit
-      totalPages
-      items {
-        id
-        actorId
-        actorName
-        action
-        entity
-        entityId
-        before
-        after
-        ip
-        createdAt
-      }
+export const recordStampDocument = graphql(`
+  query RecordStamp($entity: String!, $id: ID!) {
+    recordStamp(entity: $entity, id: $id) {
+      createdAt
+      createdByName
+      updatedAt
+      updatedByName
     }
   }
 `);

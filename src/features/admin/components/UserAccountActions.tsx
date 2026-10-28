@@ -10,7 +10,7 @@ import {
   PowerOff,
   type LucideIcon,
 } from "lucide-react";
-import { Alert, Button, Modal } from "@/design-system";
+import { Button, Modal } from "@/design-system";
 import {
   adminClient,
   type AccountAction,
@@ -18,6 +18,7 @@ import {
 import { TemporaryAccessPanel } from "@/features/admin/components/TemporaryAccessPanel";
 import type { TemporaryAccess, UserAccount } from "@/shared/contracts/api";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 type ActionKey = AccountAction | "reset-password";
 
@@ -63,7 +64,7 @@ export function UserAccountActions({ user }: { user: UserAccount }) {
   const router = useRouter();
   const [selected, setSelected] = useState<ActionKey | null>(null);
   const [result, setResult] = useState<TemporaryAccess | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   const available: ActionKey[] = [
@@ -76,13 +77,11 @@ export function UserAccountActions({ user }: { user: UserAccount }) {
   function close() {
     setSelected(null);
     setResult(null);
-    setError(null);
   }
 
   async function run() {
     if (!selected) return;
     setPending(true);
-    setError(null);
     try {
       if (selected === "reset-password") {
         setResult(await adminClient.resetPassword(user.id));
@@ -92,7 +91,7 @@ export function UserAccountActions({ user }: { user: UserAccount }) {
       }
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível concluir a ação.",
@@ -151,7 +150,6 @@ export function UserAccountActions({ user }: { user: UserAccount }) {
           <TemporaryAccessPanel access={result} />
         ) : (
           <div className="space-y-3">
-            {error && <Alert tone="danger">{error}</Alert>}
             <p>{spec?.confirm}</p>
           </div>
         )}

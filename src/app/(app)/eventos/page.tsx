@@ -175,7 +175,16 @@ export default async function EventsPage({
             venues={venues}
             canManage={canManage}
             canBuildRoster={can(user, "ROSTERS_MANAGE")}
-            canAudit={can(user, "AUDIT_READ")}
+            canPublishRoster={can(user, "ROSTERS_PUBLISH")}
+
+            rosterViewer={
+              can(user, "ROSTERS_READ_OWN") || can(user, "ROSTERS_READ_ALL")
+                ? {
+                    id: user.id,
+                    showManagerInfo: can(user, "ROSTERS_READ_ALL"),
+                  }
+                : undefined
+            }
           />
         )}
         <Pagination

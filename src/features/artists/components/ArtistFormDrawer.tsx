@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
-import { Alert, Button, Drawer, Field } from "@/design-system";
+import { Button, Drawer, Field } from "@/design-system";
 import { artistsClient } from "@/features/artists/api/artists.client";
 import type { Artist } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 // Create (no `artist`) or rename a singer / band.
 export function ArtistFormDrawer({
@@ -19,19 +20,18 @@ export function ArtistFormDrawer({
   onSaved: () => void;
 }) {
   const [name, setName] = useState(artist?.name ?? "");
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
   const valid = name.trim().length >= 2;
 
   async function submit() {
     setPending(true);
-    setError(null);
     try {
       if (artist) await artistsClient.update(artist.id, { name });
       else await artistsClient.create(name);
       onSaved();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar.",
@@ -64,7 +64,6 @@ export function ArtistFormDrawer({
           if (valid) void submit();
         }}
       >
-        {error && <Alert tone="danger">{error}</Alert>}
         <Field
           label="Nome"
           required

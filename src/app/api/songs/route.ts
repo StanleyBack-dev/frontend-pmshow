@@ -1,22 +1,39 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { bffRoute, readBody, requireToken } from "@/server/http/route-handler";
+import { enumLike, idSchema } from "@/server/http/schemas/fields";
 import { songInputSchema } from "@/server/http/schemas/repertoire.schema";
 import { repertoireService } from "@/server/services/repertoire.service";
+import type { SongCategory } from "@/shared/contracts/repertoire";
 
-/** Song search for pickers (setlist editor): ?q=… → first 15 matches. */
+const pickerQuerySchema = z.object({
+  q: z.string().max(100).optional(),
+  categoria: enumLike<SongCategory>().optional(),
+  artista: idSchema.optional(),
+});
+
+/**
+ * Song picker of the event's list of songs: ?q= (title / singer),
+ * &categoria=, &artista= → up to 100 songs of the repertoire, by title.
+ */
 export const GET = bffRoute(async (request) => {
-  const search = request.nextUrl.searchParams.get("q")?.slice(0, 100) ?? "";
+  const query = pickerQuerySchema.parse(
+    Object.fromEntries(request.nextUrl.searchParams),
+  );
   const { songs } = await repertoireService.songs(await requireToken(), {
-    search,
+    search: query.q,
+    category: query.categoria,
+    artistId: query.artista,
     archived: false,
     page: 1,
-    limit: 15,
+    limit: 100,
   });
   return NextResponse.json(
-    songs.items.slice(0, 15).map((song) => ({
+    songs.items.map((song) => ({
       id: song.id,
       title: song.title,
       artist: song.artist?.name ?? null,
+      category: song.category,
       musicalKey: song.musicalKey,
     })),
   );

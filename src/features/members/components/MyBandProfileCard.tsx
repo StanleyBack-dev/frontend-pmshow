@@ -38,6 +38,7 @@ export function MyBandProfileCard({
         .map((item) => (item.primary ? `${item.name} (principal)` : item.name))
         .join(", ") || "—",
     ],
+    ["Funções", profile.functions.map((item) => item.name).join(", ") || "—"],
     ["Matrícula", profile.registration ?? "—"],
     ["Telefone", formatPhone(profile.phone)],
   ];

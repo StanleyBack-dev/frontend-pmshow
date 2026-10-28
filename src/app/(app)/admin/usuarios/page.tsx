@@ -126,7 +126,7 @@ export default async function UsersPage({
             }
           />
         ) : (
-          <UsersTable users={users.items} canAudit={can(user, "AUDIT_READ")} />
+          <UsersTable users={users.items} />
         )}
 
         <Pagination

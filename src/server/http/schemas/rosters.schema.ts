@@ -1,14 +1,16 @@
 import "server-only";
 import { z } from "zod";
-import { enumLike, optionalText } from "@/server/http/schemas/fields";
-import type { AssignmentRole } from "@/shared/contracts/rosters";
+import { optionalText } from "@/server/http/schemas/fields";
 
 export const rosterSchema = z.object({
   assignments: z
     .array(
       z.object({
         userId: z.uuid(),
-        role: enumLike<AssignmentRole>(),
+        functionId: z
+          .uuid()
+          .nullish()
+          .transform((value) => value ?? null),
         instrumentId: z
           .uuid()
           .nullish()
@@ -18,6 +20,11 @@ export const rosterSchema = z.object({
       }),
     )
     .max(200),
+});
+
+export const keepOnRosterSchema = z.object({
+  userId: z.uuid(),
+  note: optionalText(300),
 });
 
 export const ackSchema = z.object({

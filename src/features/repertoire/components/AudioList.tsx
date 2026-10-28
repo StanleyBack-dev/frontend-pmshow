@@ -6,6 +6,7 @@ import {
   usePlayer,
   type Track,
 } from "@/features/player/components/PlayerProvider";
+import { RecordAuditButton } from "@/features/audit/components/RecordAudit";
 import { MediaItemActions } from "@/features/repertoire/components/MediaItemActions";
 import {
   formatBytes,
@@ -97,6 +98,11 @@ export function AudioList({
                   <Download className="size-4" />
                 </a>
               )}
+              <RecordAuditButton
+                entity="media"
+                id={audio.id}
+                label={audio.title}
+              />
               {canManage && <MediaItemActions asset={audio} />}
             </li>
           );

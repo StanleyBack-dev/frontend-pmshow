@@ -114,11 +114,7 @@ export default async function VenuesPage({
             }
           />
         ) : (
-          <VenuesTable
-            venues={venues.items}
-            canManage
-            canAudit={can(user, "AUDIT_READ")}
-          />
+          <VenuesTable venues={venues.items} canManage />
         )}
         <Pagination
           page={venues.page}

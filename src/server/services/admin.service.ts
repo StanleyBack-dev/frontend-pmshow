@@ -1,7 +1,6 @@
 import "server-only";
 import { backendGraphql } from "@/server/graphql/client";
 import {
-  auditLogsDocument,
   createUserDocument,
   resetUserPasswordDocument,
   revokeUserSessionsDocument,
@@ -10,14 +9,15 @@ import {
   unlockUserDocument,
   updateUserDocument,
   userDocument,
+  recordStampDocument,
   userPermissionsDocument,
   usersDocument,
 } from "@/server/graphql/operations/admin.operations";
 import type {
-  AuditEntry,
   Paginated,
   Permission,
   PermissionMatrix,
+  RecordStamp,
   TemporaryAccess,
   UserAccount,
   UserGroup,
@@ -146,28 +146,16 @@ export const adminService = {
     return setUserPermissions;
   },
 
-  /** The trail of one record, newest first (at most 50 entries). */
-  async recordAudit(
+  /** Creation and last change of one record (null: it doesn't exist). */
+  async recordStamp(
     token: string,
     entity: string,
     entityId: string,
-  ): Promise<AuditEntry[]> {
-    const { auditLogs } = await backendGraphql(auditLogsDocument, {
+  ): Promise<RecordStamp | null> {
+    const { recordStamp } = await backendGraphql(recordStampDocument, {
       token,
-      variables: { filter: { entity, entityId }, page: { page: 1, limit: 50 } },
+      variables: { entity, id: entityId },
     });
-    return auditLogs.items;
-  },
-
-  async auditLogs(
-    token: string,
-    page: number,
-    limit = 10,
-  ): Promise<Paginated<AuditEntry>> {
-    const { auditLogs } = await backendGraphql(auditLogsDocument, {
-      token,
-      variables: { page: { page, limit } },
-    });
-    return auditLogs;
+    return recordStamp ?? null;
   },
 };

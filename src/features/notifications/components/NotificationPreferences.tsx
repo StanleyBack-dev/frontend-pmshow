@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Alert } from "@/design-system";
 import { notificationsClient } from "@/features/notifications/api/notifications.client";
 import { NOTIFICATION_TYPE_LABELS } from "@/features/notifications/model/notification-labels";
 import type { NotificationPreference } from "@/shared/contracts/notifications";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 // Which notices also go by e-mail. In the app they always show up.
 export function NotificationPreferences({
@@ -14,7 +14,7 @@ export function NotificationPreferences({
   initial: NotificationPreference[];
 }) {
   const [preferences, setPreferences] = useState(initial);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
 
   async function toggle(preference: NotificationPreference) {
     const emailEnabled = !preference.emailEnabled;
@@ -27,12 +27,11 @@ export function NotificationPreferences({
         ),
       );
     apply(emailEnabled);
-    setError(null);
     try {
       await notificationsClient.setPreference(preference.type, emailEnabled);
     } catch (cause) {
       apply(!emailEnabled);
-      setError(
+      showError(
         cause instanceof ApiClientError ? cause.message : "Não foi possível.",
       );
     }
@@ -40,7 +39,6 @@ export function NotificationPreferences({
 
   return (
     <div className="space-y-3">
-      {error && <Alert tone="danger">{error}</Alert>}
       <ul className="divide-y divide-border">
         {preferences.map((preference) => {
           const meta = NOTIFICATION_TYPE_LABELS[preference.type];

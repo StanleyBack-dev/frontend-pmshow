@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { MailCheck, ScrollText, Smartphone } from "lucide-react";
+import { KeyRound, MailCheck, ScrollText, Smartphone } from "lucide-react";
 import { Card, CardBody, CardHeader, PageHeader } from "@/design-system";
 import { SettingsLinkItem } from "@/features/settings/components/SettingsLinkItem";
 
 export const metadata: Metadata = { title: "Configurações" };
 
 const ITEMS = [
+  {
+    href: "/configuracoes/senha",
+    icon: <KeyRound className="size-5" />,
+    title: "Trocar senha",
+    description: "Defina uma nova senha de acesso ao app.",
+  },
   {
     href: "/configuracoes/aplicativo",
     icon: <Smartphone className="size-5" />,
@@ -33,7 +39,7 @@ export default function SettingsPage() {
     <>
       <PageHeader
         title="Configurações"
-        description="Aplicativo, avisos e documentos do PM SHOW."
+        description="Senha, aplicativo, avisos e documentos do PM SHOW."
       />
       <Card>
         <CardHeader title="Preferências" />

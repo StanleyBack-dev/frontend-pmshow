@@ -6,8 +6,10 @@ import {
   logoutDocument,
   meDocument,
   refreshSessionDocument,
+  removeMyPhotoDocument,
   requestPasswordRecoveryDocument,
   resetPasswordWithRecoveryDocument,
+  setMyPhotoDocument,
   updateMyProfileDocument,
   verifyPasswordRecoveryCodeDocument,
 } from "@/server/graphql/operations/auth.operations";
@@ -62,6 +64,19 @@ export const authService = {
       variables: { input },
     });
     return updateMyProfile;
+  },
+
+  /** Returns the new photo's short-lived link. */
+  async setPhoto(token: string, photo: string): Promise<string> {
+    const { setMyPhoto } = await backendGraphql(setMyPhotoDocument, {
+      token,
+      variables: { photo },
+    });
+    return setMyPhoto;
+  },
+
+  async removePhoto(token: string): Promise<void> {
+    await backendGraphql(removeMyPhotoDocument, { token });
   },
 
   async requestRecovery(login: string): Promise<void> {
