@@ -1,14 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { ClipboardList, FileDown, ListMusic, MapPin } from "lucide-react";
-import { Button, buttonClasses } from "@/design-system";
+import {
+  ClipboardList,
+  FileDown,
+  Headphones,
+  ListMusic,
+  MapPin,
+} from "lucide-react";
+import { Button, Spinner, buttonClasses } from "@/design-system";
+import { eventsClient } from "@/features/events/api/events.client";
 import type { RosterViewer } from "@/features/events/components/EventDetailsPanel";
 import {
   RosterViewModal,
   SongListViewModal,
 } from "@/features/events/components/EventViewModals";
 import { venueMapUrl } from "@/features/events/model/venue-map";
+import { usePlaySongs } from "@/features/playlists/components/usePlaySongs";
 import type { EventListItem } from "@/shared/contracts/events";
 import { useToast } from "@/shared/toast/useToast";
 
@@ -42,6 +50,7 @@ export function EventQuickActions({
 }) {
   const { showError } = useToast();
   const [pending, setPending] = useState(false);
+  const rehearsal = usePlaySongs();
   const [dialog, setDialog] = useState<"songs" | "roster" | null>(null);
   const mapUrl = event.venue ? venueMapUrl(event.venue) : null;
   const hasSongs = event.setlistCount > 0;
@@ -84,6 +93,29 @@ export function EventQuickActions({
             onClick={() => void downloadSongs()}
           >
             Músicas PDF
+          </Button>
+        )}
+        {hasSongs && (
+          // Rehearsal mode: the event's songs, in order, in the player.
+          <Button
+            size="sm"
+            icon={
+              rehearsal.pending ? (
+                <Spinner size="sm" label="Carregando" />
+              ) : (
+                <Headphones className="size-4" />
+              )
+            }
+            disabled={rehearsal.pending !== null}
+            onClick={() =>
+              void rehearsal.play(event.id, async () =>
+                (await eventsClient.setlist(event.id)).map(
+                  (entry) => entry.song,
+                ),
+              )
+            }
+          >
+            Ensaiar
           </Button>
         )}
         {mapUrl && (

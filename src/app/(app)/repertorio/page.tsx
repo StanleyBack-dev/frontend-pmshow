@@ -11,6 +11,7 @@ import {
   Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
+import { RepertoireTabs } from "@/features/repertoire/components/RepertoireTabs";
 import { NewSongButton } from "@/features/repertoire/components/SongButtons";
 import { SongsTable } from "@/features/repertoire/components/SongsTable";
 import {
@@ -93,6 +94,7 @@ export default async function RepertoirePage({
         description="Músicas da banda com áudios para ouvir e vídeos para assistir."
         actions={canManage ? <NewSongButton artists={artists} /> : undefined}
       />
+      <RepertoireTabs active="songs" />
 
       <FilterPanel hasActiveFilters={filtersActive}>
         <form

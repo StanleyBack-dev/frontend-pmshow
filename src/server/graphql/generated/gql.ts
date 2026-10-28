@@ -60,6 +60,10 @@ type Documents = {
     "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    section\n    eventId\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n": typeof types.BroadcastFieldsFragmentDoc,
     "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": typeof types.BroadcastsDocument,
     "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": typeof types.SendBroadcastDocument,
+    "\n  query MyCalendarFeed {\n    myCalendarFeed {\n      token\n      createdAt\n    }\n  }\n": typeof types.MyCalendarFeedDocument,
+    "\n  mutation RenewCalendarFeed {\n    renewCalendarFeed {\n      token\n      createdAt\n    }\n  }\n": typeof types.RenewCalendarFeedDocument,
+    "\n  mutation RemoveCalendarFeed {\n    removeCalendarFeed\n  }\n": typeof types.RemoveCalendarFeedDocument,
+    "\n  query CalendarFeedIcs($token: String!) {\n    calendarFeedIcs(token: $token)\n  }\n": typeof types.CalendarFeedIcsDocument,
     "\n  query BandDashboard {\n    bandDashboard {\n      activeMembers\n      awayMembers\n      upcomingEvents\n      eventsWithoutRoster\n      pendingAcks\n      swapRequests\n      pendingAbsences\n      absentToday\n      failedNotifications\n    }\n  }\n": typeof types.BandDashboardDocument,
     "\n  fragment DutyScheduleFields on DutySchedule {\n    id\n    title\n    startsOn\n    endsOn\n    venueId\n    uniform\n    notes\n    audienceKind\n    sections\n    status\n    cancellationReason\n    dayCount\n    memberCount\n    createdAt\n  }\n": typeof types.DutyScheduleFieldsFragmentDoc,
     "\n  query DutySchedulesPage($filter: DutyScheduleFilterInput, $page: PageInput) {\n    dutySchedulesPage(filter: $filter, page: $page) {\n      items {\n        ...DutyScheduleFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.DutySchedulesPageDocument,
@@ -70,7 +74,7 @@ type Documents = {
     "\n  query EnrollmentInstruments($formToken: String!) {\n    enrollmentInstruments(formToken: $formToken) {\n      id\n      name\n    }\n  }\n": typeof types.EnrollmentInstrumentsDocument,
     "\n  mutation SubmitEnrollment($input: SubmitEnrollmentInput!) {\n    submitEnrollment(input: $input)\n  }\n": typeof types.SubmitEnrollmentDocument,
     "\n  fragment EnrollmentInviteFields on EnrollmentInvite {\n    id\n    code\n    label\n    expiresAt\n    revokedAt\n    createdAt\n    requestCount\n  }\n": typeof types.EnrollmentInviteFieldsFragmentDoc,
-    "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    fullName\n    email\n    phone\n    military\n    militaryId\n    rank\n    warName\n    instruments {\n      instrumentId\n      primary\n    }\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n": typeof types.EnrollmentRequestFieldsFragmentDoc,
+    "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    fullName\n    email\n    phone\n    military\n    militaryId\n    rank\n    warName\n    birthDate\n    instruments {\n      instrumentId\n      primary\n    }\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n": typeof types.EnrollmentRequestFieldsFragmentDoc,
     "\n  query EnrollmentInvites {\n    enrollmentInvites {\n      ...EnrollmentInviteFields\n    }\n  }\n": typeof types.EnrollmentInvitesDocument,
     "\n  mutation CreateEnrollmentInvite($input: CreateEnrollmentInviteInput!) {\n    createEnrollmentInvite(input: $input) {\n      ...EnrollmentInviteFields\n    }\n  }\n": typeof types.CreateEnrollmentInviteDocument,
     "\n  mutation RevokeEnrollmentInvite($id: ID!) {\n    revokeEnrollmentInvite(id: $id) {\n      ...EnrollmentInviteFields\n    }\n  }\n": typeof types.RevokeEnrollmentInviteDocument,
@@ -84,7 +88,7 @@ type Documents = {
     "\n  query ZipCodeAddress($zipCode: String!) {\n    zipCodeAddress(zipCode: $zipCode) {\n      zipCode\n      street\n      district\n      city\n      state\n    }\n  }\n": typeof types.ZipCodeAddressDocument,
     "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n      myAssignment {\n        functionName\n        instrumentName\n      }\n    }\n  }\n": typeof types.EventsDocument,
     "\n  query UpcomingEvents($limit: Int!) {\n    upcomingEvents(limit: $limit) {\n      ...EventFields\n    }\n  }\n": typeof types.UpcomingEventsDocument,
-    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n": typeof types.EventDocument,
+    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n": typeof types.EventDocument,
     "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n": typeof types.CreateEventDocument,
     "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n": typeof types.UpdateEventDocument,
     "\n  mutation ChangeEventStatus($id: ID!, $status: EventStatus!, $reason: String) {\n    changeEventStatus(id: $id, status: $status, reason: $reason) {\n      ...EventFields\n    }\n  }\n": typeof types.ChangeEventStatusDocument,
@@ -92,7 +96,7 @@ type Documents = {
     "\n  query Venues($includeArchived: Boolean!) {\n    venues(includeArchived: $includeArchived) {\n      ...VenueFields\n    }\n  }\n": typeof types.VenuesDocument,
     "\n  mutation CreateVenue($input: VenueInput!) {\n    createVenue(input: $input) {\n      ...VenueFields\n    }\n  }\n": typeof types.CreateVenueDocument,
     "\n  mutation UpdateVenue($id: ID!, $input: VenueInput!) {\n    updateVenue(id: $id, input: $input) {\n      ...VenueFields\n    }\n  }\n": typeof types.UpdateVenueDocument,
-    "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n    functions {\n      functionId\n      name\n    }\n  }\n": typeof types.MemberProfileFieldsFragmentDoc,
+    "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    birthDate\n    joinedOn\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n    functions {\n      functionId\n      name\n    }\n  }\n": typeof types.MemberProfileFieldsFragmentDoc,
     "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        photoUrl\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": typeof types.RosterDocument,
     "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.MemberProfileDocument,
     "\n  query MyMemberProfile {\n    myMemberProfile {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.MyMemberProfileDocument,
@@ -101,6 +105,9 @@ type Documents = {
     "\n  query InstrumentsPage($filter: InstrumentFilterInput, $page: PageInput) {\n    instrumentsPage(filter: $filter, page: $page) {\n      items {\n        id\n        name\n        section\n        archived\n        memberCount\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.InstrumentsPageDocument,
     "\n  mutation CreateInstrument($input: CreateInstrumentInput!) {\n    createInstrument(input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": typeof types.CreateInstrumentDocument,
     "\n  mutation UpdateInstrument($id: ID!, $input: UpdateInstrumentInput!) {\n    updateInstrument(id: $id, input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": typeof types.UpdateInstrumentDocument,
+    "\n  query MyBandDates {\n    myBandDates {\n      birthDate\n      joinedOn\n    }\n  }\n": typeof types.MyBandDatesDocument,
+    "\n  mutation UpdateMyBandDates($birthDate: String, $joinedOn: String) {\n    updateMyBandDates(birthDate: $birthDate, joinedOn: $joinedOn) {\n      birthDate\n      joinedOn\n    }\n  }\n": typeof types.UpdateMyBandDatesDocument,
+    "\n  query Birthdays($month: Int) {\n    birthdays(month: $month) {\n      userId\n      name\n      warName\n      rank\n      day\n      photoUrl\n    }\n  }\n": typeof types.BirthdaysDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": typeof types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": typeof types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": typeof types.MarkNotificationReadDocument,
@@ -111,6 +118,12 @@ type Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": typeof types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": typeof types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
+    "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    songCount\n    updatedAt\n  }\n": typeof types.PlaylistFieldsFragmentDoc,
+    "\n  query Playlists {\n    playlists {\n      ...PlaylistFields\n    }\n  }\n": typeof types.PlaylistsDocument,
+    "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      songs {\n        position\n        songId\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n": typeof types.PlaylistDocument,
+    "\n  mutation CreatePlaylist($input: PlaylistInput!) {\n    createPlaylist(input: $input) {\n      ...PlaylistFields\n    }\n  }\n": typeof types.CreatePlaylistDocument,
+    "\n  mutation UpdatePlaylist($id: ID!, $input: PlaylistInput!) {\n    updatePlaylist(id: $id, input: $input) {\n      ...PlaylistFields\n    }\n  }\n": typeof types.UpdatePlaylistDocument,
+    "\n  mutation DeletePlaylist($id: ID!) {\n    deletePlaylist(id: $id)\n  }\n": typeof types.DeletePlaylistDocument,
     "\n  fragment SongFields on Song {\n    id\n    title\n    artistId\n    artist {\n      id\n      name\n    }\n    stage\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": typeof types.SongFieldsFragmentDoc,
     "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n": typeof types.MediaAssetFieldsFragmentDoc,
     "\n  query Songs($filter: SongFilterInput, $page: PageInput, $archived: Boolean!) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n        media {\n          id\n          kind\n          title\n          youtubeVideoId\n        }\n      }\n    }\n    songTags\n    songTitles(archived: $archived)\n    artists(includeArchived: false) {\n      id\n      name\n      archived\n    }\n  }\n": typeof types.SongsDocument,
@@ -145,6 +158,9 @@ type Documents = {
     "\n  mutation SendSupportRequest($input: SupportRequestInput!) {\n    sendSupportRequest(input: $input) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.SendSupportRequestDocument,
     "\n  mutation ReplySupportRequest($id: ID!, $reply: String!) {\n    replySupportRequest(id: $id, reply: $reply) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.ReplySupportRequestDocument,
     "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.FinalizeSupportRequestDocument,
+    "\n  query SystemLogs($filter: SystemLogFilterInput, $page: PageInput) {\n    systemLogs(filter: $filter, page: $page) {\n      items {\n        id\n        level\n        category\n        source\n        message\n        details\n        userId\n        userName\n        ip\n        statusCode\n        durationMs\n        environment\n        createdAt\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SystemLogsDocument,
+    "\n  query SystemLogSummary {\n    systemLogSummary {\n      level\n      last24h\n      last7d\n    }\n  }\n": typeof types.SystemLogSummaryDocument,
+    "\n  mutation ReportClientError(\n    $message: String!\n    $url: String!\n    $digest: String\n  ) {\n    reportClientError(message: $message, url: $url, digest: $digest)\n  }\n": typeof types.ReportClientErrorDocument,
 };
 const documents: Documents = {
     "\n  fragment AbsenceFields on Absence {\n    id\n    userId\n    userName\n    warName\n    photoUrl\n    type\n    startsOn\n    endsOn\n    reason\n    status\n    reviewNote\n    reviewedAt\n    reviewedByName\n    cancelledAt\n    cancelledByName\n    registered\n    createdAt\n    attachments {\n      id\n      fileName\n      mimeType\n      sizeBytes\n    }\n  }\n": types.AbsenceFieldsFragmentDoc,
@@ -192,6 +208,10 @@ const documents: Documents = {
     "\n  fragment BroadcastFields on Broadcast {\n    id\n    title\n    body\n    audience\n    section\n    eventId\n    sendEmail\n    recipients\n    authorName\n    createdAt\n  }\n": types.BroadcastFieldsFragmentDoc,
     "\n  query Broadcasts {\n    broadcasts {\n      ...BroadcastFields\n    }\n  }\n": types.BroadcastsDocument,
     "\n  mutation SendBroadcast($input: BroadcastInput!) {\n    sendBroadcast(input: $input) {\n      ...BroadcastFields\n    }\n  }\n": types.SendBroadcastDocument,
+    "\n  query MyCalendarFeed {\n    myCalendarFeed {\n      token\n      createdAt\n    }\n  }\n": types.MyCalendarFeedDocument,
+    "\n  mutation RenewCalendarFeed {\n    renewCalendarFeed {\n      token\n      createdAt\n    }\n  }\n": types.RenewCalendarFeedDocument,
+    "\n  mutation RemoveCalendarFeed {\n    removeCalendarFeed\n  }\n": types.RemoveCalendarFeedDocument,
+    "\n  query CalendarFeedIcs($token: String!) {\n    calendarFeedIcs(token: $token)\n  }\n": types.CalendarFeedIcsDocument,
     "\n  query BandDashboard {\n    bandDashboard {\n      activeMembers\n      awayMembers\n      upcomingEvents\n      eventsWithoutRoster\n      pendingAcks\n      swapRequests\n      pendingAbsences\n      absentToday\n      failedNotifications\n    }\n  }\n": types.BandDashboardDocument,
     "\n  fragment DutyScheduleFields on DutySchedule {\n    id\n    title\n    startsOn\n    endsOn\n    venueId\n    uniform\n    notes\n    audienceKind\n    sections\n    status\n    cancellationReason\n    dayCount\n    memberCount\n    createdAt\n  }\n": types.DutyScheduleFieldsFragmentDoc,
     "\n  query DutySchedulesPage($filter: DutyScheduleFilterInput, $page: PageInput) {\n    dutySchedulesPage(filter: $filter, page: $page) {\n      items {\n        ...DutyScheduleFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.DutySchedulesPageDocument,
@@ -202,7 +222,7 @@ const documents: Documents = {
     "\n  query EnrollmentInstruments($formToken: String!) {\n    enrollmentInstruments(formToken: $formToken) {\n      id\n      name\n    }\n  }\n": types.EnrollmentInstrumentsDocument,
     "\n  mutation SubmitEnrollment($input: SubmitEnrollmentInput!) {\n    submitEnrollment(input: $input)\n  }\n": types.SubmitEnrollmentDocument,
     "\n  fragment EnrollmentInviteFields on EnrollmentInvite {\n    id\n    code\n    label\n    expiresAt\n    revokedAt\n    createdAt\n    requestCount\n  }\n": types.EnrollmentInviteFieldsFragmentDoc,
-    "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    fullName\n    email\n    phone\n    military\n    militaryId\n    rank\n    warName\n    instruments {\n      instrumentId\n      primary\n    }\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n": types.EnrollmentRequestFieldsFragmentDoc,
+    "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    fullName\n    email\n    phone\n    military\n    militaryId\n    rank\n    warName\n    birthDate\n    instruments {\n      instrumentId\n      primary\n    }\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n": types.EnrollmentRequestFieldsFragmentDoc,
     "\n  query EnrollmentInvites {\n    enrollmentInvites {\n      ...EnrollmentInviteFields\n    }\n  }\n": types.EnrollmentInvitesDocument,
     "\n  mutation CreateEnrollmentInvite($input: CreateEnrollmentInviteInput!) {\n    createEnrollmentInvite(input: $input) {\n      ...EnrollmentInviteFields\n    }\n  }\n": types.CreateEnrollmentInviteDocument,
     "\n  mutation RevokeEnrollmentInvite($id: ID!) {\n    revokeEnrollmentInvite(id: $id) {\n      ...EnrollmentInviteFields\n    }\n  }\n": types.RevokeEnrollmentInviteDocument,
@@ -216,7 +236,7 @@ const documents: Documents = {
     "\n  query ZipCodeAddress($zipCode: String!) {\n    zipCodeAddress(zipCode: $zipCode) {\n      zipCode\n      street\n      district\n      city\n      state\n    }\n  }\n": types.ZipCodeAddressDocument,
     "\n  query Events($filter: EventFilterInput) {\n    events(filter: $filter) {\n      ...EventFields\n      myAssignment {\n        functionName\n        instrumentName\n      }\n    }\n  }\n": types.EventsDocument,
     "\n  query UpcomingEvents($limit: Int!) {\n    upcomingEvents(limit: $limit) {\n      ...EventFields\n    }\n  }\n": types.UpcomingEventsDocument,
-    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n": types.EventDocument,
+    "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n": types.EventDocument,
     "\n  mutation CreateEvent($input: EventInput!) {\n    createEvent(input: $input) {\n      ...EventFields\n    }\n  }\n": types.CreateEventDocument,
     "\n  mutation UpdateEvent($id: ID!, $input: EventInput!) {\n    updateEvent(id: $id, input: $input) {\n      ...EventFields\n    }\n  }\n": types.UpdateEventDocument,
     "\n  mutation ChangeEventStatus($id: ID!, $status: EventStatus!, $reason: String) {\n    changeEventStatus(id: $id, status: $status, reason: $reason) {\n      ...EventFields\n    }\n  }\n": types.ChangeEventStatusDocument,
@@ -224,7 +244,7 @@ const documents: Documents = {
     "\n  query Venues($includeArchived: Boolean!) {\n    venues(includeArchived: $includeArchived) {\n      ...VenueFields\n    }\n  }\n": types.VenuesDocument,
     "\n  mutation CreateVenue($input: VenueInput!) {\n    createVenue(input: $input) {\n      ...VenueFields\n    }\n  }\n": types.CreateVenueDocument,
     "\n  mutation UpdateVenue($id: ID!, $input: VenueInput!) {\n    updateVenue(id: $id, input: $input) {\n      ...VenueFields\n    }\n  }\n": types.UpdateVenueDocument,
-    "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n    functions {\n      functionId\n      name\n    }\n  }\n": types.MemberProfileFieldsFragmentDoc,
+    "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    birthDate\n    joinedOn\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n    functions {\n      functionId\n      name\n    }\n  }\n": types.MemberProfileFieldsFragmentDoc,
     "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        photoUrl\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": types.RosterDocument,
     "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n": types.MemberProfileDocument,
     "\n  query MyMemberProfile {\n    myMemberProfile {\n      ...MemberProfileFields\n    }\n  }\n": types.MyMemberProfileDocument,
@@ -233,6 +253,9 @@ const documents: Documents = {
     "\n  query InstrumentsPage($filter: InstrumentFilterInput, $page: PageInput) {\n    instrumentsPage(filter: $filter, page: $page) {\n      items {\n        id\n        name\n        section\n        archived\n        memberCount\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.InstrumentsPageDocument,
     "\n  mutation CreateInstrument($input: CreateInstrumentInput!) {\n    createInstrument(input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": types.CreateInstrumentDocument,
     "\n  mutation UpdateInstrument($id: ID!, $input: UpdateInstrumentInput!) {\n    updateInstrument(id: $id, input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n": types.UpdateInstrumentDocument,
+    "\n  query MyBandDates {\n    myBandDates {\n      birthDate\n      joinedOn\n    }\n  }\n": types.MyBandDatesDocument,
+    "\n  mutation UpdateMyBandDates($birthDate: String, $joinedOn: String) {\n    updateMyBandDates(birthDate: $birthDate, joinedOn: $joinedOn) {\n      birthDate\n      joinedOn\n    }\n  }\n": types.UpdateMyBandDatesDocument,
+    "\n  query Birthdays($month: Int) {\n    birthdays(month: $month) {\n      userId\n      name\n      warName\n      rank\n      day\n      photoUrl\n    }\n  }\n": types.BirthdaysDocument,
     "\n  query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {\n    myNotifications(unreadOnly: $unreadOnly, page: $page) {\n      items {\n        id\n        type\n        title\n        body\n        link\n        readAt\n        createdAt\n      }\n      total\n      page\n      totalPages\n    }\n  }\n": types.MyNotificationsDocument,
     "\n  query UnreadNotificationsCount {\n    unreadNotificationsCount\n  }\n": types.UnreadNotificationsCountDocument,
     "\n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id)\n  }\n": types.MarkNotificationReadDocument,
@@ -243,6 +266,12 @@ const documents: Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
+    "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    songCount\n    updatedAt\n  }\n": types.PlaylistFieldsFragmentDoc,
+    "\n  query Playlists {\n    playlists {\n      ...PlaylistFields\n    }\n  }\n": types.PlaylistsDocument,
+    "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      songs {\n        position\n        songId\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n": types.PlaylistDocument,
+    "\n  mutation CreatePlaylist($input: PlaylistInput!) {\n    createPlaylist(input: $input) {\n      ...PlaylistFields\n    }\n  }\n": types.CreatePlaylistDocument,
+    "\n  mutation UpdatePlaylist($id: ID!, $input: PlaylistInput!) {\n    updatePlaylist(id: $id, input: $input) {\n      ...PlaylistFields\n    }\n  }\n": types.UpdatePlaylistDocument,
+    "\n  mutation DeletePlaylist($id: ID!) {\n    deletePlaylist(id: $id)\n  }\n": types.DeletePlaylistDocument,
     "\n  fragment SongFields on Song {\n    id\n    title\n    artistId\n    artist {\n      id\n      name\n    }\n    stage\n    arranger\n    category\n    musicalKey\n    bpm\n    durationSeconds\n    lyrics\n    notes\n    tags\n    archivedAt\n    createdAt\n    updatedAt\n  }\n": types.SongFieldsFragmentDoc,
     "\n  fragment MediaAssetFields on MediaAsset {\n    id\n    songId\n    kind\n    status\n    title\n    mimeType\n    sizeBytes\n    durationSeconds\n    youtubeVideoId\n    thumbnailUrl\n    createdAt\n  }\n": types.MediaAssetFieldsFragmentDoc,
     "\n  query Songs($filter: SongFilterInput, $page: PageInput, $archived: Boolean!) {\n    songs(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        ...SongFields\n        media {\n          id\n          kind\n          title\n          youtubeVideoId\n        }\n      }\n    }\n    songTags\n    songTitles(archived: $archived)\n    artists(includeArchived: false) {\n      id\n      name\n      archived\n    }\n  }\n": types.SongsDocument,
@@ -277,6 +306,9 @@ const documents: Documents = {
     "\n  mutation SendSupportRequest($input: SupportRequestInput!) {\n    sendSupportRequest(input: $input) {\n      ...SupportRequestFields\n    }\n  }\n": types.SendSupportRequestDocument,
     "\n  mutation ReplySupportRequest($id: ID!, $reply: String!) {\n    replySupportRequest(id: $id, reply: $reply) {\n      ...SupportRequestFields\n    }\n  }\n": types.ReplySupportRequestDocument,
     "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n": types.FinalizeSupportRequestDocument,
+    "\n  query SystemLogs($filter: SystemLogFilterInput, $page: PageInput) {\n    systemLogs(filter: $filter, page: $page) {\n      items {\n        id\n        level\n        category\n        source\n        message\n        details\n        userId\n        userName\n        ip\n        statusCode\n        durationMs\n        environment\n        createdAt\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SystemLogsDocument,
+    "\n  query SystemLogSummary {\n    systemLogSummary {\n      level\n      last24h\n      last7d\n    }\n  }\n": types.SystemLogSummaryDocument,
+    "\n  mutation ReportClientError(\n    $message: String!\n    $url: String!\n    $digest: String\n  ) {\n    reportClientError(message: $message, url: $url, digest: $digest)\n  }\n": types.ReportClientErrorDocument,
 };
 
 /**
@@ -462,6 +494,22 @@ export function graphql(source: "\n  mutation SendBroadcast($input: BroadcastInp
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query MyCalendarFeed {\n    myCalendarFeed {\n      token\n      createdAt\n    }\n  }\n"): typeof import('./graphql').MyCalendarFeedDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RenewCalendarFeed {\n    renewCalendarFeed {\n      token\n      createdAt\n    }\n  }\n"): typeof import('./graphql').RenewCalendarFeedDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveCalendarFeed {\n    removeCalendarFeed\n  }\n"): typeof import('./graphql').RemoveCalendarFeedDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CalendarFeedIcs($token: String!) {\n    calendarFeedIcs(token: $token)\n  }\n"): typeof import('./graphql').CalendarFeedIcsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query BandDashboard {\n    bandDashboard {\n      activeMembers\n      awayMembers\n      upcomingEvents\n      eventsWithoutRoster\n      pendingAcks\n      swapRequests\n      pendingAbsences\n      absentToday\n      failedNotifications\n    }\n  }\n"): typeof import('./graphql').BandDashboardDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -502,7 +550,7 @@ export function graphql(source: "\n  fragment EnrollmentInviteFields on Enrollme
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    fullName\n    email\n    phone\n    military\n    militaryId\n    rank\n    warName\n    instruments {\n      instrumentId\n      primary\n    }\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n"): typeof import('./graphql').EnrollmentRequestFieldsFragmentDoc;
+export function graphql(source: "\n  fragment EnrollmentRequestFields on EnrollmentRequest {\n    id\n    status\n    fullName\n    email\n    phone\n    military\n    militaryId\n    rank\n    warName\n    birthDate\n    instruments {\n      instrumentId\n      primary\n    }\n    createdAt\n    reviewedAt\n    rejectionReason\n    userId\n    photoUrl\n  }\n"): typeof import('./graphql').EnrollmentRequestFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -558,7 +606,7 @@ export function graphql(source: "\n  query UpcomingEvents($limit: Int!) {\n    u
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EventDocument;
+export function graphql(source: "\n  query Event($id: ID!) {\n    event(id: $id) {\n      ...EventFields\n      setlist {\n        position\n        songId\n        notes\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EventDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -590,7 +638,7 @@ export function graphql(source: "\n  mutation UpdateVenue($id: ID!, $input: Venu
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n    functions {\n      functionId\n      name\n    }\n  }\n"): typeof import('./graphql').MemberProfileFieldsFragmentDoc;
+export function graphql(source: "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    birthDate\n    joinedOn\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n    functions {\n      functionId\n      name\n    }\n  }\n"): typeof import('./graphql').MemberProfileFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -623,6 +671,18 @@ export function graphql(source: "\n  mutation CreateInstrument($input: CreateIns
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation UpdateInstrument($id: ID!, $input: UpdateInstrumentInput!) {\n    updateInstrument(id: $id, input: $input) {\n      id\n      name\n      section\n      archived\n    }\n  }\n"): typeof import('./graphql').UpdateInstrumentDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MyBandDates {\n    myBandDates {\n      birthDate\n      joinedOn\n    }\n  }\n"): typeof import('./graphql').MyBandDatesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateMyBandDates($birthDate: String, $joinedOn: String) {\n    updateMyBandDates(birthDate: $birthDate, joinedOn: $joinedOn) {\n      birthDate\n      joinedOn\n    }\n  }\n"): typeof import('./graphql').UpdateMyBandDatesDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Birthdays($month: Int) {\n    birthdays(month: $month) {\n      userId\n      name\n      warName\n      rank\n      day\n      photoUrl\n    }\n  }\n"): typeof import('./graphql').BirthdaysDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -663,6 +723,30 @@ export function graphql(source: "\n  mutation UnsubscribePush($endpoint: String!
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation SendTestPush {\n    sendTestPush\n  }\n"): typeof import('./graphql').SendTestPushDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    songCount\n    updatedAt\n  }\n"): typeof import('./graphql').PlaylistFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Playlists {\n    playlists {\n      ...PlaylistFields\n    }\n  }\n"): typeof import('./graphql').PlaylistsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      songs {\n        position\n        songId\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').PlaylistDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreatePlaylist($input: PlaylistInput!) {\n    createPlaylist(input: $input) {\n      ...PlaylistFields\n    }\n  }\n"): typeof import('./graphql').CreatePlaylistDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdatePlaylist($id: ID!, $input: PlaylistInput!) {\n    updatePlaylist(id: $id, input: $input) {\n      ...PlaylistFields\n    }\n  }\n"): typeof import('./graphql').UpdatePlaylistDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeletePlaylist($id: ID!) {\n    deletePlaylist(id: $id)\n  }\n"): typeof import('./graphql').DeletePlaylistDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -799,6 +883,18 @@ export function graphql(source: "\n  mutation ReplySupportRequest($id: ID!, $rep
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n"): typeof import('./graphql').FinalizeSupportRequestDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SystemLogs($filter: SystemLogFilterInput, $page: PageInput) {\n    systemLogs(filter: $filter, page: $page) {\n      items {\n        id\n        level\n        category\n        source\n        message\n        details\n        userId\n        userName\n        ip\n        statusCode\n        durationMs\n        environment\n        createdAt\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').SystemLogsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SystemLogSummary {\n    systemLogSummary {\n      level\n      last24h\n      last7d\n    }\n  }\n"): typeof import('./graphql').SystemLogSummaryDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReportClientError(\n    $message: String!\n    $url: String!\n    $digest: String\n  ) {\n    reportClientError(message: $message, url: $url, digest: $digest)\n  }\n"): typeof import('./graphql').ReportClientErrorDocument;
 
 
 export function graphql(source: string) {

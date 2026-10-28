@@ -11,11 +11,13 @@ import {
 import { Badge, Card, PageHeader } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { BandDashboardPanel } from "@/features/dashboard/components/BandDashboardPanel";
+import { BirthdaysCard } from "@/features/members/components/BirthdaysCard";
 import { UpcomingEvents } from "@/features/events/components/UpcomingEvents";
 import { lineRole } from "@/features/rosters/model/roster-labels";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { dashboardService } from "@/server/services/dashboard.service";
 import { eventsService } from "@/server/services/events.service";
+import { membersService } from "@/server/services/members.service";
 import { rostersService } from "@/server/services/rosters.service";
 import { can } from "@/shared/lib/access";
 import { formatShortDay, formatTime } from "@/shared/lib/datetime";
@@ -53,13 +55,24 @@ export default async function HomePage() {
   const canSeeAgenda = can(user, "EVENTS_READ");
   const canSeeRosters = can(user, "ROSTERS_READ_OWN");
   const isManager = can(user, "ROSTERS_READ_ALL");
-  const [upcoming, assignments, dashboard] = await authed((token) =>
+  const [upcoming, assignments, dashboard, birthdays] = await authed((token) =>
     Promise.all([
       canSeeAgenda ? eventsService.upcoming(token, 5) : Promise.resolve([]),
       canSeeRosters ? rostersService.mine(token) : Promise.resolve([]),
       isManager ? dashboardService.get(token) : Promise.resolve(null),
+      // A failure here never takes the home page down.
+      membersService.birthdays(token).catch(() => []),
     ]),
   );
+  // Today in Goiás, for the month's birthdays.
+  const [todayMonth, todayDay] = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    month: "2-digit",
+    day: "2-digit",
+  })
+    .format(new Date())
+    .split("-")
+    .map(Number);
   // My working days still ahead (or under way), apart from the events.
   const now = new Date().toISOString();
   const myDuties = assignments
@@ -204,6 +217,10 @@ export default async function HomePage() {
               </div>
             </Card>
           )}
+          <BirthdaysCard
+            birthdays={birthdays}
+            today={{ day: todayDay!, month: todayMonth! }}
+          />
           {can(user, "REPERTOIRE_READ") && (
             <Link href="/repertorio" className="block">
               <Card className="flex items-center gap-3 p-4 transition-colors hover:bg-surface-muted sm:p-5">

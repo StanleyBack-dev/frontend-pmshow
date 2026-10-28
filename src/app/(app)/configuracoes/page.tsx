@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { KeyRound, MailCheck, ScrollText, Smartphone } from "lucide-react";
+import {
+  CalendarSync,
+  KeyRound,
+  MailCheck,
+  ScrollText,
+  Smartphone,
+} from "lucide-react";
 import { Card, CardBody, CardHeader, PageHeader } from "@/design-system";
 import { SettingsLinkItem } from "@/features/settings/components/SettingsLinkItem";
 
@@ -18,6 +24,13 @@ const ITEMS = [
     title: "Aplicativo no celular",
     description:
       "Instale o PM SHOW na tela inicial e receba notificações neste aparelho.",
+  },
+  {
+    href: "/configuracoes/agenda",
+    icon: <CalendarSync className="size-5" />,
+    title: "Agenda no celular",
+    description:
+      "Suas escalas e expedientes no Google Agenda ou no iPhone, atualizados sozinhos.",
   },
   {
     href: "/configuracoes/notificacoes",

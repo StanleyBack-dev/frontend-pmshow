@@ -27,6 +27,11 @@ export const songInputSchema = z.object({
   tags: z.array(z.string().max(30)).max(20).default([]),
 });
 
+/** A calendar date (YYYY-MM-DD); the API checks it is a real one. */
+export const localDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida.");
+
 export const memberProfileInputSchema = z.object({
   warName: z.string().trim().min(2).max(60),
   rank: enumLike<Rank>(),
@@ -39,6 +44,8 @@ export const memberProfileInputSchema = z.object({
     .array(z.object({ instrumentId: z.uuid(), primary: z.boolean() }))
     .max(10),
   functionIds: z.array(z.uuid()).max(10).default([]),
+  birthDate: localDateSchema.nullish().transform((value) => value ?? null),
+  joinedOn: localDateSchema.nullish().transform((value) => value ?? null),
 });
 
 export const instrumentInputSchema = z.object({

@@ -123,6 +123,7 @@ export const eventDocument = graphql(`
             id
             kind
             title
+            youtubeVideoId
           }
         }
       }

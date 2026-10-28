@@ -85,7 +85,12 @@ export type SetlistEntry = {
     durationSeconds: number | null;
     lyrics: string | null;
     archivedAt: string | null;
-    media: { id: string; kind: "AUDIO" | "VIDEO"; title: string }[];
+    media: {
+      id: string;
+      kind: "AUDIO" | "VIDEO";
+      title: string;
+      youtubeVideoId: string | null;
+    }[];
   } | null;
 };
 

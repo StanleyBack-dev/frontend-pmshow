@@ -24,6 +24,7 @@ export function canAny(
 export const ADMIN_AREA_PERMISSIONS: Permission[] = [
   "USERS_MANAGE",
   "PERMISSIONS_MANAGE",
+  "AUDIT_READ",
 ];
 
 /**

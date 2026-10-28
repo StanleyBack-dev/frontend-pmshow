@@ -29,6 +29,12 @@ export type Track = {
   lyrics?: { title: string; text: string | null };
 };
 
+/** off: stop at the end; all: back to the first; one: the same track. */
+export type RepeatMode = "off" | "all" | "one";
+
+/** Speeds offered for practice (1 = normal). */
+export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5] as const;
+
 type PlayerState = {
   queue: Track[];
   index: number;
@@ -37,6 +43,9 @@ type PlayerState = {
   position: number;
   duration: number;
   error: string | null;
+  repeat: RepeatMode;
+  /** Playback speed, kept from track to track. */
+  rate: number;
 };
 
 type PlayerApi = PlayerState & {
@@ -48,6 +57,9 @@ type PlayerApi = PlayerState & {
   previous: () => void;
   seek: (seconds: number) => void;
   close: () => void;
+  /** Cycles off → all → one. */
+  cycleRepeat: () => void;
+  setRate: (rate: number) => void;
   /** A PlayerPanel (e.g. in a drawer) shows the player: the page bar hides. */
   embedded: boolean;
 };
@@ -83,6 +95,8 @@ const INITIAL: PlayerState = {
   position: 0,
   duration: 0,
   error: null,
+  repeat: "off",
+  rate: 1,
 };
 
 // One player for the whole signed-in area, so playback survives page
@@ -101,6 +115,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const panelSlotRef = useRef<HTMLDivElement | null>(null);
   const slotsRef = useRef<HTMLElement[]>([]);
   const nextRef = useRef<() => void>(() => undefined);
+  const endedRef = useRef<() => void>(() => undefined);
+  // Read by the players' callbacks, created before the state changes.
+  const rateRef = useRef(1);
   const [state, setState] = useState<PlayerState>(INITIAL);
   const [slotActive, setSlotActive] = useState(false);
   const current = state.queue[state.index] ?? null;
@@ -150,6 +167,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           onReady: (event) => {
             youtubeReadyRef.current = true;
             const youtube = event.target;
+            youtube.setPlaybackRate(rateRef.current);
             if (!autoplay) {
               setState((s) => ({ ...s, loading: false, playing: false }));
               return;
@@ -175,7 +193,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
               setState((s) => ({ ...s, loading: true }));
             } else if (data === YT_STATE.ENDED) {
               setState((s) => ({ ...s, playing: false }));
-              nextRef.current();
+              endedRef.current();
             }
           },
           onError: ({ data }) =>
@@ -196,6 +214,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       const youtube = youtubeReadyRef.current ? youtubeRef.current : null;
       if (youtube) {
         youtube.loadVideoById(videoId); // starts playing
+        youtube.setPlaybackRate(rateRef.current);
         youtubeVideoIdRef.current = videoId;
         return;
       }
@@ -281,6 +300,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           `/media/${track.assetId}/play`,
         );
         audio.src = url;
+        // A new source resets the speed: keep the practice speed.
+        audio.defaultPlaybackRate = rateRef.current;
+        audio.playbackRate = rateRef.current;
         await audio.play();
       } catch (cause) {
         const message =
@@ -315,8 +337,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const next = useCallback(() => {
     if (state.index < state.queue.length - 1) {
       void load(state.queue, state.index + 1);
+    } else if (state.repeat === "all" && state.queue.length > 0) {
+      void load(state.queue, 0);
     }
-  }, [load, state.index, state.queue]);
+  }, [load, state.index, state.queue, state.repeat]);
 
   useEffect(() => {
     nextRef.current = next;
@@ -365,10 +389,47 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     else audio.pause();
   }, [current, isYoutube, state.playing]);
 
+  // A track ended: the same again (repeat one), or the next one.
+  useEffect(() => {
+    endedRef.current = () => {
+      if (state.repeat !== "one") return nextRef.current();
+      if (isYoutube) {
+        const youtube = youtubeReadyRef.current ? youtubeRef.current : null;
+        youtube?.seekTo(0, true);
+        youtube?.playVideo();
+      } else if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        void audioRef.current.play().catch(() => undefined);
+      }
+    };
+  }, [state.repeat, isYoutube]);
+
+  const cycleRepeat = useCallback(
+    () =>
+      setState((s) => ({
+        ...s,
+        repeat: s.repeat === "off" ? "all" : s.repeat === "all" ? "one" : "off",
+      })),
+    [],
+  );
+
+  const setRate = useCallback((rate: number) => {
+    rateRef.current = rate;
+    if (audioRef.current) {
+      audioRef.current.defaultPlaybackRate = rate;
+      audioRef.current.playbackRate = rate;
+    }
+    (youtubeReadyRef.current ? youtubeRef.current : null)?.setPlaybackRate(
+      rate,
+    );
+    setState((s) => ({ ...s, rate }));
+  }, []);
+
   const close = useCallback(() => {
     stopAudio();
     stopYoutube();
-    setState(INITIAL);
+    // The practice settings stay for the next time.
+    setState((s) => ({ ...INITIAL, repeat: s.repeat, rate: s.rate }));
   }, [stopAudio, stopYoutube]);
 
   // <audio> events → state.
@@ -397,7 +458,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
               error: "Falha ao carregar o áudio.",
             },
       );
-    const onEnded = () => nextRef.current();
+    const onEnded = () => endedRef.current();
     audio.addEventListener("timeupdate", sync);
     audio.addEventListener("loadedmetadata", sync);
     audio.addEventListener("pause", sync);
@@ -474,9 +535,23 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       previous,
       seek,
       close,
+      cycleRepeat,
+      setRate,
       embedded: slotActive,
     }),
-    [state, current, play, toggle, next, previous, seek, close, slotActive],
+    [
+      state,
+      current,
+      play,
+      toggle,
+      next,
+      previous,
+      seek,
+      close,
+      cycleRepeat,
+      setRate,
+      slotActive,
+    ],
   );
 
   return (

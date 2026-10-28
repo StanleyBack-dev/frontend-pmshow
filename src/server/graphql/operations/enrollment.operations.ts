@@ -48,6 +48,7 @@ export const enrollmentRequestFieldsFragment = graphql(`
     militaryId
     rank
     warName
+    birthDate
     instruments {
       instrumentId
       primary

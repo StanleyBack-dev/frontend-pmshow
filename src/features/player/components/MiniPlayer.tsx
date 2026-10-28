@@ -2,16 +2,21 @@
 
 import {
   ExternalLink,
+  Gauge,
   Pause,
   Play,
+  Repeat,
+  Repeat1,
   SkipBack,
   SkipForward,
   X,
 } from "lucide-react";
 import { buttonClasses, Spinner, cn } from "@/design-system";
 import {
+  PLAYBACK_RATES,
   PlayerVideoSlot,
   usePlayer,
+  type RepeatMode,
 } from "@/features/player/components/PlayerProvider";
 import { LyricsButton } from "@/features/repertoire/components/LyricsViewer";
 import { formatDuration } from "@/features/repertoire/model/repertoire-labels";
@@ -20,6 +25,16 @@ import { youtubeWatchUrl } from "@/features/repertoire/model/video-guess";
 const iconButton =
   "grid size-10 shrink-0 place-items-center rounded-full text-fg transition-colors hover:bg-surface-muted disabled:opacity-40";
 
+const REPEAT_LABELS: Record<RepeatMode, string> = {
+  off: "Repetir: desligado",
+  all: "Repetir a lista",
+  one: "Repetir esta música",
+};
+
+/** "0,75×". */
+const rateLabel = (rate: number) =>
+  `${rate.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}×`;
+
 // Position slider, current track and the transport buttons. Used by the
 // bar at the bottom of the page and by PlayerPanel inside drawers.
 export function PlayerControls({ inline = false }: { inline?: boolean }) {
@@ -27,7 +42,16 @@ export function PlayerControls({ inline = false }: { inline?: boolean }) {
   const { current } = player;
   if (!current) return null;
 
-  const hasNext = player.index < player.queue.length - 1;
+  const hasNext =
+    player.index < player.queue.length - 1 ||
+    (player.repeat === "all" && player.queue.length > 1);
+  const RepeatIcon = player.repeat === "one" ? Repeat1 : Repeat;
+  const nextRate =
+    PLAYBACK_RATES[
+      (PLAYBACK_RATES.indexOf(player.rate as (typeof PLAYBACK_RATES)[number]) +
+        1) %
+        PLAYBACK_RATES.length
+    ];
   // YouTube refused to play it here: still let the musician listen there.
   const openOnYoutube =
     player.error && current.youtubeVideoId
@@ -63,7 +87,10 @@ export function PlayerControls({ inline = false }: { inline?: boolean }) {
               player.error ? "text-danger" : "text-muted",
             )}
           >
-            {player.error ?? current.songTitle}
+            {player.error ??
+              (player.queue.length > 1
+                ? `${player.index + 1}/${player.queue.length} · ${current.songTitle}`
+                : current.songTitle)}
           </p>
         </div>
         {openOnYoutube && (
@@ -83,6 +110,33 @@ export function PlayerControls({ inline = false }: { inline?: boolean }) {
         <span className="hidden text-xs text-soft tabular-nums sm:inline">
           {formatDuration(player.position)} / {formatDuration(player.duration)}
         </span>
+        {/* Practice: speed and repeat (kept from track to track). */}
+        <button
+          type="button"
+          onClick={() => player.setRate(nextRate)}
+          aria-label={`Velocidade ${rateLabel(player.rate)}: trocar para ${rateLabel(nextRate)}`}
+          title="Velocidade"
+          className={cn(
+            "inline-flex h-8 shrink-0 items-center gap-1 rounded-full px-2 text-xs font-semibold tabular-nums transition-colors hover:bg-surface-muted",
+            player.rate === 1 ? "text-soft" : "text-accent",
+          )}
+        >
+          <Gauge aria-hidden className="size-4 max-sm:hidden" />
+          {rateLabel(player.rate)}
+        </button>
+        <button
+          type="button"
+          onClick={player.cycleRepeat}
+          aria-label={REPEAT_LABELS[player.repeat]}
+          title={REPEAT_LABELS[player.repeat]}
+          className={cn(
+            iconButton,
+            "size-8",
+            player.repeat === "off" ? "text-soft" : "text-accent",
+          )}
+        >
+          <RepeatIcon className="size-4" />
+        </button>
         {current.lyrics && (
           <LyricsButton
             title={current.lyrics.title}

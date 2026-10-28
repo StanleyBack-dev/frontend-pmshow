@@ -148,6 +148,16 @@ export function EnrollmentFields({
           onChange={(e) => set("warName", maskWarName(e.target.value))}
           error={error("warName")}
         />
+        <Field
+          label="Data de nascimento"
+          required
+          type="date"
+          autoComplete="bday"
+          max={new Date().toISOString().slice(0, 10)}
+          value={form.birthDate}
+          onChange={(e) => set("birthDate", e.target.value)}
+          error={error("birthDate")}
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             label="E-mail"
