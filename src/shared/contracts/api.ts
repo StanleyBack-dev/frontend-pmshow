@@ -85,6 +85,7 @@ export const AUDITED_ENTITIES = [
   "enrollment_request",
   "broadcast",
   "media",
+  "support_request",
 ] as const;
 export type AuditedEntity = (typeof AUDITED_ENTITIES)[number];
 

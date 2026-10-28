@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { DataTable, type DataTableColumn } from "@/design-system";
+import { Pencil } from "lucide-react";
+import {
+  DataTable,
+  LinkPendingSwap,
+  type DataTableColumn,
+} from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { CopyShareValue } from "@/features/admin/components/CopyShareValue";
 import { UserStatusBadges } from "@/features/admin/components/UserStatusBadges";
@@ -9,7 +14,8 @@ import { auditColumn } from "@/features/audit/components/RecordAudit";
 import type { UserAccount } from "@/shared/contracts/api";
 import { formatDateTime } from "@/shared/lib/format";
 
-// Accounts of the admin area (amoremio table, with the audit column).
+// Accounts of the admin area (amoremio table, with the audit column). The
+// pencil (first column; on phones next to the name) opens the account's page.
 export function UsersTable({ users }: { users: UserAccount[] }) {
   const audit = auditColumn((user: UserAccount) => ({
     entity: "user" as const,
@@ -19,16 +25,30 @@ export function UsersTable({ users }: { users: UserAccount[] }) {
   }));
   const columns: DataTableColumn<UserAccount>[] = [
     {
+      key: "edit",
+      label: "",
+      className: "w-12 pr-0",
+      mobile: "control",
+      render: (user) => (
+        <Link
+          href={`/admin/usuarios/${user.id}`}
+          aria-label={`Editar ${user.name}`}
+          title="Editar usuário"
+          className="grid size-8 place-items-center rounded-md text-accent transition-colors hover:bg-accent-soft"
+        >
+          {/* The page takes a moment: the pencil turns into a spinner. */}
+          <LinkPendingSwap>
+            <Pencil aria-hidden className="size-4" />
+          </LinkPendingSwap>
+        </Link>
+      ),
+    },
+    {
       key: "name",
       label: "Nome",
       mobile: "title",
       render: (user) => (
-        <Link
-          href={`/admin/usuarios/${user.id}`}
-          className="font-medium text-fg hover:text-accent hover:underline"
-        >
-          {user.name}
-        </Link>
+        <span className="font-medium text-fg">{user.name}</span>
       ),
     },
     {

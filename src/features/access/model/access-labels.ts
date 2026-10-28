@@ -63,6 +63,10 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Ver quem criou e alterou os registros",
     area: "Administração",
   },
+  SUPPORT_MANAGE: {
+    label: "Responder solicitações de suporte",
+    area: "Administração",
+  },
 };
 
 /** Only granted by the user's group; never per user. */
@@ -72,6 +76,7 @@ export const LOCKED_PERMISSIONS: ReadonlySet<Permission> = new Set([
   "AUDIT_READ",
   "MEMBERS_READ",
   "MEMBERS_MANAGE",
+  "SUPPORT_MANAGE",
 ]);
 
 export const PERMISSION_AREAS: PermissionArea[] = [

@@ -60,6 +60,18 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     label: "Comunicados",
     description: "Avisos gerais enviados pelos gestores da banda.",
   },
+  SUPPORT_REQUESTED: {
+    label: "Nova solicitação de suporte",
+    description: "Para o administrador geral: alguém pediu ajuda pelo Suporte.",
+  },
+  SUPPORT_ANSWERED: {
+    label: "Resposta do suporte",
+    description: "O suporte respondeu uma solicitação sua.",
+  },
+  SUPPORT_FINALIZED: {
+    label: "Suporte finalizado",
+    description: "Uma solicitação sua ao suporte foi finalizada.",
+  },
   ENROLLMENT_SUBMITTED: {
     label: "Novo cadastro",
     description:

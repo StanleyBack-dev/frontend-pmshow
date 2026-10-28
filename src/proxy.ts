@@ -101,6 +101,6 @@ export const config = {
   matcher: [
     // Everything except static assets, generated icons, the service worker
     // and the public endpoints (login, logout, password recovery, sign-up).
-    "/((?!_next/static|_next/image|icon.svg|apple-icon|pwa-icon|manifest.webmanifest|robots.txt|sw.js|api/auth/|api/public/).*)",
+    "/((?!_next/static|_next/image|icon.svg|apple-icon|pwa-icon|opengraph-image|cadastro/opengraph-image|manifest.webmanifest|robots.txt|sw.js|api/auth/|api/public/).*)",
   ],
 };

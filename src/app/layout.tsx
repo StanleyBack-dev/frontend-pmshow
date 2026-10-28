@@ -18,6 +18,20 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   // Private app: no page is offered to search engines.
   robots: { index: false, follow: false },
+  // Link previews (WhatsApp, Instagram, Facebook, X): the image comes from
+  // app/opengraph-image.tsx; pages without their own inherit these.
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} · Banda da Polícia Militar de Goiás`,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} · Banda da Polícia Militar de Goiás`,
+    description: SITE_DESCRIPTION,
+  },
   // Title and status bar of the installed app on iOS.
   appleWebApp: {
     capable: true,

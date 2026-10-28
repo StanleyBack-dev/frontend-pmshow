@@ -138,6 +138,12 @@ type Documents = {
     "\n  mutation SaveRoster($eventId: ID!, $input: RosterInput!) {\n    saveRoster(eventId: $eventId, input: $input) {\n      ...RosterFields\n    }\n  }\n": typeof types.SaveRosterDocument,
     "\n  mutation PublishRoster($eventId: ID!) {\n    publishRoster(eventId: $eventId) {\n      ...RosterFields\n    }\n  }\n": typeof types.PublishRosterDocument,
     "\n  mutation AcknowledgeRoster(\n    $eventId: ID!\n    $answer: AckAnswer!\n    $note: String\n  ) {\n    acknowledgeRoster(eventId: $eventId, answer: $answer, note: $note) {\n      ackStatus\n      ackNote\n    }\n  }\n": typeof types.AcknowledgeRosterDocument,
+    "\n  fragment SupportRequestFields on SupportRequest {\n    id\n    protocol\n    userId\n    userName\n    warName\n    category\n    subject\n    message\n    status\n    reply\n    repliedAt\n    repliedByName\n    finalizedAt\n    finalizedByName\n    createdAt\n  }\n": typeof types.SupportRequestFieldsFragmentDoc,
+    "\n  query SupportPage($page: PageInput) {\n    supportQuota {\n      limit\n      sentToday\n      remaining\n      nextAllowedAt\n    }\n    mySupportRequests(page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SupportPageDocument,
+    "\n  query SupportRequests($status: SupportStatus, $page: PageInput) {\n    supportRequests(status: $status, page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SupportRequestsDocument,
+    "\n  mutation SendSupportRequest($input: SupportRequestInput!) {\n    sendSupportRequest(input: $input) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.SendSupportRequestDocument,
+    "\n  mutation ReplySupportRequest($id: ID!, $reply: String!) {\n    replySupportRequest(id: $id, reply: $reply) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.ReplySupportRequestDocument,
+    "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.FinalizeSupportRequestDocument,
 };
 const documents: Documents = {
     "\n  fragment AbsenceFields on Absence {\n    id\n    userId\n    userName\n    warName\n    type\n    startsOn\n    endsOn\n    reason\n    status\n    reviewNote\n    reviewedAt\n    reviewedByName\n    cancelledAt\n    cancelledByName\n    registered\n    createdAt\n    attachments {\n      id\n      fileName\n      mimeType\n      sizeBytes\n    }\n  }\n": types.AbsenceFieldsFragmentDoc,
@@ -263,6 +269,12 @@ const documents: Documents = {
     "\n  mutation SaveRoster($eventId: ID!, $input: RosterInput!) {\n    saveRoster(eventId: $eventId, input: $input) {\n      ...RosterFields\n    }\n  }\n": types.SaveRosterDocument,
     "\n  mutation PublishRoster($eventId: ID!) {\n    publishRoster(eventId: $eventId) {\n      ...RosterFields\n    }\n  }\n": types.PublishRosterDocument,
     "\n  mutation AcknowledgeRoster(\n    $eventId: ID!\n    $answer: AckAnswer!\n    $note: String\n  ) {\n    acknowledgeRoster(eventId: $eventId, answer: $answer, note: $note) {\n      ackStatus\n      ackNote\n    }\n  }\n": types.AcknowledgeRosterDocument,
+    "\n  fragment SupportRequestFields on SupportRequest {\n    id\n    protocol\n    userId\n    userName\n    warName\n    category\n    subject\n    message\n    status\n    reply\n    repliedAt\n    repliedByName\n    finalizedAt\n    finalizedByName\n    createdAt\n  }\n": types.SupportRequestFieldsFragmentDoc,
+    "\n  query SupportPage($page: PageInput) {\n    supportQuota {\n      limit\n      sentToday\n      remaining\n      nextAllowedAt\n    }\n    mySupportRequests(page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SupportPageDocument,
+    "\n  query SupportRequests($status: SupportStatus, $page: PageInput) {\n    supportRequests(status: $status, page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SupportRequestsDocument,
+    "\n  mutation SendSupportRequest($input: SupportRequestInput!) {\n    sendSupportRequest(input: $input) {\n      ...SupportRequestFields\n    }\n  }\n": types.SendSupportRequestDocument,
+    "\n  mutation ReplySupportRequest($id: ID!, $reply: String!) {\n    replySupportRequest(id: $id, reply: $reply) {\n      ...SupportRequestFields\n    }\n  }\n": types.ReplySupportRequestDocument,
+    "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n": types.FinalizeSupportRequestDocument,
 };
 
 /**
@@ -757,6 +769,30 @@ export function graphql(source: "\n  mutation PublishRoster($eventId: ID!) {\n  
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation AcknowledgeRoster(\n    $eventId: ID!\n    $answer: AckAnswer!\n    $note: String\n  ) {\n    acknowledgeRoster(eventId: $eventId, answer: $answer, note: $note) {\n      ackStatus\n      ackNote\n    }\n  }\n"): typeof import('./graphql').AcknowledgeRosterDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment SupportRequestFields on SupportRequest {\n    id\n    protocol\n    userId\n    userName\n    warName\n    category\n    subject\n    message\n    status\n    reply\n    repliedAt\n    repliedByName\n    finalizedAt\n    finalizedByName\n    createdAt\n  }\n"): typeof import('./graphql').SupportRequestFieldsFragmentDoc;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SupportPage($page: PageInput) {\n    supportQuota {\n      limit\n      sentToday\n      remaining\n      nextAllowedAt\n    }\n    mySupportRequests(page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').SupportPageDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SupportRequests($status: SupportStatus, $page: PageInput) {\n    supportRequests(status: $status, page: $page) {\n      items {\n        ...SupportRequestFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').SupportRequestsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SendSupportRequest($input: SupportRequestInput!) {\n    sendSupportRequest(input: $input) {\n      ...SupportRequestFields\n    }\n  }\n"): typeof import('./graphql').SendSupportRequestDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReplySupportRequest($id: ID!, $reply: String!) {\n    replySupportRequest(id: $id, reply: $reply) {\n      ...SupportRequestFields\n    }\n  }\n"): typeof import('./graphql').ReplySupportRequestDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n"): typeof import('./graphql').FinalizeSupportRequestDocument;
 
 
 export function graphql(source: string) {
