@@ -2,7 +2,12 @@
 
 import { auditColumn } from "@/features/audit/components/RecordAudit";
 import { Fragment } from "react";
-import { Badge, DataTable, type DataTableColumn } from "@/design-system";
+import {
+  Avatar,
+  Badge,
+  DataTable,
+  type DataTableColumn,
+} from "@/design-system";
 import { CopyShareValue } from "@/features/admin/components/CopyShareValue";
 import { AbsenceActions } from "@/features/availability/components/AbsenceActions";
 import {
@@ -121,7 +126,14 @@ export function AbsencesTable({
           label: "Integrante",
           mobile: "title",
           render: (absence) => (
-            <span className="font-medium text-fg">{absence.userName}</span>
+            <span className="flex items-center gap-2.5">
+              <Avatar
+                name={absence.warName ?? absence.userName}
+                src={absence.photoUrl}
+                size="sm"
+              />
+              <span className="font-medium text-fg">{absence.userName}</span>
+            </span>
           ),
         },
         {

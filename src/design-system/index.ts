@@ -20,6 +20,10 @@ export { Hint } from "./components/Hint";
 export { LinkPending, LinkPendingSwap } from "./components/LinkPending";
 export { Modal } from "./components/Modal";
 export { PageHeader } from "./components/PageHeader";
+export {
+  PageTitleAddon,
+  PageTitleAddonProvider,
+} from "./components/PageTitleAddon";
 export { Pagination } from "./components/Pagination";
 export { PasswordField } from "./components/PasswordField";
 export { Select, type SelectOption } from "./components/Select";

@@ -6,6 +6,7 @@ export const absenceFieldsFragment = graphql(`
     userId
     userName
     warName
+    photoUrl
     type
     startsOn
     endsOn

@@ -14,13 +14,14 @@ import {
   Users,
 } from "lucide-react";
 import {
+  Avatar,
   Badge,
   Button,
+  cn,
   Field,
+  inputClasses,
   Modal,
   Select,
-  cn,
-  inputClasses,
 } from "@/design-system";
 import {
   ABSENCE_TYPE_LABELS,
@@ -744,6 +745,7 @@ function CandidateRow({
               <Plus className="size-4" />
             )}
           </span>
+          <Avatar name={candidate.warName} src={candidate.photoUrl} size="sm" />
           <span className="min-w-0 flex-1">
             <span className="block font-medium text-fg">
               {personName(candidate)}
@@ -849,6 +851,7 @@ function AssignmentRow({
   return (
     <li className={cn("space-y-3 px-4 py-3", swap && "bg-danger-soft/40")}>
       <div className="flex items-start gap-2">
+        <Avatar name={candidate.warName} src={candidate.photoUrl} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-fg">
             {personName(candidate)}
@@ -1033,6 +1036,7 @@ function SubstituteModal({
                   onClick={() => onPick(item)}
                   className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-surface-muted"
                 >
+                  <Avatar name={item.warName} src={item.photoUrl} size="sm" />
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-medium text-fg">
                       {personName(item)}

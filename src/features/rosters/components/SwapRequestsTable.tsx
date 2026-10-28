@@ -5,7 +5,12 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Repeat } from "lucide-react";
-import { Button, DataTable, type DataTableColumn } from "@/design-system";
+import {
+  Avatar,
+  Button,
+  DataTable,
+  type DataTableColumn,
+} from "@/design-system";
 import { RankBadge } from "@/features/members/components/RankBadge";
 import { SECTION_LABELS } from "@/features/members/model/member-labels";
 import { KeepOnRosterButton } from "@/features/rosters/components/KeepOnRosterButton";
@@ -79,7 +84,14 @@ export function SwapRequestsTable({
       label: "Integrante",
       mobile: "title",
       render: (row) => (
-        <span className="font-medium text-fg">{nameOf(row)}</span>
+        <span className="flex items-center gap-2.5">
+          <Avatar
+            name={row.person?.warName ?? nameOf(row)}
+            src={row.person?.photoUrl ?? null}
+            size="sm"
+          />
+          <span className="font-medium text-fg">{nameOf(row)}</span>
+        </span>
       ),
     },
     {

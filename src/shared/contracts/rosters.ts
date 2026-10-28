@@ -30,6 +30,8 @@ export type Assignment = {
   person: {
     name: string;
     warName: string;
+    /** Short-lived link to the profile photo (null: none). */
+    photoUrl: string | null;
     rank: Rank;
     registration: string | null;
     /** Digits only (area code + number). */
@@ -51,6 +53,8 @@ export type RosterCandidate = {
   userId: string;
   name: string;
   warName: string;
+  /** Short-lived link to the profile photo (null: none). */
+  photoUrl: string | null;
   rank: Rank;
   registration: string | null;
   /** Digits only (area code + number). */
@@ -91,6 +95,8 @@ export type SwapRequest = MyAssignment & {
   person: {
     name: string;
     warName: string;
+    /** Short-lived link to the profile photo (null: none). */
+    photoUrl: string | null;
     rank: Rank;
     section: Section;
   } | null;

@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CalendarOff,
   CalendarRange,
+  CircleHelp,
   CircleUserRound,
   ClipboardList,
   Guitar,
@@ -125,6 +126,8 @@ export const ACCOUNT_NAV: NavItem[] = [
   // Everyone: ask the app's support (administrators answer there too).
   { href: "/suporte", label: "Suporte", icon: LifeBuoy },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
+  // Everyone: how to use each menu, by their permissions.
+  { href: "/ajuda", label: "Ajuda", icon: CircleHelp },
 ];
 
 /** Admin area: shown when the user has any of its permissions. */

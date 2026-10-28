@@ -6,6 +6,7 @@ import {
   logoutDocument,
   meDocument,
   refreshSessionDocument,
+  completeOnboardingDocument,
   removeMyPhotoDocument,
   requestPasswordRecoveryDocument,
   resetPasswordWithRecoveryDocument,
@@ -77,6 +78,11 @@ export const authService = {
 
   async removePhoto(token: string): Promise<void> {
     await backendGraphql(removeMyPhotoDocument, { token });
+  },
+
+  /** The guided tour was finished or skipped (not shown again). */
+  async completeOnboarding(token: string): Promise<void> {
+    await backendGraphql(completeOnboardingDocument, { token });
   },
 
   async requestRecovery(login: string): Promise<void> {

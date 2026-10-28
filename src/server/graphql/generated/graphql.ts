@@ -629,7 +629,7 @@ export type VerifyRecoveryCodeInput = {
   login: string;
 };
 
-export type AbsenceFieldsFragment = { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> };
+export type AbsenceFieldsFragment = { id: string, userId: string, userName: string, warName: string | null, photoUrl: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> };
 
 export type RequestAbsenceAttachmentUploadsMutationVariables = Exact<{
   files: Array<AttachmentFileInput> | AttachmentFileInput;
@@ -649,21 +649,21 @@ export type AbsenceAttachmentUrlQuery = { absenceAttachmentUrl: string };
 export type MyAbsencesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyAbsencesQuery = { myAbsences: Array<{ id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> }> };
+export type MyAbsencesQuery = { myAbsences: Array<{ id: string, userId: string, userName: string, warName: string | null, photoUrl: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> }> };
 
 export type AbsencesQueryVariables = Exact<{
   filter?: AbsenceFilterInput | null | undefined;
 }>;
 
 
-export type AbsencesQuery = { absences: Array<{ id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> }> };
+export type AbsencesQuery = { absences: Array<{ id: string, userId: string, userName: string, warName: string | null, photoUrl: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> }> };
 
 export type RequestAbsenceMutationVariables = Exact<{
   input: AbsenceInput;
 }>;
 
 
-export type RequestAbsenceMutation = { requestAbsence: { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> } };
+export type RequestAbsenceMutation = { requestAbsence: { id: string, userId: string, userName: string, warName: string | null, photoUrl: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> } };
 
 export type RegisterAbsenceMutationVariables = Exact<{
   userId: string | number;
@@ -671,7 +671,7 @@ export type RegisterAbsenceMutationVariables = Exact<{
 }>;
 
 
-export type RegisterAbsenceMutation = { registerAbsence: { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> } };
+export type RegisterAbsenceMutation = { registerAbsence: { id: string, userId: string, userName: string, warName: string | null, photoUrl: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> } };
 
 export type ReviewAbsenceMutationVariables = Exact<{
   id: string | number;
@@ -680,14 +680,14 @@ export type ReviewAbsenceMutationVariables = Exact<{
 }>;
 
 
-export type ReviewAbsenceMutation = { reviewAbsence: { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> } };
+export type ReviewAbsenceMutation = { reviewAbsence: { id: string, userId: string, userName: string, warName: string | null, photoUrl: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> } };
 
 export type CancelAbsenceMutationVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type CancelAbsenceMutation = { cancelAbsence: { id: string, userId: string, userName: string, warName: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> } };
+export type CancelAbsenceMutation = { cancelAbsence: { id: string, userId: string, userName: string, warName: string | null, photoUrl: string | null, type: AbsenceType, startsOn: string, endsOn: string, reason: string | null, status: AbsenceStatus, reviewNote: string | null, reviewedAt: string | null, reviewedByName: string | null, cancelledAt: string | null, cancelledByName: string | null, registered: boolean, createdAt: string, attachments: Array<{ id: string, fileName: string, mimeType: string, sizeBytes: number }> } };
 
 export type UsersQueryVariables = Exact<{
   filter?: UserFilterInput | null | undefined;
@@ -809,7 +809,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null } } };
+export type LoginMutation = { login: { accessToken: string, accessTokenExpiresAt: string, refreshToken: string, refreshTokenExpiresAt: string, user: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean } } };
 
 export type RefreshSessionMutationVariables = Exact<{
   refreshToken: string;
@@ -826,7 +826,12 @@ export type LogoutMutation = { logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null } };
+export type MeQuery = { me: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean } };
+
+export type CompleteOnboardingMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CompleteOnboardingMutation = { completeOnboarding: boolean };
 
 export type ChangeMyPasswordMutationVariables = Exact<{
   input: ChangePasswordInput;
@@ -840,7 +845,7 @@ export type UpdateMyProfileMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null } };
+export type UpdateMyProfileMutation = { updateMyProfile: { id: string, name: string, username: string, email: string, group: UserGroup, mustChangePassword: boolean, permissions: Array<Permission>, photoUrl: string | null, onboardingCompleted: boolean } };
 
 export type SetMyPhotoMutationVariables = Exact<{
   photo: string;
@@ -1135,7 +1140,7 @@ export type RosterQueryVariables = Exact<{
 }>;
 
 
-export type RosterQuery = { roster: { total: number, page: number, limit: number, totalPages: number, items: Array<{ userId: string, name: string, username: string, active: boolean, profile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } | null }> } };
+export type RosterQuery = { roster: { total: number, page: number, limit: number, totalPages: number, items: Array<{ userId: string, name: string, username: string, active: boolean, photoUrl: string | null, profile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } | null }> } };
 
 export type MemberProfileQueryVariables = Exact<{
   userId: string | number;
@@ -1357,23 +1362,23 @@ export type SearchYoutubeQueryVariables = Exact<{
 
 export type SearchYoutubeQuery = { searchYoutube: Array<{ videoId: string, title: string, channelTitle: string, thumbnailUrl: string, publishedAt: string | null, durationSeconds: number | null }> };
 
-export type AssignmentFieldsFragment = { userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section } | null };
+export type AssignmentFieldsFragment = { userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, photoUrl: string | null } | null };
 
-export type RosterFieldsFragment = { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section } | null }> };
+export type RosterFieldsFragment = { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, photoUrl: string | null } | null }> };
 
 export type EventRosterQueryVariables = Exact<{
   eventId: string | number;
 }>;
 
 
-export type EventRosterQuery = { eventRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section } | null }> } | null };
+export type EventRosterQuery = { eventRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, photoUrl: string | null } | null }> } | null };
 
 export type RosterCandidatesQueryVariables = Exact<{
   eventId: string | number;
 }>;
 
 
-export type RosterCandidatesQuery = { rosterCandidates: Array<{ userId: string, name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, memberStatus: MemberStatus, blocker: CandidateBlocker | null, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }>, absence: { type: AbsenceType, startsOn: string, endsOn: string } | null, busyWith: Array<{ eventId: string, title: string }> }> };
+export type RosterCandidatesQuery = { rosterCandidates: Array<{ userId: string, name: string, warName: string, photoUrl: string | null, rank: Rank, registration: string | null, phone: string | null, section: Section, memberStatus: MemberStatus, blocker: CandidateBlocker | null, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }>, absence: { type: AbsenceType, startsOn: string, endsOn: string } | null, busyWith: Array<{ eventId: string, title: string }> }> };
 
 export type MyAssignmentFieldsFragment = { eventId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, ackStatus: AckStatus, ackNote: string | null, event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venue: { id: string, name: string } | null } | null };
 
@@ -1397,7 +1402,7 @@ export type SwapRequestsQueryVariables = Exact<{
 }>;
 
 
-export type SwapRequestsQuery = { swapRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ userId: string, ackAt: string | null, eventId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, ackStatus: AckStatus, ackNote: string | null, person: { name: string, warName: string, rank: Rank, section: Section } | null, event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venue: { id: string, name: string } | null } | null }> } };
+export type SwapRequestsQuery = { swapRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ userId: string, ackAt: string | null, eventId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, ackStatus: AckStatus, ackNote: string | null, person: { name: string, warName: string, rank: Rank, section: Section, photoUrl: string | null } | null, event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venue: { id: string, name: string } | null } | null }> } };
 
 export type KeepOnRosterMutationVariables = Exact<{
   eventId: string | number;
@@ -1414,14 +1419,14 @@ export type SaveRosterMutationVariables = Exact<{
 }>;
 
 
-export type SaveRosterMutation = { saveRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section } | null }> } };
+export type SaveRosterMutation = { saveRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, photoUrl: string | null } | null }> } };
 
 export type PublishRosterMutationVariables = Exact<{
   eventId: string | number;
 }>;
 
 
-export type PublishRosterMutation = { publishRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section } | null }> } };
+export type PublishRosterMutation = { publishRoster: { eventId: string, status: RosterStatus, version: number, publishedAt: string | null, uncoveredSections: Array<Section>, assignments: Array<{ userId: string, functionId: string | null, functionName: string | null, instrumentId: string | null, instrumentName: string | null, notes: string | null, overrideReason: string | null, ackStatus: AckStatus, ackNote: string | null, ackAt: string | null, person: { name: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, photoUrl: string | null } | null }> } };
 
 export type AcknowledgeRosterMutationVariables = Exact<{
   eventId: string | number;
@@ -1495,6 +1500,7 @@ export const AbsenceFieldsFragmentDoc = new TypedDocumentString(`
   userId
   userName
   warName
+  photoUrl
   type
   startsOn
   endsOn
@@ -1734,6 +1740,7 @@ export const AssignmentFieldsFragmentDoc = new TypedDocumentString(`
     registration
     phone
     section
+    photoUrl
   }
 }
     `, {"fragmentName":"AssignmentFields"}) as unknown as TypedDocumentString<AssignmentFieldsFragment, unknown>;
@@ -1766,6 +1773,7 @@ export const RosterFieldsFragmentDoc = new TypedDocumentString(`
     registration
     phone
     section
+    photoUrl
   }
 }`, {"fragmentName":"RosterFields"}) as unknown as TypedDocumentString<RosterFieldsFragment, unknown>;
 export const MyAssignmentFieldsFragmentDoc = new TypedDocumentString(`
@@ -1838,6 +1846,7 @@ export const MyAbsencesDocument = new TypedDocumentString(`
   userId
   userName
   warName
+  photoUrl
   type
   startsOn
   endsOn
@@ -1868,6 +1877,7 @@ export const AbsencesDocument = new TypedDocumentString(`
   userId
   userName
   warName
+  photoUrl
   type
   startsOn
   endsOn
@@ -1898,6 +1908,7 @@ export const RequestAbsenceDocument = new TypedDocumentString(`
   userId
   userName
   warName
+  photoUrl
   type
   startsOn
   endsOn
@@ -1928,6 +1939,7 @@ export const RegisterAbsenceDocument = new TypedDocumentString(`
   userId
   userName
   warName
+  photoUrl
   type
   startsOn
   endsOn
@@ -1958,6 +1970,7 @@ export const ReviewAbsenceDocument = new TypedDocumentString(`
   userId
   userName
   warName
+  photoUrl
   type
   startsOn
   endsOn
@@ -1988,6 +2001,7 @@ export const CancelAbsenceDocument = new TypedDocumentString(`
   userId
   userName
   warName
+  photoUrl
   type
   startsOn
   endsOn
@@ -2284,6 +2298,7 @@ export const LoginDocument = new TypedDocumentString(`
       mustChangePassword
       permissions
       photoUrl
+      onboardingCompleted
     }
   }
 }
@@ -2314,9 +2329,15 @@ export const MeDocument = new TypedDocumentString(`
     mustChangePassword
     permissions
     photoUrl
+    onboardingCompleted
   }
 }
     `) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
+export const CompleteOnboardingDocument = new TypedDocumentString(`
+    mutation CompleteOnboarding {
+  completeOnboarding
+}
+    `) as unknown as TypedDocumentString<CompleteOnboardingMutation, CompleteOnboardingMutationVariables>;
 export const ChangeMyPasswordDocument = new TypedDocumentString(`
     mutation ChangeMyPassword($input: ChangePasswordInput!) {
   changeMyPassword(input: $input)
@@ -2333,6 +2354,7 @@ export const UpdateMyProfileDocument = new TypedDocumentString(`
     mustChangePassword
     permissions
     photoUrl
+    onboardingCompleted
   }
 }
     `) as unknown as TypedDocumentString<UpdateMyProfileMutation, UpdateMyProfileMutationVariables>;
@@ -3165,6 +3187,7 @@ export const RosterDocument = new TypedDocumentString(`
       name
       username
       active
+      photoUrl
       profile {
         ...MemberProfileFields
       }
@@ -3699,6 +3722,7 @@ export const EventRosterDocument = new TypedDocumentString(`
     registration
     phone
     section
+    photoUrl
   }
 }
 fragment RosterFields on Roster {
@@ -3717,6 +3741,7 @@ export const RosterCandidatesDocument = new TypedDocumentString(`
     userId
     name
     warName
+    photoUrl
     rank
     registration
     phone
@@ -3823,6 +3848,7 @@ export const SwapRequestsDocument = new TypedDocumentString(`
         warName
         rank
         section
+        photoUrl
       }
     }
     total
@@ -3885,6 +3911,7 @@ export const SaveRosterDocument = new TypedDocumentString(`
     registration
     phone
     section
+    photoUrl
   }
 }
 fragment RosterFields on Roster {
@@ -3921,6 +3948,7 @@ export const PublishRosterDocument = new TypedDocumentString(`
     registration
     phone
     section
+    photoUrl
   }
 }
 fragment RosterFields on Roster {
