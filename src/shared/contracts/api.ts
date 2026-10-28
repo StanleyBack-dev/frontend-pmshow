@@ -30,6 +30,8 @@ export type SessionUser = {
   permissions: Permission[];
   /** Short-lived link to the profile photo (null: none). */
   photoUrl: string | null;
+  /** Already saw (or skipped) the guided tour. */
+  onboardingCompleted: boolean;
 };
 
 export type UserAccount = {

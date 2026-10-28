@@ -35,6 +35,7 @@ export const rosterDocument = graphql(`
         name
         username
         active
+        photoUrl
         profile {
           ...MemberProfileFields
         }

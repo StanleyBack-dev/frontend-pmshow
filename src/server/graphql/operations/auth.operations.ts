@@ -16,6 +16,7 @@ export const loginDocument = graphql(`
         mustChangePassword
         permissions
         photoUrl
+        onboardingCompleted
       }
     }
   }
@@ -49,7 +50,14 @@ export const meDocument = graphql(`
       mustChangePassword
       permissions
       photoUrl
+      onboardingCompleted
     }
+  }
+`);
+
+export const completeOnboardingDocument = graphql(`
+  mutation CompleteOnboarding {
+    completeOnboarding
   }
 `);
 
@@ -70,6 +78,7 @@ export const updateMyProfileDocument = graphql(`
       mustChangePassword
       permissions
       photoUrl
+      onboardingCompleted
     }
   }
 `);

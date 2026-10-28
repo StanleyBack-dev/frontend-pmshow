@@ -38,6 +38,8 @@ export type RosterEntry = {
   name: string;
   username: string;
   active: boolean;
+  /** Short-lived link to the profile photo (null: none). */
+  photoUrl: string | null;
   profile: MemberProfile | null;
 };
 

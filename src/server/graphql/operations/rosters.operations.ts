@@ -19,6 +19,7 @@ export const assignmentFieldsFragment = graphql(`
       registration
       phone
       section
+      photoUrl
     }
   }
 `);
@@ -50,6 +51,7 @@ export const rosterCandidatesDocument = graphql(`
       userId
       name
       warName
+      photoUrl
       rank
       registration
       phone
@@ -142,6 +144,7 @@ export const swapRequestsDocument = graphql(`
           warName
           rank
           section
+          photoUrl
         }
       }
       total

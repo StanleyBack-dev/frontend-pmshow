@@ -7,6 +7,8 @@ export type Absence = {
   userId: string;
   userName: string;
   warName: string | null;
+  /** Short-lived link to the profile photo (null: none). */
+  photoUrl: string | null;
   type: AbsenceType;
   /** YYYY-MM-DD, both inclusive. */
   startsOn: string;

@@ -1,6 +1,11 @@
 "use client";
 
-import { Badge, DataTable, type DataTableColumn } from "@/design-system";
+import {
+  Avatar,
+  Badge,
+  DataTable,
+  type DataTableColumn,
+} from "@/design-system";
 import { auditColumn } from "@/features/audit/components/RecordAudit";
 import { MemberProfileButton } from "@/features/members/components/MemberProfileButton";
 import { RankBadge } from "@/features/members/components/RankBadge";
@@ -50,8 +55,13 @@ export function MembersTable({
       key: "warName",
       label: "Nome de guerra",
       mobile: "title",
-      render: ({ profile, name }) => (
-        <span className="font-medium text-fg">{profile?.warName ?? name}</span>
+      render: ({ profile, name, photoUrl }) => (
+        <span className="flex items-center gap-2.5">
+          <Avatar name={profile?.warName ?? name} src={photoUrl} size="sm" />
+          <span className="font-medium text-fg">
+            {profile?.warName ?? name}
+          </span>
+        </span>
       ),
     },
     {

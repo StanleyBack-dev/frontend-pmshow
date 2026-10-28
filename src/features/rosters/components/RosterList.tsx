@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Badge, cn } from "@/design-system";
+import { Avatar, Badge, cn } from "@/design-system";
 import { RankBadge } from "@/features/members/components/RankBadge";
 import { SECTION_LABELS } from "@/features/members/model/member-labels";
 import {
@@ -100,6 +100,11 @@ function RosterLine({
   return (
     <li className={cn("px-3 py-2.5 text-sm", mine && "bg-accent-soft/40")}>
       <div className="flex items-center gap-x-3 gap-y-1">
+        <Avatar
+          name={person?.warName ?? name}
+          src={person?.photoUrl ?? null}
+          size="sm"
+        />
         <span className="min-w-0 flex-1">
           <span className="font-medium text-fg">{name}</span>
           <span className="block text-xs text-soft">{role}</span>

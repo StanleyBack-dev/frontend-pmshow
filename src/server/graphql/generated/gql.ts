@@ -15,7 +15,7 @@ import * as types from './graphql';
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  fragment AbsenceFields on Absence {\n    id\n    userId\n    userName\n    warName\n    type\n    startsOn\n    endsOn\n    reason\n    status\n    reviewNote\n    reviewedAt\n    reviewedByName\n    cancelledAt\n    cancelledByName\n    registered\n    createdAt\n    attachments {\n      id\n      fileName\n      mimeType\n      sizeBytes\n    }\n  }\n": typeof types.AbsenceFieldsFragmentDoc,
+    "\n  fragment AbsenceFields on Absence {\n    id\n    userId\n    userName\n    warName\n    photoUrl\n    type\n    startsOn\n    endsOn\n    reason\n    status\n    reviewNote\n    reviewedAt\n    reviewedByName\n    cancelledAt\n    cancelledByName\n    registered\n    createdAt\n    attachments {\n      id\n      fileName\n      mimeType\n      sizeBytes\n    }\n  }\n": typeof types.AbsenceFieldsFragmentDoc,
     "\n  mutation RequestAbsenceAttachmentUploads($files: [AttachmentFileInput!]!) {\n    requestAbsenceAttachmentUploads(files: $files) {\n      storageKey\n      upload {\n        url\n        fields\n      }\n    }\n  }\n": typeof types.RequestAbsenceAttachmentUploadsDocument,
     "\n  query AbsenceAttachmentUrl($id: ID!, $download: Boolean!) {\n    absenceAttachmentUrl(id: $id, download: $download)\n  }\n": typeof types.AbsenceAttachmentUrlDocument,
     "\n  query MyAbsences {\n    myAbsences {\n      ...AbsenceFields\n    }\n  }\n": typeof types.MyAbsencesDocument,
@@ -41,12 +41,13 @@ type Documents = {
     "\n  query ArtistsPage($filter: ArtistFilterInput, $page: PageInput) {\n    artistsPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        name\n        archived\n        createdAt\n        songCount\n      }\n    }\n  }\n": typeof types.ArtistsPageDocument,
     "\n  mutation CreateArtist($input: ArtistInput!) {\n    createArtist(input: $input) {\n      ...ArtistFields\n    }\n  }\n": typeof types.CreateArtistDocument,
     "\n  mutation UpdateArtist($id: ID!, $input: ArtistInput!) {\n    updateArtist(id: $id, input: $input) {\n      ...ArtistFields\n    }\n  }\n": typeof types.UpdateArtistDocument,
-    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n      }\n    }\n  }\n": typeof types.LoginDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        onboardingCompleted\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": typeof types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
-    "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n    }\n  }\n": typeof types.MeDocument,
+    "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      onboardingCompleted\n    }\n  }\n": typeof types.MeDocument,
+    "\n  mutation CompleteOnboarding {\n    completeOnboarding\n  }\n": typeof types.CompleteOnboardingDocument,
     "\n  mutation ChangeMyPassword($input: ChangePasswordInput!) {\n    changeMyPassword(input: $input)\n  }\n": typeof types.ChangeMyPasswordDocument,
-    "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n    }\n  }\n": typeof types.UpdateMyProfileDocument,
+    "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      onboardingCompleted\n    }\n  }\n": typeof types.UpdateMyProfileDocument,
     "\n  mutation SetMyPhoto($photo: String!) {\n    setMyPhoto(photo: $photo)\n  }\n": typeof types.SetMyPhotoDocument,
     "\n  mutation RemoveMyPhoto {\n    removeMyPhoto\n  }\n": typeof types.RemoveMyPhotoDocument,
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": typeof types.RequestPasswordRecoveryDocument,
@@ -92,7 +93,7 @@ type Documents = {
     "\n  mutation CreateVenue($input: VenueInput!) {\n    createVenue(input: $input) {\n      ...VenueFields\n    }\n  }\n": typeof types.CreateVenueDocument,
     "\n  mutation UpdateVenue($id: ID!, $input: VenueInput!) {\n    updateVenue(id: $id, input: $input) {\n      ...VenueFields\n    }\n  }\n": typeof types.UpdateVenueDocument,
     "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n    functions {\n      functionId\n      name\n    }\n  }\n": typeof types.MemberProfileFieldsFragmentDoc,
-    "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": typeof types.RosterDocument,
+    "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        photoUrl\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": typeof types.RosterDocument,
     "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.MemberProfileDocument,
     "\n  query MyMemberProfile {\n    myMemberProfile {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.MyMemberProfileDocument,
     "\n  mutation SaveMemberProfile($userId: ID!, $input: MemberProfileInput!) {\n    saveMemberProfile(userId: $userId, input: $input) {\n      ...MemberProfileFields\n    }\n  }\n": typeof types.SaveMemberProfileDocument,
@@ -126,14 +127,14 @@ type Documents = {
     "\n  query AudioDownloadUrl($assetId: ID!) {\n    audioDownloadUrl(assetId: $assetId)\n  }\n": typeof types.AudioDownloadUrlDocument,
     "\n  query FindLyrics($artist: String!, $title: String!) {\n    findLyrics(artist: $artist, title: $title) {\n      artist\n      title\n      lyrics\n      sourceUrl\n    }\n  }\n": typeof types.FindLyricsDocument,
     "\n  query SearchYoutube($query: String!) {\n    searchYoutube(query: $query) {\n      videoId\n      title\n      channelTitle\n      thumbnailUrl\n      publishedAt\n      durationSeconds\n    }\n  }\n": typeof types.SearchYoutubeDocument,
-    "\n  fragment AssignmentFields on Assignment {\n    userId\n    functionId\n    functionName\n    instrumentId\n    instrumentName\n    notes\n    overrideReason\n    ackStatus\n    ackNote\n    ackAt\n    person {\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n    }\n  }\n": typeof types.AssignmentFieldsFragmentDoc,
+    "\n  fragment AssignmentFields on Assignment {\n    userId\n    functionId\n    functionName\n    instrumentId\n    instrumentName\n    notes\n    overrideReason\n    ackStatus\n    ackNote\n    ackAt\n    person {\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n      photoUrl\n    }\n  }\n": typeof types.AssignmentFieldsFragmentDoc,
     "\n  fragment RosterFields on Roster {\n    eventId\n    status\n    version\n    publishedAt\n    uncoveredSections\n    assignments {\n      ...AssignmentFields\n    }\n  }\n": typeof types.RosterFieldsFragmentDoc,
     "\n  query EventRoster($eventId: ID!) {\n    eventRoster(eventId: $eventId) {\n      ...RosterFields\n    }\n  }\n": typeof types.EventRosterDocument,
-    "\n  query RosterCandidates($eventId: ID!) {\n    rosterCandidates(eventId: $eventId) {\n      userId\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n      memberStatus\n      instruments {\n        instrumentId\n        name\n        primary\n      }\n      functions {\n        functionId\n        name\n      }\n      blocker\n      absence {\n        type\n        startsOn\n        endsOn\n      }\n      busyWith {\n        eventId\n        title\n      }\n    }\n  }\n": typeof types.RosterCandidatesDocument,
+    "\n  query RosterCandidates($eventId: ID!) {\n    rosterCandidates(eventId: $eventId) {\n      userId\n      name\n      warName\n      photoUrl\n      rank\n      registration\n      phone\n      section\n      memberStatus\n      instruments {\n        instrumentId\n        name\n        primary\n      }\n      functions {\n        functionId\n        name\n      }\n      blocker\n      absence {\n        type\n        startsOn\n        endsOn\n      }\n      busyWith {\n        eventId\n        title\n      }\n    }\n  }\n": typeof types.RosterCandidatesDocument,
     "\n  fragment MyAssignmentFields on MyAssignment {\n    eventId\n    functionId\n    functionName\n    instrumentId\n    instrumentName\n    ackStatus\n    ackNote\n    event {\n      id\n      title\n      type\n      status\n      callTime\n      startsAt\n      endsAt\n      venue {\n        id\n        name\n      }\n    }\n  }\n": typeof types.MyAssignmentFieldsFragmentDoc,
     "\n  query MyAssignments($acknowledged: Boolean) {\n    myAssignments(acknowledged: $acknowledged) {\n      ...MyAssignmentFields\n    }\n  }\n": typeof types.MyAssignmentsDocument,
     "\n  query MyAssignmentsPage($tab: MyAssignmentTab!, $page: PageInput) {\n    myAssignmentsPage(tab: $tab, page: $page) {\n      items {\n        ...MyAssignmentFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n    myAssignmentCounts {\n      acknowledged\n      pending\n      duty\n    }\n  }\n": typeof types.MyAssignmentsPageDocument,
-    "\n  query SwapRequests($page: PageInput) {\n    swapRequests(page: $page) {\n      items {\n        ...MyAssignmentFields\n        userId\n        ackAt\n        person {\n          name\n          warName\n          rank\n          section\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SwapRequestsDocument,
+    "\n  query SwapRequests($page: PageInput) {\n    swapRequests(page: $page) {\n      items {\n        ...MyAssignmentFields\n        userId\n        ackAt\n        person {\n          name\n          warName\n          rank\n          section\n          photoUrl\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": typeof types.SwapRequestsDocument,
     "\n  mutation KeepOnRoster($eventId: ID!, $userId: ID!, $note: String) {\n    keepOnRoster(eventId: $eventId, userId: $userId, note: $note) {\n      userId\n      ackStatus\n    }\n  }\n": typeof types.KeepOnRosterDocument,
     "\n  mutation SaveRoster($eventId: ID!, $input: RosterInput!) {\n    saveRoster(eventId: $eventId, input: $input) {\n      ...RosterFields\n    }\n  }\n": typeof types.SaveRosterDocument,
     "\n  mutation PublishRoster($eventId: ID!) {\n    publishRoster(eventId: $eventId) {\n      ...RosterFields\n    }\n  }\n": typeof types.PublishRosterDocument,
@@ -146,7 +147,7 @@ type Documents = {
     "\n  mutation FinalizeSupportRequest($id: ID!) {\n    finalizeSupportRequest(id: $id) {\n      ...SupportRequestFields\n    }\n  }\n": typeof types.FinalizeSupportRequestDocument,
 };
 const documents: Documents = {
-    "\n  fragment AbsenceFields on Absence {\n    id\n    userId\n    userName\n    warName\n    type\n    startsOn\n    endsOn\n    reason\n    status\n    reviewNote\n    reviewedAt\n    reviewedByName\n    cancelledAt\n    cancelledByName\n    registered\n    createdAt\n    attachments {\n      id\n      fileName\n      mimeType\n      sizeBytes\n    }\n  }\n": types.AbsenceFieldsFragmentDoc,
+    "\n  fragment AbsenceFields on Absence {\n    id\n    userId\n    userName\n    warName\n    photoUrl\n    type\n    startsOn\n    endsOn\n    reason\n    status\n    reviewNote\n    reviewedAt\n    reviewedByName\n    cancelledAt\n    cancelledByName\n    registered\n    createdAt\n    attachments {\n      id\n      fileName\n      mimeType\n      sizeBytes\n    }\n  }\n": types.AbsenceFieldsFragmentDoc,
     "\n  mutation RequestAbsenceAttachmentUploads($files: [AttachmentFileInput!]!) {\n    requestAbsenceAttachmentUploads(files: $files) {\n      storageKey\n      upload {\n        url\n        fields\n      }\n    }\n  }\n": types.RequestAbsenceAttachmentUploadsDocument,
     "\n  query AbsenceAttachmentUrl($id: ID!, $download: Boolean!) {\n    absenceAttachmentUrl(id: $id, download: $download)\n  }\n": types.AbsenceAttachmentUrlDocument,
     "\n  query MyAbsences {\n    myAbsences {\n      ...AbsenceFields\n    }\n  }\n": types.MyAbsencesDocument,
@@ -172,12 +173,13 @@ const documents: Documents = {
     "\n  query ArtistsPage($filter: ArtistFilterInput, $page: PageInput) {\n    artistsPage(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        id\n        name\n        archived\n        createdAt\n        songCount\n      }\n    }\n  }\n": types.ArtistsPageDocument,
     "\n  mutation CreateArtist($input: ArtistInput!) {\n    createArtist(input: $input) {\n      ...ArtistFields\n    }\n  }\n": types.CreateArtistDocument,
     "\n  mutation UpdateArtist($id: ID!, $input: ArtistInput!) {\n    updateArtist(id: $id, input: $input) {\n      ...ArtistFields\n    }\n  }\n": types.UpdateArtistDocument,
-    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n      }\n    }\n  }\n": types.LoginDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        onboardingCompleted\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation RefreshSession($refreshToken: String!) {\n    refreshSessionTokens(refreshToken: $refreshToken) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n    }\n  }\n": types.RefreshSessionDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
-    "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n    }\n  }\n": types.MeDocument,
+    "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      onboardingCompleted\n    }\n  }\n": types.MeDocument,
+    "\n  mutation CompleteOnboarding {\n    completeOnboarding\n  }\n": types.CompleteOnboardingDocument,
     "\n  mutation ChangeMyPassword($input: ChangePasswordInput!) {\n    changeMyPassword(input: $input)\n  }\n": types.ChangeMyPasswordDocument,
-    "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n    }\n  }\n": types.UpdateMyProfileDocument,
+    "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      onboardingCompleted\n    }\n  }\n": types.UpdateMyProfileDocument,
     "\n  mutation SetMyPhoto($photo: String!) {\n    setMyPhoto(photo: $photo)\n  }\n": types.SetMyPhotoDocument,
     "\n  mutation RemoveMyPhoto {\n    removeMyPhoto\n  }\n": types.RemoveMyPhotoDocument,
     "\n  mutation RequestPasswordRecovery($login: String!) {\n    requestPasswordRecovery(login: $login)\n  }\n": types.RequestPasswordRecoveryDocument,
@@ -223,7 +225,7 @@ const documents: Documents = {
     "\n  mutation CreateVenue($input: VenueInput!) {\n    createVenue(input: $input) {\n      ...VenueFields\n    }\n  }\n": types.CreateVenueDocument,
     "\n  mutation UpdateVenue($id: ID!, $input: VenueInput!) {\n    updateVenue(id: $id, input: $input) {\n      ...VenueFields\n    }\n  }\n": types.UpdateVenueDocument,
     "\n  fragment MemberProfileFields on MemberProfile {\n    userId\n    warName\n    rank\n    registration\n    phone\n    section\n    status\n    notes\n    updatedAt\n    instruments {\n      instrumentId\n      name\n      primary\n    }\n    functions {\n      functionId\n      name\n    }\n  }\n": types.MemberProfileFieldsFragmentDoc,
-    "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": types.RosterDocument,
+    "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        photoUrl\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n": types.RosterDocument,
     "\n  query MemberProfile($userId: ID!) {\n    memberProfile(userId: $userId) {\n      ...MemberProfileFields\n    }\n  }\n": types.MemberProfileDocument,
     "\n  query MyMemberProfile {\n    myMemberProfile {\n      ...MemberProfileFields\n    }\n  }\n": types.MyMemberProfileDocument,
     "\n  mutation SaveMemberProfile($userId: ID!, $input: MemberProfileInput!) {\n    saveMemberProfile(userId: $userId, input: $input) {\n      ...MemberProfileFields\n    }\n  }\n": types.SaveMemberProfileDocument,
@@ -257,14 +259,14 @@ const documents: Documents = {
     "\n  query AudioDownloadUrl($assetId: ID!) {\n    audioDownloadUrl(assetId: $assetId)\n  }\n": types.AudioDownloadUrlDocument,
     "\n  query FindLyrics($artist: String!, $title: String!) {\n    findLyrics(artist: $artist, title: $title) {\n      artist\n      title\n      lyrics\n      sourceUrl\n    }\n  }\n": types.FindLyricsDocument,
     "\n  query SearchYoutube($query: String!) {\n    searchYoutube(query: $query) {\n      videoId\n      title\n      channelTitle\n      thumbnailUrl\n      publishedAt\n      durationSeconds\n    }\n  }\n": types.SearchYoutubeDocument,
-    "\n  fragment AssignmentFields on Assignment {\n    userId\n    functionId\n    functionName\n    instrumentId\n    instrumentName\n    notes\n    overrideReason\n    ackStatus\n    ackNote\n    ackAt\n    person {\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n    }\n  }\n": types.AssignmentFieldsFragmentDoc,
+    "\n  fragment AssignmentFields on Assignment {\n    userId\n    functionId\n    functionName\n    instrumentId\n    instrumentName\n    notes\n    overrideReason\n    ackStatus\n    ackNote\n    ackAt\n    person {\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n      photoUrl\n    }\n  }\n": types.AssignmentFieldsFragmentDoc,
     "\n  fragment RosterFields on Roster {\n    eventId\n    status\n    version\n    publishedAt\n    uncoveredSections\n    assignments {\n      ...AssignmentFields\n    }\n  }\n": types.RosterFieldsFragmentDoc,
     "\n  query EventRoster($eventId: ID!) {\n    eventRoster(eventId: $eventId) {\n      ...RosterFields\n    }\n  }\n": types.EventRosterDocument,
-    "\n  query RosterCandidates($eventId: ID!) {\n    rosterCandidates(eventId: $eventId) {\n      userId\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n      memberStatus\n      instruments {\n        instrumentId\n        name\n        primary\n      }\n      functions {\n        functionId\n        name\n      }\n      blocker\n      absence {\n        type\n        startsOn\n        endsOn\n      }\n      busyWith {\n        eventId\n        title\n      }\n    }\n  }\n": types.RosterCandidatesDocument,
+    "\n  query RosterCandidates($eventId: ID!) {\n    rosterCandidates(eventId: $eventId) {\n      userId\n      name\n      warName\n      photoUrl\n      rank\n      registration\n      phone\n      section\n      memberStatus\n      instruments {\n        instrumentId\n        name\n        primary\n      }\n      functions {\n        functionId\n        name\n      }\n      blocker\n      absence {\n        type\n        startsOn\n        endsOn\n      }\n      busyWith {\n        eventId\n        title\n      }\n    }\n  }\n": types.RosterCandidatesDocument,
     "\n  fragment MyAssignmentFields on MyAssignment {\n    eventId\n    functionId\n    functionName\n    instrumentId\n    instrumentName\n    ackStatus\n    ackNote\n    event {\n      id\n      title\n      type\n      status\n      callTime\n      startsAt\n      endsAt\n      venue {\n        id\n        name\n      }\n    }\n  }\n": types.MyAssignmentFieldsFragmentDoc,
     "\n  query MyAssignments($acknowledged: Boolean) {\n    myAssignments(acknowledged: $acknowledged) {\n      ...MyAssignmentFields\n    }\n  }\n": types.MyAssignmentsDocument,
     "\n  query MyAssignmentsPage($tab: MyAssignmentTab!, $page: PageInput) {\n    myAssignmentsPage(tab: $tab, page: $page) {\n      items {\n        ...MyAssignmentFields\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n    myAssignmentCounts {\n      acknowledged\n      pending\n      duty\n    }\n  }\n": types.MyAssignmentsPageDocument,
-    "\n  query SwapRequests($page: PageInput) {\n    swapRequests(page: $page) {\n      items {\n        ...MyAssignmentFields\n        userId\n        ackAt\n        person {\n          name\n          warName\n          rank\n          section\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SwapRequestsDocument,
+    "\n  query SwapRequests($page: PageInput) {\n    swapRequests(page: $page) {\n      items {\n        ...MyAssignmentFields\n        userId\n        ackAt\n        person {\n          name\n          warName\n          rank\n          section\n          photoUrl\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n": types.SwapRequestsDocument,
     "\n  mutation KeepOnRoster($eventId: ID!, $userId: ID!, $note: String) {\n    keepOnRoster(eventId: $eventId, userId: $userId, note: $note) {\n      userId\n      ackStatus\n    }\n  }\n": types.KeepOnRosterDocument,
     "\n  mutation SaveRoster($eventId: ID!, $input: RosterInput!) {\n    saveRoster(eventId: $eventId, input: $input) {\n      ...RosterFields\n    }\n  }\n": types.SaveRosterDocument,
     "\n  mutation PublishRoster($eventId: ID!) {\n    publishRoster(eventId: $eventId) {\n      ...RosterFields\n    }\n  }\n": types.PublishRosterDocument,
@@ -280,7 +282,7 @@ const documents: Documents = {
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment AbsenceFields on Absence {\n    id\n    userId\n    userName\n    warName\n    type\n    startsOn\n    endsOn\n    reason\n    status\n    reviewNote\n    reviewedAt\n    reviewedByName\n    cancelledAt\n    cancelledByName\n    registered\n    createdAt\n    attachments {\n      id\n      fileName\n      mimeType\n      sizeBytes\n    }\n  }\n"): typeof import('./graphql').AbsenceFieldsFragmentDoc;
+export function graphql(source: "\n  fragment AbsenceFields on Absence {\n    id\n    userId\n    userName\n    warName\n    photoUrl\n    type\n    startsOn\n    endsOn\n    reason\n    status\n    reviewNote\n    reviewedAt\n    reviewedByName\n    cancelledAt\n    cancelledByName\n    registered\n    createdAt\n    attachments {\n      id\n      fileName\n      mimeType\n      sizeBytes\n    }\n  }\n"): typeof import('./graphql').AbsenceFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -384,7 +386,7 @@ export function graphql(source: "\n  mutation UpdateArtist($id: ID!, $input: Art
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n      }\n    }\n  }\n"): typeof import('./graphql').LoginDocument;
+export function graphql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      accessTokenExpiresAt\n      refreshToken\n      refreshTokenExpiresAt\n      user {\n        id\n        name\n        username\n        email\n        group\n        mustChangePassword\n        permissions\n        photoUrl\n        onboardingCompleted\n      }\n    }\n  }\n"): typeof import('./graphql').LoginDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -396,7 +398,11 @@ export function graphql(source: "\n  mutation Logout {\n    logout\n  }\n"): typ
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n    }\n  }\n"): typeof import('./graphql').MeDocument;
+export function graphql(source: "\n  query Me {\n    me {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      onboardingCompleted\n    }\n  }\n"): typeof import('./graphql').MeDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CompleteOnboarding {\n    completeOnboarding\n  }\n"): typeof import('./graphql').CompleteOnboardingDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -404,7 +410,7 @@ export function graphql(source: "\n  mutation ChangeMyPassword($input: ChangePas
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n    }\n  }\n"): typeof import('./graphql').UpdateMyProfileDocument;
+export function graphql(source: "\n  mutation UpdateMyProfile($input: UpdateMyProfileInput!) {\n    updateMyProfile(input: $input) {\n      id\n      name\n      username\n      email\n      group\n      mustChangePassword\n      permissions\n      photoUrl\n      onboardingCompleted\n    }\n  }\n"): typeof import('./graphql').UpdateMyProfileDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -588,7 +594,7 @@ export function graphql(source: "\n  fragment MemberProfileFields on MemberProfi
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').RosterDocument;
+export function graphql(source: "\n  query Roster($filter: RosterFilterInput, $page: PageInput) {\n    roster(filter: $filter, page: $page) {\n      total\n      page\n      limit\n      totalPages\n      items {\n        userId\n        name\n        username\n        active\n        photoUrl\n        profile {\n          ...MemberProfileFields\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').RosterDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -724,7 +730,7 @@ export function graphql(source: "\n  query SearchYoutube($query: String!) {\n   
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment AssignmentFields on Assignment {\n    userId\n    functionId\n    functionName\n    instrumentId\n    instrumentName\n    notes\n    overrideReason\n    ackStatus\n    ackNote\n    ackAt\n    person {\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n    }\n  }\n"): typeof import('./graphql').AssignmentFieldsFragmentDoc;
+export function graphql(source: "\n  fragment AssignmentFields on Assignment {\n    userId\n    functionId\n    functionName\n    instrumentId\n    instrumentName\n    notes\n    overrideReason\n    ackStatus\n    ackNote\n    ackAt\n    person {\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n      photoUrl\n    }\n  }\n"): typeof import('./graphql').AssignmentFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -736,7 +742,7 @@ export function graphql(source: "\n  query EventRoster($eventId: ID!) {\n    eve
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query RosterCandidates($eventId: ID!) {\n    rosterCandidates(eventId: $eventId) {\n      userId\n      name\n      warName\n      rank\n      registration\n      phone\n      section\n      memberStatus\n      instruments {\n        instrumentId\n        name\n        primary\n      }\n      functions {\n        functionId\n        name\n      }\n      blocker\n      absence {\n        type\n        startsOn\n        endsOn\n      }\n      busyWith {\n        eventId\n        title\n      }\n    }\n  }\n"): typeof import('./graphql').RosterCandidatesDocument;
+export function graphql(source: "\n  query RosterCandidates($eventId: ID!) {\n    rosterCandidates(eventId: $eventId) {\n      userId\n      name\n      warName\n      photoUrl\n      rank\n      registration\n      phone\n      section\n      memberStatus\n      instruments {\n        instrumentId\n        name\n        primary\n      }\n      functions {\n        functionId\n        name\n      }\n      blocker\n      absence {\n        type\n        startsOn\n        endsOn\n      }\n      busyWith {\n        eventId\n        title\n      }\n    }\n  }\n"): typeof import('./graphql').RosterCandidatesDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -752,7 +758,7 @@ export function graphql(source: "\n  query MyAssignmentsPage($tab: MyAssignmentT
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query SwapRequests($page: PageInput) {\n    swapRequests(page: $page) {\n      items {\n        ...MyAssignmentFields\n        userId\n        ackAt\n        person {\n          name\n          warName\n          rank\n          section\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').SwapRequestsDocument;
+export function graphql(source: "\n  query SwapRequests($page: PageInput) {\n    swapRequests(page: $page) {\n      items {\n        ...MyAssignmentFields\n        userId\n        ackAt\n        person {\n          name\n          warName\n          rank\n          section\n          photoUrl\n        }\n      }\n      total\n      page\n      limit\n      totalPages\n    }\n  }\n"): typeof import('./graphql').SwapRequestsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
