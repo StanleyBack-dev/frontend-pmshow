@@ -187,3 +187,17 @@ input:-webkit-autofill:focus {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Opening screen (AppSplash): if scripts never take it away, it leaves by
+   itself after a while so the page is never stuck behind it. */
+.app-splash {
+  animation: app-splash-out 0.3s ease 10s forwards;
+}
+
+@keyframes app-splash-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
