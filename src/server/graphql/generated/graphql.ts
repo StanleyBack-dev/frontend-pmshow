@@ -366,7 +366,10 @@ export type NotificationType =
   | 'ROSTER_REMOVED'
   | 'ROSTER_SWAP_DECLINED'
   | 'ROSTER_SWAP_REQUESTED'
-  | 'ROSTER_UPDATED';
+  | 'ROSTER_UPDATED'
+  | 'SUPPORT_ANSWERED'
+  | 'SUPPORT_FINALIZED'
+  | 'SUPPORT_REQUESTED';
 
 export type PageInput = {
   limit?: number;
@@ -392,6 +395,7 @@ export type Permission =
   | 'ROSTERS_PUBLISH'
   | 'ROSTERS_READ_ALL'
   | 'ROSTERS_READ_OWN'
+  | 'SUPPORT_MANAGE'
   | 'USERS_MANAGE';
 
 /** PushSubscription do navegador (PushManager). */
@@ -534,6 +538,26 @@ export type SubmitEnrollmentInput = {
   /** Foto de perfil em base64 (JPEG, PNG ou WebP, até 2 MB). */
   photo?: string | null | undefined;
 };
+
+/** Do que se trata a solicitação de suporte. */
+export type SupportCategory =
+  | 'ACESSO'
+  | 'DUVIDA'
+  | 'OUTRO'
+  | 'PROBLEMA'
+  | 'SUGESTAO';
+
+export type SupportRequestInput = {
+  category: SupportCategory;
+  message: string;
+  subject: string;
+};
+
+/** Aberto → respondido → finalizado. */
+export type SupportStatus =
+  | 'ABERTO'
+  | 'FINALIZADO'
+  | 'RESPONDIDO';
 
 export type UpdateBandFunctionInput = {
   archived?: boolean | null | undefined;
@@ -1408,6 +1432,45 @@ export type AcknowledgeRosterMutationVariables = Exact<{
 
 export type AcknowledgeRosterMutation = { acknowledgeRoster: { ackStatus: AckStatus, ackNote: string | null } };
 
+export type SupportRequestFieldsFragment = { id: string, protocol: number, userId: string, userName: string, warName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string };
+
+export type SupportPageQueryVariables = Exact<{
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type SupportPageQuery = { supportQuota: { limit: number, sentToday: number, remaining: number, nextAllowedAt: string | null }, mySupportRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, protocol: number, userId: string, userName: string, warName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string }> } };
+
+export type SupportRequestsQueryVariables = Exact<{
+  status?: SupportStatus | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type SupportRequestsQuery = { supportRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, protocol: number, userId: string, userName: string, warName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string }> } };
+
+export type SendSupportRequestMutationVariables = Exact<{
+  input: SupportRequestInput;
+}>;
+
+
+export type SendSupportRequestMutation = { sendSupportRequest: { id: string, protocol: number, userId: string, userName: string, warName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
+
+export type ReplySupportRequestMutationVariables = Exact<{
+  id: string | number;
+  reply: string;
+}>;
+
+
+export type ReplySupportRequestMutation = { replySupportRequest: { id: string, protocol: number, userId: string, userName: string, warName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
+
+export type FinalizeSupportRequestMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type FinalizeSupportRequestMutation = { finalizeSupportRequest: { id: string, protocol: number, userId: string, userName: string, warName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -1729,6 +1792,25 @@ export const MyAssignmentFieldsFragmentDoc = new TypedDocumentString(`
   }
 }
     `, {"fragmentName":"MyAssignmentFields"}) as unknown as TypedDocumentString<MyAssignmentFieldsFragment, unknown>;
+export const SupportRequestFieldsFragmentDoc = new TypedDocumentString(`
+    fragment SupportRequestFields on SupportRequest {
+  id
+  protocol
+  userId
+  userName
+  warName
+  category
+  subject
+  message
+  status
+  reply
+  repliedAt
+  repliedByName
+  finalizedAt
+  finalizedByName
+  createdAt
+}
+    `, {"fragmentName":"SupportRequestFields"}) as unknown as TypedDocumentString<SupportRequestFieldsFragment, unknown>;
 export const RequestAbsenceAttachmentUploadsDocument = new TypedDocumentString(`
     mutation RequestAbsenceAttachmentUploads($files: [AttachmentFileInput!]!) {
   requestAbsenceAttachmentUploads(files: $files) {
@@ -3859,3 +3941,136 @@ export const AcknowledgeRosterDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AcknowledgeRosterMutation, AcknowledgeRosterMutationVariables>;
+export const SupportPageDocument = new TypedDocumentString(`
+    query SupportPage($page: PageInput) {
+  supportQuota {
+    limit
+    sentToday
+    remaining
+    nextAllowedAt
+  }
+  mySupportRequests(page: $page) {
+    items {
+      ...SupportRequestFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment SupportRequestFields on SupportRequest {
+  id
+  protocol
+  userId
+  userName
+  warName
+  category
+  subject
+  message
+  status
+  reply
+  repliedAt
+  repliedByName
+  finalizedAt
+  finalizedByName
+  createdAt
+}`) as unknown as TypedDocumentString<SupportPageQuery, SupportPageQueryVariables>;
+export const SupportRequestsDocument = new TypedDocumentString(`
+    query SupportRequests($status: SupportStatus, $page: PageInput) {
+  supportRequests(status: $status, page: $page) {
+    items {
+      ...SupportRequestFields
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    fragment SupportRequestFields on SupportRequest {
+  id
+  protocol
+  userId
+  userName
+  warName
+  category
+  subject
+  message
+  status
+  reply
+  repliedAt
+  repliedByName
+  finalizedAt
+  finalizedByName
+  createdAt
+}`) as unknown as TypedDocumentString<SupportRequestsQuery, SupportRequestsQueryVariables>;
+export const SendSupportRequestDocument = new TypedDocumentString(`
+    mutation SendSupportRequest($input: SupportRequestInput!) {
+  sendSupportRequest(input: $input) {
+    ...SupportRequestFields
+  }
+}
+    fragment SupportRequestFields on SupportRequest {
+  id
+  protocol
+  userId
+  userName
+  warName
+  category
+  subject
+  message
+  status
+  reply
+  repliedAt
+  repliedByName
+  finalizedAt
+  finalizedByName
+  createdAt
+}`) as unknown as TypedDocumentString<SendSupportRequestMutation, SendSupportRequestMutationVariables>;
+export const ReplySupportRequestDocument = new TypedDocumentString(`
+    mutation ReplySupportRequest($id: ID!, $reply: String!) {
+  replySupportRequest(id: $id, reply: $reply) {
+    ...SupportRequestFields
+  }
+}
+    fragment SupportRequestFields on SupportRequest {
+  id
+  protocol
+  userId
+  userName
+  warName
+  category
+  subject
+  message
+  status
+  reply
+  repliedAt
+  repliedByName
+  finalizedAt
+  finalizedByName
+  createdAt
+}`) as unknown as TypedDocumentString<ReplySupportRequestMutation, ReplySupportRequestMutationVariables>;
+export const FinalizeSupportRequestDocument = new TypedDocumentString(`
+    mutation FinalizeSupportRequest($id: ID!) {
+  finalizeSupportRequest(id: $id) {
+    ...SupportRequestFields
+  }
+}
+    fragment SupportRequestFields on SupportRequest {
+  id
+  protocol
+  userId
+  userName
+  warName
+  category
+  subject
+  message
+  status
+  reply
+  repliedAt
+  repliedByName
+  finalizedAt
+  finalizedByName
+  createdAt
+}`) as unknown as TypedDocumentString<FinalizeSupportRequestMutation, FinalizeSupportRequestMutationVariables>;

@@ -128,7 +128,10 @@ export type NotificationType =
   | 'ROSTER_REMOVED'
   | 'ROSTER_SWAP_DECLINED'
   | 'ROSTER_SWAP_REQUESTED'
-  | 'ROSTER_UPDATED';
+  | 'ROSTER_UPDATED'
+  | 'SUPPORT_ANSWERED'
+  | 'SUPPORT_FINALIZED'
+  | 'SUPPORT_REQUESTED';
 
 /** Capacidade verificada pela API. */
 export type Permission =
@@ -149,6 +152,7 @@ export type Permission =
   | 'ROSTERS_PUBLISH'
   | 'ROSTERS_READ_ALL'
   | 'ROSTERS_READ_OWN'
+  | 'SUPPORT_MANAGE'
   | 'USERS_MANAGE';
 
 /** Posto/graduação. */
@@ -201,6 +205,20 @@ export type SongCategory =
 export type SongStage =
   | 'CONHECIDA'
   | 'NOVA';
+
+/** Do que se trata a solicitação de suporte. */
+export type SupportCategory =
+  | 'ACESSO'
+  | 'DUVIDA'
+  | 'OUTRO'
+  | 'PROBLEMA'
+  | 'SUGESTAO';
+
+/** Aberto → respondido → finalizado. */
+export type SupportStatus =
+  | 'ABERTO'
+  | 'FINALIZADO'
+  | 'RESPONDIDO';
 
 /** Perfil de acesso: Músico, Gestor ou Administrador geral. */
 export type UserGroup =

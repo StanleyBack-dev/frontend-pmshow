@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Guitar,
   House,
+  LifeBuoy,
   ListMusic,
   MapPin,
   type LucideIcon,
@@ -121,6 +122,8 @@ export const PRIMARY_NAV: NavItem[] = [
 export const ACCOUNT_NAV: NavItem[] = [
   { href: "/perfil", label: "Meu perfil", icon: CircleUserRound },
   { href: "/notificacoes", label: "Notificações", icon: Bell },
+  // Everyone: ask the app's support (administrators answer there too).
+  { href: "/suporte", label: "Suporte", icon: LifeBuoy },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 
