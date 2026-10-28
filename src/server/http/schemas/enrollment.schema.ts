@@ -25,6 +25,7 @@ export const enrollmentDataSchema = z.object({
     .nullish()
     .transform((value) => value ?? null),
   warName: z.string().trim().min(1).max(60),
+  birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida."),
   instruments: z
     .array(z.object({ instrumentId: idSchema, primary: z.boolean() }))
     .max(10),

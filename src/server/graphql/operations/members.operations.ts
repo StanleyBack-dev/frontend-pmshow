@@ -10,6 +10,8 @@ export const memberProfileFieldsFragment = graphql(`
     section
     status
     notes
+    birthDate
+    joinedOn
     updatedAt
     instruments {
       instrumentId
@@ -115,6 +117,37 @@ export const updateInstrumentDocument = graphql(`
       name
       section
       archived
+    }
+  }
+`);
+
+export const myBandDatesDocument = graphql(`
+  query MyBandDates {
+    myBandDates {
+      birthDate
+      joinedOn
+    }
+  }
+`);
+
+export const updateMyBandDatesDocument = graphql(`
+  mutation UpdateMyBandDates($birthDate: String, $joinedOn: String) {
+    updateMyBandDates(birthDate: $birthDate, joinedOn: $joinedOn) {
+      birthDate
+      joinedOn
+    }
+  }
+`);
+
+export const birthdaysDocument = graphql(`
+  query Birthdays($month: Int) {
+    birthdays(month: $month) {
+      userId
+      name
+      warName
+      rank
+      day
+      photoUrl
     }
   }
 `);

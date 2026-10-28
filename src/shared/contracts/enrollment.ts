@@ -30,10 +30,14 @@ export type EnrollmentData = {
   militaryId: string | null;
   rank: Rank | null;
   warName: string;
+  /** YYYY-MM-DD (required on the form). */
+  birthDate: string;
   instruments: EnrollmentInstrumentChoice[];
 };
 
-export type EnrollmentRequest = Omit<EnrollmentData, "rank"> & {
+export type EnrollmentRequest = Omit<EnrollmentData, "rank" | "birthDate"> & {
+  /** null on sign-ups sent before the field existed. */
+  birthDate: string | null;
   id: string;
   status: EnrollmentStatus;
   rank: Rank;

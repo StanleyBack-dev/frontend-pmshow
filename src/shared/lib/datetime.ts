@@ -36,6 +36,21 @@ export function monthRange(month: string): { from: string; to: string } {
   };
 }
 
+/** "2026-11-15" → the day's [from, to) instants, for the API filter. */
+export function dayRange(day: string): { from: string; to: string } {
+  const start = new Date(`${day}T00:00:00${OFFSET}`);
+  const next = new Date(start.getTime() + 86_400_000);
+  return { from: start.toISOString(), to: next.toISOString() };
+}
+
+export function isDay(value: string | undefined): value is string {
+  return Boolean(
+    value &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(new Date(`${value}T00:00:00${OFFSET}`).getTime()),
+  );
+}
+
 /** Current month as "YYYY-MM", in Goiás time. */
 export function currentMonth(now: Date): string {
   return localDay(now).slice(0, 7);

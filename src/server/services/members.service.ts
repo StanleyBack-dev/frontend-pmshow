@@ -7,11 +7,16 @@ import {
   memberProfileDocument,
   myMemberProfileDocument,
   rosterDocument,
+  birthdaysDocument,
+  myBandDatesDocument,
   saveMemberProfileDocument,
+  updateMyBandDatesDocument,
   updateInstrumentDocument,
 } from "@/server/graphql/operations/members.operations";
 import type { Paginated } from "@/shared/contracts/api";
 import type {
+  BandDates,
+  Birthday,
   Instrument,
   InstrumentListItem,
   MemberProfile,
@@ -81,6 +86,32 @@ export const membersService = {
       token,
     });
     return myMemberProfile ?? null;
+  },
+
+  /** The month's birthdays (default: this month). */
+  async birthdays(token: string, month?: number): Promise<Birthday[]> {
+    const { birthdays } = await backendGraphql(birthdaysDocument, {
+      token,
+      variables: { month: month ?? null },
+    });
+    return birthdays;
+  },
+
+  /** The user's own birthday and band start date (any user). */
+  async myDates(token: string): Promise<BandDates> {
+    const { myBandDates } = await backendGraphql(myBandDatesDocument, {
+      token,
+    });
+    return myBandDates;
+  },
+
+  /** The user's own birthday and band start date (both optional). */
+  async saveMyDates(token: string, dates: BandDates): Promise<BandDates> {
+    const { updateMyBandDates } = await backendGraphql(
+      updateMyBandDatesDocument,
+      { token, variables: dates },
+    );
+    return updateMyBandDates;
   },
 
   async saveProfile(

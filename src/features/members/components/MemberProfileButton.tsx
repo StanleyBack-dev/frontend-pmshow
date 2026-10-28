@@ -35,10 +35,15 @@ import {
 } from "@/shared/lib/masks";
 import { useToast } from "@/shared/toast/useToast";
 
-type Form = Omit<MemberProfileInput, "registration" | "phone" | "notes"> & {
+type Form = Omit<
+  MemberProfileInput,
+  "registration" | "phone" | "notes" | "birthDate" | "joinedOn"
+> & {
   registration: string;
   phone: string;
   notes: string;
+  birthDate: string;
+  joinedOn: string;
 };
 
 const fromProfile = (profile: MemberProfile | null): Form => ({
@@ -49,6 +54,8 @@ const fromProfile = (profile: MemberProfile | null): Form => ({
   section: profile?.section ?? "METAIS",
   status: profile?.status ?? "ATIVO",
   notes: profile?.notes ?? "",
+  birthDate: profile?.birthDate ?? "",
+  joinedOn: profile?.joinedOn ?? "",
   instruments:
     profile?.instruments.map(({ instrumentId, primary }) => ({
       instrumentId,
@@ -93,6 +100,8 @@ export function MemberProfileButton({
         registration: form.registration || null,
         phone: form.phone || null,
         notes: form.notes || null,
+        birthDate: form.birthDate || null,
+        joinedOn: form.joinedOn || null,
       });
       setOpen(false);
       router.refresh();
@@ -225,6 +234,21 @@ export function MemberProfileButton({
               onChange={(event) => set("phone", maskPhone(event.target.value))}
               onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
               error={(touched.phone && phoneError(form.phone)) || undefined}
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label="Data de nascimento"
+              type="date"
+              value={form.birthDate}
+              onChange={(event) => set("birthDate", event.target.value)}
+            />
+            <Field
+              label="Ingresso na banda"
+              type="date"
+              value={form.joinedOn}
+              onChange={(event) => set("joinedOn", event.target.value)}
             />
           </div>
 

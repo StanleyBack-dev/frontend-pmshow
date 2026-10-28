@@ -77,6 +77,11 @@ export const NOTIFICATION_TYPE_LABELS: Record<
     description:
       "Para o administrador geral: alguém enviou o cadastro pelo link e aguarda aprovação.",
   },
+  SYSTEM_ALERT: {
+    label: "Alerta do sistema",
+    description:
+      "Para o administrador geral: erros, eventos de segurança e rotinas que falharam (detalhes em Administração → Logs).",
+  },
 };
 
 /** "há 5 min", "ontem", "12/11". */

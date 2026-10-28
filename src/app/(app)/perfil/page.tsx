@@ -4,6 +4,7 @@ import { Card, CardBody, CardHeader, PageHeader } from "@/design-system";
 import { GROUP_LABELS } from "@/features/access/model/access-labels";
 import { MyPhotoField } from "@/features/auth/components/MyPhotoField";
 import { ProfileForm } from "@/features/auth/components/ProfileForm";
+import { MyBandDatesCard } from "@/features/members/components/MyBandDatesCard";
 import { MyBandProfileCard } from "@/features/members/components/MyBandProfileCard";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { membersService } from "@/server/services/members.service";
@@ -12,7 +13,12 @@ export const metadata: Metadata = { title: "Meu perfil" };
 
 export default async function ProfilePage() {
   const user = await getSessionUser();
-  const bandProfile = await authed((token) => membersService.myProfile(token));
+  const [bandProfile, dates] = await authed((token) =>
+    Promise.all([
+      membersService.myProfile(token),
+      membersService.myDates(token),
+    ]),
+  );
 
   return (
     <>
@@ -53,6 +59,10 @@ export default async function ProfilePage() {
         </Card>
         <div className="lg:col-span-2">
           <MyBandProfileCard profile={bandProfile} />
+        </div>
+        {/* Everyone, with or without a band profile. */}
+        <div className="lg:col-span-2">
+          <MyBandDatesCard profile={dates} />
         </div>
       </div>
     </>

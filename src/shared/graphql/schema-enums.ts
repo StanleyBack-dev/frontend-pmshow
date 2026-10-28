@@ -131,7 +131,8 @@ export type NotificationType =
   | 'ROSTER_UPDATED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
-  | 'SUPPORT_REQUESTED';
+  | 'SUPPORT_REQUESTED'
+  | 'SYSTEM_ALERT';
 
 /** Capacidade verificada pela API. */
 export type Permission =

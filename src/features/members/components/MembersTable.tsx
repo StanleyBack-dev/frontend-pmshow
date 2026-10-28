@@ -12,6 +12,9 @@ import { RankBadge } from "@/features/members/components/RankBadge";
 import {
   SECTION_LABELS,
   STATUS_LABELS,
+  bandTime,
+  formatDayMonth,
+  formatLocalDay,
   formatPhone,
 } from "@/features/members/model/member-labels";
 import type {
@@ -63,6 +66,21 @@ export function MembersTable({
           </span>
         </span>
       ),
+    },
+    {
+      key: "birthday",
+      label: "Aniversário",
+      desktop: "detail",
+      render: ({ profile }) => formatDayMonth(profile?.birthDate ?? null),
+    },
+    {
+      key: "bandTime",
+      label: "Tempo de banda",
+      desktop: "detail",
+      render: ({ profile }) =>
+        profile?.joinedOn
+          ? `${bandTime(profile.joinedOn, new Date())} (desde ${formatLocalDay(profile.joinedOn)})`
+          : "—",
     },
     {
       key: "rank",

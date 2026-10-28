@@ -88,6 +88,7 @@ export const AUDITED_ENTITIES = [
   "broadcast",
   "media",
   "support_request",
+  "playlist",
 ] as const;
 export type AuditedEntity = (typeof AUDITED_ENTITIES)[number];
 

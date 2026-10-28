@@ -96,6 +96,9 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Os cartões do painel levam direto à lista correspondente (ex.: ciências pendentes leva aos pedidos de troca quando houver).",
           only: ["ROSTERS_READ_ALL"],
         },
+        {
+          text: "“Aniversariantes” mostra quem faz aniversário no mês; o de hoje aparece em destaque. Informe a sua data em Meu perfil.",
+        },
       ],
     },
   },
@@ -157,6 +160,9 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Abra a seta da linha para ver tudo sem sair da tabela: horários, local, pedido, escalados e os botões Músicas PDF, Abrir no mapa e Lista de músicas.",
         },
         {
+          text: "“Ensaiar” toca no player, em sequência, as músicas da lista do evento que têm áudio ou vídeo.",
+        },
+        {
           text: "“Novo evento” cadastra um evento; o lápis edita; a situação muda direto na tabela.",
           only: MANAGERS_EVENTS,
         },
@@ -202,6 +208,9 @@ export const HELP_TOPICS: HelpTopic[] = [
       notices: [
         {
           text: "Quem está escalado é avisado no app e por e-mail quando o horário ou o local muda e quando o evento é cancelado, com o nome do gestor que fez a mudança.",
+        },
+        {
+          text: "No celular, o aviso de escala traz os botões “Estou ciente” e “Ver evento” (no Android e no computador; no iPhone, toque no aviso para abrir o evento).",
         },
       ],
     },
@@ -332,16 +341,28 @@ export const HELP_TOPICS: HelpTopic[] = [
     icon: ListMusic,
     permission: "REPERTOIRE_READ",
     area: "main",
-    tour: "As músicas da banda com áudios para ouvir e vídeos para ensaiar, a letra e o tom.",
+    tour: "As músicas da banda com áudios e vídeos, letra e tom, e playlists para ensaiar em sequência.",
     sections: {
       purpose: [
         { text: "Estudar as músicas: ouvir, assistir, ver letra e tom." },
+        {
+          text: "Ensaiar com playlists: as músicas tocam em sequência, com repetição e controle de velocidade.",
+        },
       ],
       howto: [
         {
           text: "Busque por título, intérprete ou filtros; abra a música para ver áudios, vídeos e letra.",
         },
         { text: "O player continua tocando enquanto você navega pelo app." },
+        {
+          text: "Na aba Playlists, “Nova playlist” monta uma lista com as músicas na ordem que quiser; “Tocar” começa a tocar a lista.",
+        },
+        {
+          text: "“Minhas” mostra as suas playlists; “Da banda”, as compartilhadas com todos. Marque “Compartilhar com a banda” para a sua aparecer lá.",
+        },
+        {
+          text: "No player: o botão de velocidade alterna entre 0,5× e 1,5×; o de repetição alterna entre repetir a lista, repetir a música e não repetir.",
+        },
         {
           text: "Cadastre e edite músicas (título, intérprete, tom, letra, vídeos).",
           only: ["REPERTOIRE_MANAGE"],
@@ -350,6 +371,11 @@ export const HELP_TOPICS: HelpTopic[] = [
         {
           text: "Baixe os áudios para ouvir sem internet.",
           only: ["MEDIA_DOWNLOAD"],
+        },
+      ],
+      rules: [
+        {
+          text: "Só quem criou a playlist pode editá-la ou excluí-la; as da banda os demais apenas tocam.",
         },
       ],
     },
@@ -516,13 +542,21 @@ export const HELP_TOPICS: HelpTopic[] = [
     title: "Meu perfil",
     icon: CircleUserRound,
     area: "account",
-    tour: "Sua foto e seus dados pessoais. O e-mail recebe escalas, avisos e a recuperação de senha.",
+    tour: "Sua foto, seus dados pessoais, aniversário e tempo de banda. O e-mail recebe escalas, avisos e a recuperação de senha.",
     sections: {
       howto: [
         {
           text: "Troque a foto de perfil: ela ajuda a banda a identificar você.",
         },
         { text: "Mantenha o e-mail atualizado para receber escalas e avisos." },
+        {
+          text: "Em “Aniversário e tempo de banda”, informe a data de nascimento e a de ingresso na banda (opcionais): o tempo de banda é calculado sozinho.",
+        },
+      ],
+      rules: [
+        {
+          text: "O aniversário (dia e mês) aparece para a banda no Início durante o seu mês.",
+        },
       ],
     },
   },
@@ -599,6 +633,14 @@ export const HELP_TOPICS: HelpTopic[] = [
         {
           text: "Notificações: escolha quais avisos também chegam por e-mail.",
         },
+        {
+          text: "Agenda no celular: gere o seu link e adicione ao Google Agenda ou ao iPhone; as escalas publicadas aparecem lá e se atualizam sozinhas.",
+        },
+      ],
+      rules: [
+        {
+          text: "O link da agenda é pessoal: quem tiver o link vê as suas escalas. Se ele vazar, use “Gerar novo link” ou remova.",
+        },
       ],
     },
   },
@@ -627,7 +669,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     icon: ShieldCheck,
     admin: true,
     area: "account",
-    tour: "Contas de acesso, permissões, cadastros pela página pública e links de convite.",
+    tour: "Contas de acesso, permissões, cadastros pela página pública, links de convite e os logs do sistema.",
     sections: {
       howto: [
         {
@@ -642,10 +684,24 @@ export const HELP_TOPICS: HelpTopic[] = [
           text: "Links de cadastro: gere o código da turma e compartilhe pelo WhatsApp.",
           only: ["USERS_MANAGE"],
         },
+        {
+          text: "Logs e alertas: erros da API e do banco, eventos de segurança, avisos não entregues, rotinas do GitHub que falharam e erros de tela. Filtre por período, nível, tipo, ambiente ou busca e abra a seta para ver os detalhes.",
+          only: ["AUDIT_READ"],
+        },
       ],
       rules: [
         {
           text: "Algumas permissões só vêm do grupo e não podem ser dadas a uma pessoa (contas, permissões, dados dos músicos, suporte).",
+        },
+        {
+          text: "Os logs ficam 90 dias e não guardam senhas, tokens ou e-mails completos.",
+          only: ["AUDIT_READ"],
+        },
+      ],
+      notices: [
+        {
+          text: "Problemas sérios (erros, contas bloqueadas, excesso de tentativas, rotinas que falharam) também chegam no app e por e-mail, no máximo um aviso a cada 30 minutos por tipo.",
+          only: ["AUDIT_READ"],
         },
       ],
     },

@@ -18,6 +18,8 @@ export type EnrollmentForm = {
   militaryId: string;
   rank: Rank | "";
   warName: string;
+  /** YYYY-MM-DD (date input). */
+  birthDate: string;
   instruments: EnrollmentInstrumentChoice[];
 };
 
@@ -29,6 +31,7 @@ export const EMPTY_ENROLLMENT: EnrollmentForm = {
   militaryId: "",
   rank: "",
   warName: "",
+  birthDate: "",
   instruments: [],
 };
 
@@ -40,6 +43,7 @@ export const fromRequest = (request: EnrollmentRequest): EnrollmentForm => ({
   militaryId: request.militaryId ?? "",
   rank: request.military ? request.rank : "",
   warName: request.warName,
+  birthDate: request.birthDate ?? "",
   instruments: request.instruments.map(({ instrumentId, primary }) => ({
     instrumentId,
     primary,
@@ -76,6 +80,10 @@ export function enrollmentErrors(form: EnrollmentForm): EnrollmentErrors {
   }
   const warName = form.warName.trim();
   if (warName.length < 2) errors.warName = "Informe o nome de guerra.";
+  if (!form.birthDate) errors.birthDate = "Informe a data de nascimento.";
+  else if (form.birthDate > new Date().toISOString().slice(0, 10)) {
+    errors.birthDate = "A data de nascimento não pode ser no futuro.";
+  }
   if (form.instruments.length === 0) {
     errors.instruments = "Escolha pelo menos um instrumento ou função.";
   }
@@ -90,6 +98,7 @@ export const toEnrollmentData = (form: EnrollmentForm): EnrollmentData => ({
   militaryId: form.military ? form.militaryId : null,
   rank: form.military && form.rank ? form.rank : null,
   warName: form.warName.trim(),
+  birthDate: form.birthDate,
   instruments: form.instruments,
 });
 

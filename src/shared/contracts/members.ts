@@ -28,6 +28,10 @@ export type MemberProfile = {
   section: Section;
   status: MemberStatus;
   notes: string | null;
+  /** YYYY-MM-DD (null: not filled in). */
+  birthDate: string | null;
+  /** When the person joined the band, YYYY-MM-DD (null: not filled in). */
+  joinedOn: string | null;
   updatedAt: string;
   instruments: { instrumentId: string; name: string; primary: boolean }[];
   functions: { functionId: string; name: string }[];
@@ -51,8 +55,25 @@ export type MemberProfileInput = {
   section: Section;
   status: MemberStatus;
   notes: string | null;
+  birthDate: string | null;
+  joinedOn: string | null;
   instruments: { instrumentId: string; primary: boolean }[];
   functionIds: string[];
+};
+
+/** A birthday of the month (home page). */
+/** Birthday and band start date (YYYY-MM-DD) of any user. */
+export type BandDates = { birthDate: string | null; joinedOn: string | null };
+
+export type Birthday = {
+  userId: string;
+  name: string;
+  /** The user's name when there is no band profile. */
+  warName: string;
+  rank: Rank | null;
+  /** Day of the month. */
+  day: number;
+  photoUrl: string | null;
 };
 
 /** A function in the band (regente, motorista, técnico de som…). */

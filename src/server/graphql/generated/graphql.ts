@@ -207,6 +207,8 @@ export type DutyScheduleStatus =
 
 /** Dados do cadastro (formulário ou correção). */
 export type EnrollmentDataInput = {
+  /** Data de nascimento (AAAA-MM-DD). */
+  birthDate: string;
   email: string;
   fullName: string;
   instruments: Array<EnrollmentInstrumentInput>;
@@ -325,9 +327,13 @@ export type MemberInstrumentInput = {
 };
 
 export type MemberProfileInput = {
+  /** AAAA-MM-DD; ausente = mantém a atual. */
+  birthDate?: string | null | undefined;
   /** Funções na banda; ausente = mantém as atuais. */
   functionIds?: Array<string | number> | null | undefined;
   instruments: Array<MemberInstrumentInput>;
+  /** Ingresso na banda (AAAA-MM-DD); ausente = mantém. */
+  joinedOn?: string | null | undefined;
   notes?: string | null | undefined;
   phone?: string | null | undefined;
   rank: Rank;
@@ -369,7 +375,8 @@ export type NotificationType =
   | 'ROSTER_UPDATED'
   | 'SUPPORT_ANSWERED'
   | 'SUPPORT_FINALIZED'
-  | 'SUPPORT_REQUESTED';
+  | 'SUPPORT_REQUESTED'
+  | 'SYSTEM_ALERT';
 
 export type PageInput = {
   limit?: number;
@@ -397,6 +404,14 @@ export type Permission =
   | 'ROSTERS_READ_OWN'
   | 'SUPPORT_MANAGE'
   | 'USERS_MANAGE';
+
+export type PlaylistInput = {
+  description?: string | null | undefined;
+  name: string;
+  shared: boolean;
+  /** Músicas na ordem em que tocam. */
+  songIds: Array<string | number>;
+};
 
 /** PushSubscription do navegador (PushManager). */
 export type PushSubscriptionInput = {
@@ -558,6 +573,15 @@ export type SupportStatus =
   | 'ABERTO'
   | 'FINALIZADO'
   | 'RESPONDIDO';
+
+export type SystemLogFilterInput = {
+  categories?: Array<string> | null | undefined;
+  environment?: string | null | undefined;
+  from?: string | null | undefined;
+  levels?: Array<string> | null | undefined;
+  search?: string | null | undefined;
+  to?: string | null | undefined;
+};
 
 export type UpdateBandFunctionInput = {
   archived?: boolean | null | undefined;
@@ -924,6 +948,28 @@ export type SendBroadcastMutationVariables = Exact<{
 
 export type SendBroadcastMutation = { sendBroadcast: { id: string, title: string, body: string, audience: BroadcastAudience, section: Section | null, eventId: string | null, sendEmail: boolean, recipients: number, authorName: string | null, createdAt: string } };
 
+export type MyCalendarFeedQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyCalendarFeedQuery = { myCalendarFeed: { token: string, createdAt: string } | null };
+
+export type RenewCalendarFeedMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RenewCalendarFeedMutation = { renewCalendarFeed: { token: string, createdAt: string } };
+
+export type RemoveCalendarFeedMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RemoveCalendarFeedMutation = { removeCalendarFeed: boolean };
+
+export type CalendarFeedIcsQueryVariables = Exact<{
+  token: string;
+}>;
+
+
+export type CalendarFeedIcsQuery = { calendarFeedIcs: string | null };
+
 export type BandDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -984,7 +1030,7 @@ export type SubmitEnrollmentMutation = { submitEnrollment: boolean };
 
 export type EnrollmentInviteFieldsFragment = { id: string, code: string, label: string, expiresAt: string, revokedAt: string | null, createdAt: string, requestCount: number };
 
-export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, military: boolean, militaryId: string | null, rank: Rank, warName: string, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null, instruments: Array<{ instrumentId: string, primary: boolean }> };
+export type EnrollmentRequestFieldsFragment = { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, military: boolean, militaryId: string | null, rank: Rank, warName: string, birthDate: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null, instruments: Array<{ instrumentId: string, primary: boolean }> };
 
 export type EnrollmentInvitesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1011,7 +1057,7 @@ export type EnrollmentRequestsQueryVariables = Exact<{
 }>;
 
 
-export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, military: boolean, militaryId: string | null, rank: Rank, warName: string, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null, instruments: Array<{ instrumentId: string, primary: boolean }> }> } };
+export type EnrollmentRequestsQuery = { pendingEnrollmentCount: number, enrollmentRequests: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, military: boolean, militaryId: string | null, rank: Rank, warName: string, birthDate: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null, instruments: Array<{ instrumentId: string, primary: boolean }> }> } };
 
 export type ApproveEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -1020,7 +1066,7 @@ export type ApproveEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, military: boolean, militaryId: string | null, rank: Rank, warName: string, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null, instruments: Array<{ instrumentId: string, primary: boolean }> }, access: { temporaryPassword: string, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
+export type ApproveEnrollmentRequestMutation = { approveEnrollmentRequest: { request: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, military: boolean, militaryId: string | null, rank: Rank, warName: string, birthDate: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null, instruments: Array<{ instrumentId: string, primary: boolean }> }, access: { temporaryPassword: string, emailSent: boolean, user: { id: string, name: string, email: string, username: string, group: UserGroup, active: boolean, mustChangePassword: boolean, lockedUntil: string | null, locked: boolean, lastLoginAt: string | null, deactivatedAt: string | null, createdAt: string } } } };
 
 export type RejectEnrollmentRequestMutationVariables = Exact<{
   id: string | number;
@@ -1028,7 +1074,7 @@ export type RejectEnrollmentRequestMutationVariables = Exact<{
 }>;
 
 
-export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, military: boolean, militaryId: string | null, rank: Rank, warName: string, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null, instruments: Array<{ instrumentId: string, primary: boolean }> } };
+export type RejectEnrollmentRequestMutation = { rejectEnrollmentRequest: { id: string, status: EnrollmentStatus, fullName: string, email: string, phone: string, military: boolean, militaryId: string | null, rank: Rank, warName: string, birthDate: string | null, createdAt: string, reviewedAt: string | null, rejectionReason: string | null, userId: string | null, photoUrl: string | null, instruments: Array<{ instrumentId: string, primary: boolean }> } };
 
 export type EventFieldsFragment = { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null };
 
@@ -1076,7 +1122,7 @@ export type EventQueryVariables = Exact<{
 }>;
 
 
-export type EventQuery = { event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, setlist: Array<{ position: number, songId: string, notes: string | null, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, lyrics: string | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string }> } | null }>, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
+export type EventQuery = { event: { id: string, title: string, type: EventType, status: EventStatus, callTime: string | null, startsAt: string, endsAt: string | null, venueId: string | null, uniform: EventUniform | null, requester: string | null, documentRef: string | null, notes: string | null, cancellationReason: string | null, setlist: Array<{ position: number, songId: string, notes: string | null, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, lyrics: string | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string, youtubeVideoId: string | null }> } | null }>, venue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } | null } };
 
 export type CreateEventMutationVariables = Exact<{
   input: EventInput;
@@ -1132,7 +1178,7 @@ export type UpdateVenueMutationVariables = Exact<{
 
 export type UpdateVenueMutation = { updateVenue: { id: string, name: string, zipCode: string | null, street: string | null, number: string | null, complement: string | null, district: string | null, city: string, state: string, fullAddress: string, mapsUrl: string | null, notes: string | null, archived: boolean } };
 
-export type MemberProfileFieldsFragment = { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> };
+export type MemberProfileFieldsFragment = { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, birthDate: string | null, joinedOn: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> };
 
 export type RosterQueryVariables = Exact<{
   filter?: RosterFilterInput | null | undefined;
@@ -1140,19 +1186,19 @@ export type RosterQueryVariables = Exact<{
 }>;
 
 
-export type RosterQuery = { roster: { total: number, page: number, limit: number, totalPages: number, items: Array<{ userId: string, name: string, username: string, active: boolean, photoUrl: string | null, profile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } | null }> } };
+export type RosterQuery = { roster: { total: number, page: number, limit: number, totalPages: number, items: Array<{ userId: string, name: string, username: string, active: boolean, photoUrl: string | null, profile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, birthDate: string | null, joinedOn: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } | null }> } };
 
 export type MemberProfileQueryVariables = Exact<{
   userId: string | number;
 }>;
 
 
-export type MemberProfileQuery = { memberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } | null };
+export type MemberProfileQuery = { memberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, birthDate: string | null, joinedOn: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } | null };
 
 export type MyMemberProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MyMemberProfileQuery = { myMemberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } | null };
+export type MyMemberProfileQuery = { myMemberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, birthDate: string | null, joinedOn: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } | null };
 
 export type SaveMemberProfileMutationVariables = Exact<{
   userId: string | number;
@@ -1160,7 +1206,7 @@ export type SaveMemberProfileMutationVariables = Exact<{
 }>;
 
 
-export type SaveMemberProfileMutation = { saveMemberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } };
+export type SaveMemberProfileMutation = { saveMemberProfile: { userId: string, warName: string, rank: Rank, registration: string | null, phone: string | null, section: Section, status: MemberStatus, notes: string | null, birthDate: string | null, joinedOn: string | null, updatedAt: string, instruments: Array<{ instrumentId: string, name: string, primary: boolean }>, functions: Array<{ functionId: string, name: string }> } };
 
 export type InstrumentsQueryVariables = Exact<{
   includeArchived: boolean;
@@ -1191,6 +1237,26 @@ export type UpdateInstrumentMutationVariables = Exact<{
 
 
 export type UpdateInstrumentMutation = { updateInstrument: { id: string, name: string, section: Section, archived: boolean } };
+
+export type MyBandDatesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyBandDatesQuery = { myBandDates: { birthDate: string | null, joinedOn: string | null } };
+
+export type UpdateMyBandDatesMutationVariables = Exact<{
+  birthDate?: string | null | undefined;
+  joinedOn?: string | null | undefined;
+}>;
+
+
+export type UpdateMyBandDatesMutation = { updateMyBandDates: { birthDate: string | null, joinedOn: string | null } };
+
+export type BirthdaysQueryVariables = Exact<{
+  month?: number | null | undefined;
+}>;
+
+
+export type BirthdaysQuery = { birthdays: Array<{ userId: string, name: string, warName: string, rank: Rank | null, day: number, photoUrl: string | null }> };
 
 export type MyNotificationsQueryVariables = Exact<{
   unreadOnly: boolean;
@@ -1253,6 +1319,42 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SendTestPushMutation = { sendTestPush: number };
+
+export type PlaylistFieldsFragment = { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string };
+
+export type PlaylistsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PlaylistsQuery = { playlists: Array<{ id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string }> };
+
+export type PlaylistQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type PlaylistQuery = { playlist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string, songs: Array<{ position: number, songId: string, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, lyrics: string | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string, youtubeVideoId: string | null }> } | null }> } };
+
+export type CreatePlaylistMutationVariables = Exact<{
+  input: PlaylistInput;
+}>;
+
+
+export type CreatePlaylistMutation = { createPlaylist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string } };
+
+export type UpdatePlaylistMutationVariables = Exact<{
+  id: string | number;
+  input: PlaylistInput;
+}>;
+
+
+export type UpdatePlaylistMutation = { updatePlaylist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string } };
+
+export type DeletePlaylistMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeletePlaylistMutation = { deletePlaylist: boolean };
 
 export type SongFieldsFragment = { id: string, title: string, artistId: string | null, stage: SongStage, arranger: string | null, category: SongCategory, musicalKey: string | null, bpm: number | null, durationSeconds: number | null, lyrics: string | null, notes: string | null, tags: Array<string>, archivedAt: string | null, createdAt: string, updatedAt: string, artist: { id: string, name: string } | null };
 
@@ -1476,6 +1578,28 @@ export type FinalizeSupportRequestMutationVariables = Exact<{
 
 export type FinalizeSupportRequestMutation = { finalizeSupportRequest: { id: string, protocol: number, userId: string, userName: string, warName: string | null, category: SupportCategory, subject: string, message: string, status: SupportStatus, reply: string | null, repliedAt: string | null, repliedByName: string | null, finalizedAt: string | null, finalizedByName: string | null, createdAt: string } };
 
+export type SystemLogsQueryVariables = Exact<{
+  filter?: SystemLogFilterInput | null | undefined;
+  page?: PageInput | null | undefined;
+}>;
+
+
+export type SystemLogsQuery = { systemLogs: { total: number, page: number, limit: number, totalPages: number, items: Array<{ id: string, level: string, category: string, source: string, message: string, details: Record<string, unknown> | null, userId: string | null, userName: string | null, ip: string | null, statusCode: number | null, durationMs: number | null, environment: string, createdAt: string }> } };
+
+export type SystemLogSummaryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SystemLogSummaryQuery = { systemLogSummary: Array<{ level: string, last24h: number, last7d: number }> };
+
+export type ReportClientErrorMutationVariables = Exact<{
+  message: string;
+  url: string;
+  digest?: string | null | undefined;
+}>;
+
+
+export type ReportClientErrorMutation = { reportClientError: boolean };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -1599,6 +1723,7 @@ export const EnrollmentRequestFieldsFragmentDoc = new TypedDocumentString(`
   militaryId
   rank
   warName
+  birthDate
   instruments {
     instrumentId
     primary
@@ -1671,6 +1796,8 @@ export const MemberProfileFieldsFragmentDoc = new TypedDocumentString(`
   section
   status
   notes
+  birthDate
+  joinedOn
   updatedAt
   instruments {
     instrumentId
@@ -1683,6 +1810,18 @@ export const MemberProfileFieldsFragmentDoc = new TypedDocumentString(`
   }
 }
     `, {"fragmentName":"MemberProfileFields"}) as unknown as TypedDocumentString<MemberProfileFieldsFragment, unknown>;
+export const PlaylistFieldsFragmentDoc = new TypedDocumentString(`
+    fragment PlaylistFields on Playlist {
+  id
+  name
+  description
+  shared
+  ownerId
+  ownerName
+  songCount
+  updatedAt
+}
+    `, {"fragmentName":"PlaylistFields"}) as unknown as TypedDocumentString<PlaylistFieldsFragment, unknown>;
 export const SongFieldsFragmentDoc = new TypedDocumentString(`
     fragment SongFields on Song {
   id
@@ -2462,6 +2601,32 @@ export const SendBroadcastDocument = new TypedDocumentString(`
   authorName
   createdAt
 }`) as unknown as TypedDocumentString<SendBroadcastMutation, SendBroadcastMutationVariables>;
+export const MyCalendarFeedDocument = new TypedDocumentString(`
+    query MyCalendarFeed {
+  myCalendarFeed {
+    token
+    createdAt
+  }
+}
+    `) as unknown as TypedDocumentString<MyCalendarFeedQuery, MyCalendarFeedQueryVariables>;
+export const RenewCalendarFeedDocument = new TypedDocumentString(`
+    mutation RenewCalendarFeed {
+  renewCalendarFeed {
+    token
+    createdAt
+  }
+}
+    `) as unknown as TypedDocumentString<RenewCalendarFeedMutation, RenewCalendarFeedMutationVariables>;
+export const RemoveCalendarFeedDocument = new TypedDocumentString(`
+    mutation RemoveCalendarFeed {
+  removeCalendarFeed
+}
+    `) as unknown as TypedDocumentString<RemoveCalendarFeedMutation, RemoveCalendarFeedMutationVariables>;
+export const CalendarFeedIcsDocument = new TypedDocumentString(`
+    query CalendarFeedIcs($token: String!) {
+  calendarFeedIcs(token: $token)
+}
+    `) as unknown as TypedDocumentString<CalendarFeedIcsQuery, CalendarFeedIcsQueryVariables>;
 export const BandDashboardDocument = new TypedDocumentString(`
     query BandDashboard {
   bandDashboard {
@@ -2675,6 +2840,7 @@ export const EnrollmentRequestsDocument = new TypedDocumentString(`
   militaryId
   rank
   warName
+  birthDate
   instruments {
     instrumentId
     primary
@@ -2724,6 +2890,7 @@ fragment EnrollmentRequestFields on EnrollmentRequest {
   militaryId
   rank
   warName
+  birthDate
   instruments {
     instrumentId
     primary
@@ -2750,6 +2917,7 @@ export const RejectEnrollmentRequestDocument = new TypedDocumentString(`
   militaryId
   rank
   warName
+  birthDate
   instruments {
     instrumentId
     primary
@@ -2949,6 +3117,7 @@ export const EventDocument = new TypedDocumentString(`
           id
           kind
           title
+          youtubeVideoId
         }
       }
     }
@@ -3203,6 +3372,8 @@ export const RosterDocument = new TypedDocumentString(`
   section
   status
   notes
+  birthDate
+  joinedOn
   updatedAt
   instruments {
     instrumentId
@@ -3229,6 +3400,8 @@ export const MemberProfileDocument = new TypedDocumentString(`
   section
   status
   notes
+  birthDate
+  joinedOn
   updatedAt
   instruments {
     instrumentId
@@ -3255,6 +3428,8 @@ export const MyMemberProfileDocument = new TypedDocumentString(`
   section
   status
   notes
+  birthDate
+  joinedOn
   updatedAt
   instruments {
     instrumentId
@@ -3281,6 +3456,8 @@ export const SaveMemberProfileDocument = new TypedDocumentString(`
   section
   status
   notes
+  birthDate
+  joinedOn
   updatedAt
   instruments {
     instrumentId
@@ -3339,6 +3516,34 @@ export const UpdateInstrumentDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateInstrumentMutation, UpdateInstrumentMutationVariables>;
+export const MyBandDatesDocument = new TypedDocumentString(`
+    query MyBandDates {
+  myBandDates {
+    birthDate
+    joinedOn
+  }
+}
+    `) as unknown as TypedDocumentString<MyBandDatesQuery, MyBandDatesQueryVariables>;
+export const UpdateMyBandDatesDocument = new TypedDocumentString(`
+    mutation UpdateMyBandDates($birthDate: String, $joinedOn: String) {
+  updateMyBandDates(birthDate: $birthDate, joinedOn: $joinedOn) {
+    birthDate
+    joinedOn
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateMyBandDatesMutation, UpdateMyBandDatesMutationVariables>;
+export const BirthdaysDocument = new TypedDocumentString(`
+    query Birthdays($month: Int) {
+  birthdays(month: $month) {
+    userId
+    name
+    warName
+    rank
+    day
+    photoUrl
+  }
+}
+    `) as unknown as TypedDocumentString<BirthdaysQuery, BirthdaysQueryVariables>;
 export const MyNotificationsDocument = new TypedDocumentString(`
     query MyNotifications($unreadOnly: Boolean!, $page: PageInput) {
   myNotifications(unreadOnly: $unreadOnly, page: $page) {
@@ -3408,6 +3613,93 @@ export const SendTestPushDocument = new TypedDocumentString(`
   sendTestPush
 }
     `) as unknown as TypedDocumentString<SendTestPushMutation, SendTestPushMutationVariables>;
+export const PlaylistsDocument = new TypedDocumentString(`
+    query Playlists {
+  playlists {
+    ...PlaylistFields
+  }
+}
+    fragment PlaylistFields on Playlist {
+  id
+  name
+  description
+  shared
+  ownerId
+  ownerName
+  songCount
+  updatedAt
+}`) as unknown as TypedDocumentString<PlaylistsQuery, PlaylistsQueryVariables>;
+export const PlaylistDocument = new TypedDocumentString(`
+    query Playlist($id: ID!) {
+  playlist(id: $id) {
+    ...PlaylistFields
+    songs {
+      position
+      songId
+      song {
+        id
+        title
+        musicalKey
+        durationSeconds
+        lyrics
+        archivedAt
+        media {
+          id
+          kind
+          title
+          youtubeVideoId
+        }
+      }
+    }
+  }
+}
+    fragment PlaylistFields on Playlist {
+  id
+  name
+  description
+  shared
+  ownerId
+  ownerName
+  songCount
+  updatedAt
+}`) as unknown as TypedDocumentString<PlaylistQuery, PlaylistQueryVariables>;
+export const CreatePlaylistDocument = new TypedDocumentString(`
+    mutation CreatePlaylist($input: PlaylistInput!) {
+  createPlaylist(input: $input) {
+    ...PlaylistFields
+  }
+}
+    fragment PlaylistFields on Playlist {
+  id
+  name
+  description
+  shared
+  ownerId
+  ownerName
+  songCount
+  updatedAt
+}`) as unknown as TypedDocumentString<CreatePlaylistMutation, CreatePlaylistMutationVariables>;
+export const UpdatePlaylistDocument = new TypedDocumentString(`
+    mutation UpdatePlaylist($id: ID!, $input: PlaylistInput!) {
+  updatePlaylist(id: $id, input: $input) {
+    ...PlaylistFields
+  }
+}
+    fragment PlaylistFields on Playlist {
+  id
+  name
+  description
+  shared
+  ownerId
+  ownerName
+  songCount
+  updatedAt
+}`) as unknown as TypedDocumentString<UpdatePlaylistMutation, UpdatePlaylistMutationVariables>;
+export const DeletePlaylistDocument = new TypedDocumentString(`
+    mutation DeletePlaylist($id: ID!) {
+  deletePlaylist(id: $id)
+}
+    `) as unknown as TypedDocumentString<DeletePlaylistMutation, DeletePlaylistMutationVariables>;
 export const SongsDocument = new TypedDocumentString(`
     query Songs($filter: SongFilterInput, $page: PageInput, $archived: Boolean!) {
   songs(filter: $filter, page: $page) {
@@ -4102,3 +4394,42 @@ export const FinalizeSupportRequestDocument = new TypedDocumentString(`
   finalizedByName
   createdAt
 }`) as unknown as TypedDocumentString<FinalizeSupportRequestMutation, FinalizeSupportRequestMutationVariables>;
+export const SystemLogsDocument = new TypedDocumentString(`
+    query SystemLogs($filter: SystemLogFilterInput, $page: PageInput) {
+  systemLogs(filter: $filter, page: $page) {
+    items {
+      id
+      level
+      category
+      source
+      message
+      details
+      userId
+      userName
+      ip
+      statusCode
+      durationMs
+      environment
+      createdAt
+    }
+    total
+    page
+    limit
+    totalPages
+  }
+}
+    `) as unknown as TypedDocumentString<SystemLogsQuery, SystemLogsQueryVariables>;
+export const SystemLogSummaryDocument = new TypedDocumentString(`
+    query SystemLogSummary {
+  systemLogSummary {
+    level
+    last24h
+    last7d
+  }
+}
+    `) as unknown as TypedDocumentString<SystemLogSummaryQuery, SystemLogSummaryQueryVariables>;
+export const ReportClientErrorDocument = new TypedDocumentString(`
+    mutation ReportClientError($message: String!, $url: String!, $digest: String) {
+  reportClientError(message: $message, url: $url, digest: $digest)
+}
+    `) as unknown as TypedDocumentString<ReportClientErrorMutation, ReportClientErrorMutationVariables>;

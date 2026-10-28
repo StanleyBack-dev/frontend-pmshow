@@ -11,6 +11,8 @@ export type YoutubePlayer = {
   getCurrentTime(): number;
   getDuration(): number;
   getPlayerState(): number;
+  /** 0.25 to 2 (the video decides which rates it offers). */
+  setPlaybackRate(rate: number): void;
   destroy(): void;
 };
 
