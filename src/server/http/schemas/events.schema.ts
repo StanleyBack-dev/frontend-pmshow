@@ -21,6 +21,10 @@ export const eventInputSchema = z.object({
   requester: optionalText(160),
   documentRef: optionalText(80),
   notes: optionalText(2000),
+  setlist: z
+    .array(z.object({ songId: z.uuid(), notes: optionalText(200) }))
+    .max(200)
+    .optional(),
 });
 
 export const eventStatusSchema = z.object({

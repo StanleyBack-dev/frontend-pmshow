@@ -16,6 +16,10 @@ export const memberProfileFieldsFragment = graphql(`
       name
       primary
     }
+    functions {
+      functionId
+      name
+    }
   }
 `);
 
@@ -70,6 +74,24 @@ export const instrumentsDocument = graphql(`
       name
       section
       archived
+    }
+  }
+`);
+
+export const instrumentsPageDocument = graphql(`
+  query InstrumentsPage($filter: InstrumentFilterInput, $page: PageInput) {
+    instrumentsPage(filter: $filter, page: $page) {
+      items {
+        id
+        name
+        section
+        archived
+        memberCount
+      }
+      total
+      page
+      limit
+      totalPages
     }
   }
 `);

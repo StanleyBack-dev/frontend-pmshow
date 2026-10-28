@@ -4,12 +4,14 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Play, Plus } from "lucide-react";
-import { Alert, Button, Field } from "@/design-system";
+import { Button, Field } from "@/design-system";
 import { repertoireClient } from "@/features/repertoire/api/repertoire.client";
+import { RecordAuditButton } from "@/features/audit/components/RecordAudit";
 import { MediaItemActions } from "@/features/repertoire/components/MediaItemActions";
 import type { MediaAsset } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { urlError } from "@/shared/lib/masks";
+import { useToast } from "@/shared/toast/useToast";
 
 // Thumbnail first; the YouTube player (privacy-enhanced domain) loads only
 // when someone presses play, so pages stay light and nothing is sent to
@@ -70,6 +72,11 @@ export function VideoList({
           <LiteYoutube video={video} />
           <div className="flex items-start gap-2">
             <p className="flex-1 text-sm font-medium text-fg">{video.title}</p>
+            <RecordAuditButton
+              entity="media"
+              id={video.id}
+              label={video.title}
+            />
             {canManage && <MediaItemActions asset={video} />}
           </div>
         </li>
@@ -81,19 +88,18 @@ export function VideoList({
 export function AddVideoForm({ songId }: { songId: string }) {
   const router = useRouter();
   const [link, setLink] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     setPending(true);
-    setError(null);
     try {
       await repertoireClient.addVideo(songId, link, null);
       setLink("");
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível adicionar o vídeo.",
@@ -104,7 +110,6 @@ export function AddVideoForm({ songId }: { songId: string }) {
 
   return (
     <form onSubmit={submit} className="space-y-2" noValidate>
-      {error && <Alert tone="danger">{error}</Alert>}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <Field
           label="Link do YouTube"

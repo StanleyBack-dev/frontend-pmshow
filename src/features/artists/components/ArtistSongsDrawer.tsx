@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Alert, Badge, Drawer, Spinner } from "@/design-system";
+import { Badge, Drawer, Spinner } from "@/design-system";
 import { artistsClient } from "@/features/artists/api/artists.client";
 import { PlayerPanel } from "@/features/player/components/MiniPlayer";
 import { usePlayer } from "@/features/player/components/PlayerProvider";
@@ -17,6 +17,7 @@ import type {
   SongListItem,
 } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 // The artist's songs without leaving the artists page: lyrics (full
 // screen) and play / pause, as in the repertoire list, with the player
@@ -32,7 +33,8 @@ export function ArtistSongsDrawer({
 }) {
   const player = usePlayer();
   const [songs, setSongs] = useState<SongListItem[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const { showError } = useToast();
 
   function close() {
     const playingHere = songs?.some((song) =>
@@ -51,7 +53,8 @@ export function ArtistSongsDrawer({
       },
       (cause: unknown) => {
         if (!active) return;
-        setError(
+        setFailed(true);
+        showError(
           cause instanceof ApiClientError
             ? cause.message
             : "Não foi possível carregar as músicas.",
@@ -61,7 +64,7 @@ export function ArtistSongsDrawer({
     return () => {
       active = false;
     };
-  }, [artist.id]);
+  }, [artist.id, showError]);
 
   return (
     <Drawer
@@ -73,8 +76,7 @@ export function ArtistSongsDrawer({
       {/* The page's player bar and video sit behind the drawer: here the
           player shows inside it, pinned while the list scrolls. */}
       <PlayerPanel className="sticky -top-5 z-10 -mx-5 -mt-5 mb-3 border-b border-border bg-surface px-5 py-3" />
-      {error && <Alert tone="danger">{error}</Alert>}
-      {!songs && !error && (
+      {!songs && !failed && (
         <div className="grid place-items-center py-10">
           <Spinner />
         </div>

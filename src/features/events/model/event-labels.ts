@@ -13,6 +13,7 @@ export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   FORMATURA: "Formatura",
   ENSAIO: "Ensaio",
   CULTO_MISSA: "Culto / missa",
+  EXPEDIENTE: "Expediente",
   OUTRO: "Outro",
 };
 

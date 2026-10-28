@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  ArrowUpRight,
   CalendarDays,
+  ClipboardList,
   FileText,
   Flag,
   ListMusic,
@@ -12,7 +15,6 @@ import {
   Plus,
 } from "lucide-react";
 import {
-  Alert,
   Button,
   Drawer,
   Field,
@@ -23,6 +25,7 @@ import {
 } from "@/design-system";
 import { eventsClient } from "@/features/events/api/events.client";
 import { VenueFormDrawer } from "@/features/events/components/VenueFormDrawer";
+import { RosterModal } from "@/features/rosters/components/RosterModal";
 import {
   SongListEditor,
   toSongListItems,
@@ -44,6 +47,7 @@ import type {
 } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
 import { fromLocalInput, toLocalInput } from "@/shared/lib/datetime";
+import { useToast } from "@/shared/toast/useToast";
 
 // One date and three times: the band's day reads like the order of the
 // event (arrive, start, end), without repeating the date three times.
@@ -162,18 +166,23 @@ function toInput(form: Form): EventInput | string {
   };
 }
 
-function EventFormDrawer({
+export function EventFormDrawer({
   event,
   venues,
+  canBuildRoster = false,
+  canPublishRoster = false,
   onClose,
 }: {
   event?: BandEvent;
   venues: Venue[];
+  /** Shows "Montar escala" (existing events still open). */
+  canBuildRoster?: boolean;
+  canPublishRoster?: boolean;
   onClose: () => void;
 }) {
   const router = useRouter();
   const [form, setForm] = useState<Form>(() => fromEvent(event));
-  const [error, setError] = useState<string | null>(null);
+  const { showError, showSuccess } = useToast();
   const [pending, setPending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   // The list of songs: loaded for an existing event, saved with it.
@@ -195,31 +204,35 @@ function EventFormDrawer({
   );
   const errors = scheduleErrors(form);
   const summary = scheduleSummary(form);
+  const [rosterOpen, setRosterOpen] = useState(false);
+  const rosterOpenable =
+    canBuildRoster &&
+    event !== undefined &&
+    (event.status === "PLANEJADO" || event.status === "CONFIRMADO");
+  const closeRoster = useCallback(() => setRosterOpen(false), []);
 
   async function submit() {
     setSubmitted(true);
     const input = toInput(form);
-    if (typeof input === "string") return setError(input);
+    if (typeof input === "string") return showError(input);
     setPending(true);
-    setError(null);
     try {
-      const songs = songList.rows ?? [];
+      // The list of songs goes with the event: one request, one transaction.
+      const songs = toSongListItems(songList.rows ?? []);
       if (event) {
-        await eventsClient.update(event.id, input);
-        if (songsChanged) {
-          await eventsClient.setSetlist(event.id, toSongListItems(songs));
-        }
-        router.refresh();
+        await eventsClient.update(event.id, {
+          ...input,
+          ...(songsChanged ? { setlist: songs } : {}),
+        });
+        showSuccess("Evento salvo.");
       } else {
-        const created = await eventsClient.create(input);
-        if (songs.length > 0) {
-          await eventsClient.setSetlist(created.id, toSongListItems(songs));
-        }
-        router.push(`/eventos/${created.id}`);
+        await eventsClient.create({ ...input, setlist: songs });
+        showSuccess("Evento criado.", "Ele já aparece na lista e na agenda.");
       }
+      router.refresh();
       onClose();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar o evento.",
@@ -237,7 +250,7 @@ function EventFormDrawer({
       subtitle={
         event
           ? undefined
-          : "Depois de criar, monte a escala na página do evento."
+          : "Depois de criar, monte a escala pela coluna Escala da lista."
       }
       busy={pending}
       footer={
@@ -255,6 +268,34 @@ function EventFormDrawer({
         </>
       }
     >
+      {event && (
+        <Link
+          href={`/eventos/${event.id}`}
+          className="mb-4 inline-flex items-center gap-1 text-sm text-accent hover:underline"
+        >
+          Abrir página do evento <ArrowUpRight className="size-4" />
+        </Link>
+      )}
+      {rosterOpenable && (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-lg border border-accent-border bg-accent-soft p-4">
+          <span className="grid size-9 shrink-0 place-items-center rounded-md bg-accent text-accent-fg">
+            <ClipboardList className="size-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-fg">Escala da banda</p>
+            <p className="text-xs text-muted">
+              Escolha quem vai tocar neste evento e a função de cada um.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            icon={<ClipboardList className="size-4" />}
+            onClick={() => setRosterOpen(true)}
+          >
+            Montar escala
+          </Button>
+        </div>
+      )}
       <form
         className="space-y-5"
         onSubmit={(e) => {
@@ -262,8 +303,6 @@ function EventFormDrawer({
           void submit();
         }}
       >
-        {error && <Alert tone="danger">{error}</Alert>}
-
         <FormSection
           icon={<Flag />}
           title="O evento"
@@ -375,11 +414,10 @@ function EventFormDrawer({
           title="Lista de músicas"
           description="O que a banda vai tocar, na ordem. Pode ficar para depois."
         >
-          {songList.error && <Alert tone="danger">{songList.error}</Alert>}
           {songList.rows ? (
             <SongListEditor rows={songList.rows} onChange={changeSongs} />
           ) : (
-            !songList.error && (
+            !songList.failed && (
               <div className="grid place-items-center py-4">
                 <Spinner size="sm" />
               </div>
@@ -427,6 +465,14 @@ function EventFormDrawer({
           />
         </FormSection>
       </form>
+      {rosterOpen && event && (
+        <RosterModal
+          eventId={event.id}
+          eventTitle={event.title}
+          canPublish={canPublishRoster}
+          onClose={closeRoster}
+        />
+      )}
       {creatingVenue && (
         <VenueFormDrawer
           onClose={() => setCreatingVenue(false)}
@@ -457,43 +503,16 @@ export function NewEventButton({ venues }: { venues: Venue[] }) {
   );
 }
 
-// Pencil at the start of an events-page row (the row is not clickable).
-export function EditEventIconButton({
-  event,
-  venues,
-}: {
-  event: BandEvent;
-  venues: Venue[];
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label={`Editar ${event.title}`}
-        title="Editar evento"
-        className="grid size-8 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg"
-      >
-        <Pencil aria-hidden className="size-4" />
-      </button>
-      {open && (
-        <EventFormDrawer
-          event={event}
-          venues={venues}
-          onClose={() => setOpen(false)}
-        />
-      )}
-    </>
-  );
-}
-
 export function EditEventButton({
   event,
   venues,
+  canBuildRoster = false,
+  canPublishRoster = false,
 }: {
   event: BandEvent;
   venues: Venue[];
+  canBuildRoster?: boolean;
+  canPublishRoster?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -510,6 +529,8 @@ export function EditEventButton({
         <EventFormDrawer
           event={event}
           venues={venues}
+          canBuildRoster={canBuildRoster}
+          canPublishRoster={canPublishRoster}
           onClose={() => setOpen(false)}
         />
       )}

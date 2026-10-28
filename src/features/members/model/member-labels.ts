@@ -20,6 +20,9 @@ export const RANK_LABELS: Record<Rank, { label: string; short: string }> = {
 
 export const RANKS = Object.keys(RANK_LABELS) as Rank[];
 
+/** Civilians are shown in another color, to tell them apart. */
+export const isCivil = (rank: Rank | null | undefined) => rank === "CIVIL";
+
 export const SECTION_LABELS: Record<Section, string> = {
   MADEIRAS: "Madeiras",
   METAIS: "Metais",
@@ -27,7 +30,6 @@ export const SECTION_LABELS: Record<Section, string> = {
   CORDAS_BASE: "Cordas e base",
   VOCAL: "Vocal",
   TECNICA: "Técnica",
-  APOIO: "Apoio",
 };
 
 export const SECTIONS = Object.keys(SECTION_LABELS) as Section[];

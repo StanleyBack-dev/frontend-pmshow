@@ -15,6 +15,7 @@ export const loginDocument = graphql(`
         group
         mustChangePassword
         permissions
+        photoUrl
       }
     }
   }
@@ -47,6 +48,7 @@ export const meDocument = graphql(`
       group
       mustChangePassword
       permissions
+      photoUrl
     }
   }
 `);
@@ -67,7 +69,20 @@ export const updateMyProfileDocument = graphql(`
       group
       mustChangePassword
       permissions
+      photoUrl
     }
+  }
+`);
+
+export const setMyPhotoDocument = graphql(`
+  mutation SetMyPhoto($photo: String!) {
+    setMyPhoto(photo: $photo)
+  }
+`);
+
+export const removeMyPhotoDocument = graphql(`
+  mutation RemoveMyPhoto {
+    removeMyPhoto
   }
 `);
 

@@ -1,10 +1,13 @@
 import {
   Bell,
+  BriefcaseBusiness,
   CalendarClock,
   CalendarDays,
   CalendarOff,
+  CalendarRange,
   CircleUserRound,
   ClipboardList,
+  Guitar,
   House,
   ListMusic,
   MapPin,
@@ -25,7 +28,15 @@ export type NavItem = {
   also?: string[];
   /** Shown only with this permission (the page and the API check again). */
   permission?: Permission;
+  /** Shown with any of these permissions. */
+  anyPermission?: Permission[];
 };
+
+/** Whether the menu shows the entry to someone with `permissions`. */
+export const canSee = (item: NavItem, permissions: readonly Permission[]) =>
+  (!item.permission || permissions.includes(item.permission)) &&
+  (!item.anyPermission ||
+    item.anyPermission.some((permission) => permissions.includes(permission)));
 
 // Main menu, in the order of a musician's routine. Each page checks its own
 // permission again; the menu only hides what the user can't open.
@@ -51,8 +62,14 @@ export const PRIMARY_NAV: NavItem[] = [
   },
   {
     href: "/escalas",
-    label: "Minhas escalas",
+    label: "Escalas",
     icon: ClipboardList,
+    permission: "ROSTERS_READ_OWN",
+  },
+  {
+    href: "/expedientes",
+    label: "Expedientes",
+    icon: CalendarRange,
     permission: "ROSTERS_READ_OWN",
   },
   {
@@ -74,10 +91,23 @@ export const PRIMARY_NAV: NavItem[] = [
     permission: "MEMBERS_READ",
   },
   {
+    href: "/instrumentos",
+    label: "Instrumentos",
+    icon: Guitar,
+    permission: "MEMBERS_MANAGE",
+  },
+  {
+    href: "/funcoes",
+    label: "Funções",
+    icon: BriefcaseBusiness,
+    permission: "MEMBERS_MANAGE",
+  },
+  {
     href: "/indisponibilidades",
     label: "Indisponibilidades",
     icon: CalendarOff,
-    permission: "ABSENCES_REQUEST",
+    // Musicians ask; managers review.
+    anyPermission: ["ABSENCES_REQUEST", "ABSENCES_MANAGE"],
   },
   {
     href: "/comunicados",

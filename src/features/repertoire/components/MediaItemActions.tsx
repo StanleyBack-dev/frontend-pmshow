@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
-import { Alert, Button, Field, Modal } from "@/design-system";
+import { Button, Field, Modal } from "@/design-system";
 import { repertoireClient } from "@/features/repertoire/api/repertoire.client";
 import type { MediaAsset } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 type Mode = "rename" | "remove" | null;
 
@@ -15,12 +16,11 @@ export function MediaItemActions({ asset }: { asset: MediaAsset }) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(null);
   const [title, setTitle] = useState(asset.title);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function run() {
     setPending(true);
-    setError(null);
     try {
       if (mode === "rename")
         await repertoireClient.renameMedia(asset.id, title);
@@ -28,7 +28,7 @@ export function MediaItemActions({ asset }: { asset: MediaAsset }) {
       setMode(null);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError ? cause.message : "Não foi possível.",
       );
     }
@@ -87,7 +87,6 @@ export function MediaItemActions({ asset }: { asset: MediaAsset }) {
         }
       >
         <div className="space-y-3">
-          {error && <Alert tone="danger">{error}</Alert>}
           {mode === "rename" ? (
             <Field
               label="Título"

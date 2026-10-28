@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Check, Search } from "lucide-react";
-import { Alert, Button, Field, Modal, Spinner, cn } from "@/design-system";
+import { Button, Field, Modal, Spinner, cn } from "@/design-system";
 import { repertoireClient } from "@/features/repertoire/api/repertoire.client";
 import { formatDuration } from "@/features/repertoire/model/repertoire-labels";
 import type { YoutubeVideoResult } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 // In-app YouTube search: type, search, mark one video and confirm.
 export function YoutubeSearchModal({
@@ -24,19 +25,18 @@ export function YoutubeSearchModal({
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<YoutubeVideoResult[] | null>(null);
   const [selected, setSelected] = useState<YoutubeVideoResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function search() {
     if (query.trim().length < 2) return;
     setPending(true);
-    setError(null);
     setSelected(null);
     try {
       setResults(await repertoireClient.searchYoutube(query.trim()));
     } catch (cause) {
       setResults(null);
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível buscar no YouTube.",
@@ -92,8 +92,6 @@ export function YoutubeSearchModal({
             Buscar
           </Button>
         </form>
-
-        {error && <Alert tone="danger">{error}</Alert>}
 
         {pending && !results && (
           <div className="grid place-items-center py-8">

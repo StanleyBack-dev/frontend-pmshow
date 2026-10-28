@@ -3,16 +3,18 @@
 import { usePathname } from "next/navigation";
 import { SegmentedNav } from "@/design-system";
 
-export function AdminTabs({ showAudit }: { showAudit: boolean }) {
+const TABS = [
+  { label: "Usuários", href: "/admin/usuarios" },
+  { label: "Cadastros", href: "/admin/cadastros" },
+  { label: "Links de cadastro", href: "/admin/links" },
+];
+
+export function AdminTabs() {
   const pathname = usePathname();
-  const tabs = [
-    { label: "Usuários", href: "/admin/usuarios" },
-    ...(showAudit ? [{ label: "Auditoria", href: "/admin/auditoria" }] : []),
-  ];
   return (
     <SegmentedNav
       label="Administração"
-      items={tabs.map((tab) => ({
+      items={TABS.map((tab) => ({
         ...tab,
         active: pathname === tab.href || pathname.startsWith(`${tab.href}/`),
       }))}

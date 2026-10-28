@@ -48,6 +48,7 @@ import {
   maskBpm,
   maskDuration,
 } from "@/shared/lib/masks";
+import { useToast } from "@/shared/toast/useToast";
 
 type FormState = {
   title: string;
@@ -140,7 +141,7 @@ export function SongFormDrawer({
   const [dialog, setDialog] = useState<"artist" | "youtube" | "confirm" | null>(
     null,
   );
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
   // Field errors show once the field was left (or on save).
   const [touched, setTouched] = useState({
@@ -232,11 +233,10 @@ export function SongFormDrawer({
     const input = toInput(form);
     if (typeof input === "string" || !artistName.trim()) {
       setTouched({ duration: true, bpm: true, artist: true });
-      return setError(
+      return showError(
         typeof input === "string" ? input : "Informe o cantor / banda.",
       );
     }
-    setError(null);
     // Names that came from a video, a new artist or a new song: confirm.
     const confirm = !song || Boolean(video) || Boolean(form.newArtistName);
     if (confirm) setDialog("confirm");
@@ -245,9 +245,8 @@ export function SongFormDrawer({
 
   async function submit() {
     const input = toInput(form);
-    if (typeof input === "string") return setError(input);
+    if (typeof input === "string") return showError(input);
     setPending(true);
-    setError(null);
     try {
       const typedArtist = form.newArtistName.trim().replace(/\s+/g, " ");
       if (typedArtist) {
@@ -273,7 +272,7 @@ export function SongFormDrawer({
       onClose();
     } catch (cause) {
       setDialog(null);
-      setError(errorMessage(cause, "Não foi possível salvar a música."));
+      showError(errorMessage(cause, "Não foi possível salvar a música."));
     }
     setPending(false);
   }
@@ -300,7 +299,6 @@ export function SongFormDrawer({
       }
     >
       <div className="space-y-4">
-        {error && <Alert tone="danger">{error}</Alert>}
         <div className="flex items-end gap-2">
           <Field
             label="Título"

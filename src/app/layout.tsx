@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { connection } from "next/server";
+import { ToastProvider } from "@/shared/toast/ToastProvider";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/shared/lib/site";
 import "./globals.css";
 
@@ -39,7 +40,9 @@ export default async function RootLayout({
   await connection();
   return (
     <html lang="pt-BR" className={inter.variable}>
-      <body>{children}</body>
+      <body>
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

@@ -2,7 +2,7 @@ import { PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
 import { AdminTabs } from "@/features/admin/components/AdminTabs";
 import { getSessionUser } from "@/server/auth/current-user";
-import { ADMIN_AREA_PERMISSIONS, can, canAny } from "@/shared/lib/access";
+import { ADMIN_AREA_PERMISSIONS, canAny } from "@/shared/lib/access";
 
 export default async function AdminLayout({
   children,
@@ -16,10 +16,10 @@ export default async function AdminLayout({
     <>
       <PageHeader
         title="Administração"
-        description="Acesso dos integrantes, permissões e histórico de ações."
+        description="Acesso dos integrantes, cadastros pelo link, links de cadastro e permissões."
       />
       <div className="mb-6">
-        <AdminTabs showAudit={can(user, "AUDIT_READ")} />
+        <AdminTabs />
       </div>
       {children}
     </>

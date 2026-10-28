@@ -10,11 +10,13 @@ const GROUPS = [
 
 export const userIdSchema = z.uuid();
 
+export const userGroupSchema = z.enum(GROUPS);
+
 export const userInputSchema = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.email().max(254),
   username: z.string().trim().min(3).max(32),
-  group: z.enum(GROUPS),
+  group: userGroupSchema,
 });
 
 // The API checks the value against its own enum; here it only has to look

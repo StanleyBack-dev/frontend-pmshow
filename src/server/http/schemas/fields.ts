@@ -10,7 +10,7 @@ export const idSchema = z.uuid();
 export const enumLike = <T extends string>() =>
   z
     .string()
-    .regex(/^[A-Z_]{2,32}$/)
+    .regex(/^[A-Z][A-Z0-9_]{1,31}$/)
     .transform((value) => value as T);
 
 /** Optional text, trimmed; blank becomes null. */

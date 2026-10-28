@@ -3,7 +3,7 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Upload } from "lucide-react";
-import { Alert, Button } from "@/design-system";
+import { Button } from "@/design-system";
 import {
   readAudioDuration,
   repertoireClient,
@@ -14,6 +14,7 @@ import {
   MAX_AUDIO_MB,
 } from "@/features/repertoire/model/repertoire-labels";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 type Step = "idle" | "uploading" | "confirming";
 
@@ -24,21 +25,20 @@ export function AudioUploader({ songId }: { songId: string }) {
   const input = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<Step>("idle");
   const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
 
   async function onFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
 
-    setError(null);
     if (!ACCEPTED_AUDIO_TYPES.includes(file.type)) {
-      return setError(
+      return showError(
         "Formato não aceito. Use MP3, M4A, AAC, OGG, WAV ou FLAC.",
       );
     }
     if (file.size > MAX_AUDIO_MB * 1024 * 1024) {
-      return setError(`O áudio pode ter no máximo ${MAX_AUDIO_MB} MB.`);
+      return showError(`O áudio pode ter no máximo ${MAX_AUDIO_MB} MB.`);
     }
 
     try {
@@ -59,7 +59,7 @@ export function AudioUploader({ songId }: { songId: string }) {
       await repertoireClient.confirmAudioUpload(ticket.asset.id, duration);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível enviar o áudio.",
@@ -72,7 +72,6 @@ export function AudioUploader({ songId }: { songId: string }) {
 
   return (
     <div className="space-y-2">
-      {error && <Alert tone="danger">{error}</Alert>}
       <input
         ref={input}
         type="file"

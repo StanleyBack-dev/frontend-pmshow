@@ -53,6 +53,14 @@ export type BandEvent = {
   venue: Venue | null;
 };
 
+/** An agenda entry: the event and my line on its published roster. */
+export type AgendaEvent = BandEvent & {
+  myAssignment: {
+    functionName: string | null;
+    instrumentName: string | null;
+  } | null;
+};
+
 /** Upcoming (from now on) or past events. */
 export type EventPeriod = "UPCOMING" | "PAST";
 
@@ -95,6 +103,8 @@ export type EventInput = {
   requester: string | null;
   documentRef: string | null;
   notes: string | null;
+  /** The list of songs, saved with the event; omitted = keep it. */
+  setlist?: { songId: string; notes: string | null }[];
 };
 
 export type VenueInput = {

@@ -3,6 +3,7 @@ import { backendGraphql } from "@/server/graphql/client";
 import {
   createInstrumentDocument,
   instrumentsDocument,
+  instrumentsPageDocument,
   memberProfileDocument,
   myMemberProfileDocument,
   rosterDocument,
@@ -12,6 +13,7 @@ import {
 import type { Paginated } from "@/shared/contracts/api";
 import type {
   Instrument,
+  InstrumentListItem,
   MemberProfile,
   MemberProfileInput,
   MemberStatus,
@@ -24,6 +26,7 @@ export type RosterQuery = {
   section?: Section;
   status?: MemberStatus;
   instrumentId?: string;
+  functionId?: string;
   withProfile?: boolean;
   page: number;
   limit?: number;
@@ -42,6 +45,7 @@ export const membersService = {
           section: query.section,
           status: query.status,
           instrumentId: query.instrumentId,
+          functionId: query.functionId,
           withProfile: query.withProfile,
         },
         page: { page: query.page, limit: query.limit ?? 10 },
@@ -100,6 +104,30 @@ export const membersService = {
       variables: { includeArchived },
     });
     return instruments;
+  },
+
+  async instrumentsPage(
+    token: string,
+    query: {
+      search: string;
+      section?: Section;
+      archived: boolean;
+      page: number;
+      limit: number;
+    },
+  ): Promise<Paginated<InstrumentListItem>> {
+    const { instrumentsPage } = await backendGraphql(instrumentsPageDocument, {
+      token,
+      variables: {
+        filter: {
+          search: query.search || undefined,
+          section: query.section,
+          archived: query.archived,
+        },
+        page: { page: query.page, limit: query.limit },
+      },
+    });
+    return instrumentsPage;
   },
 
   async createInstrument(

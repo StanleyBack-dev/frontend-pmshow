@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ClipboardList, ExternalLink, FileDown } from "lucide-react";
+import { ArrowLeft, ClipboardList, ExternalLink } from "lucide-react";
 import {
   Alert,
   Badge,
@@ -21,6 +21,7 @@ import {
 } from "@/features/events/model/event-labels";
 import { AckActions } from "@/features/rosters/components/AckActions";
 import { RosterList } from "@/features/rosters/components/RosterList";
+import { RosterPdfActions } from "@/features/rosters/components/RosterPdfActions";
 import { authed, getSessionUser } from "@/server/auth/current-user";
 import { BackendError } from "@/server/http/backend-error";
 import { eventsService } from "@/server/services/events.service";
@@ -60,10 +61,16 @@ export default async function EventPage({
     }
   });
 
-  const editable = canManage && event.status !== "REALIZADO";
   const open = event.status === "PLANEJADO" || event.status === "CONFIRMADO";
+  // Cancelled stays locked until "Reabrir"; done is final.
+  const editable = canManage && open;
   const myLine = roster?.assignments.find((line) => line.userId === user.id);
-  const canAnswer = roster?.status === "PUBLICADA" && myLine && open;
+  // Working days (expediente) are only announced: nothing to answer.
+  const canAnswer =
+    roster?.status === "PUBLICADA" &&
+    myLine &&
+    open &&
+    event.type !== "EXPEDIENTE";
   const status = EVENT_STATUS[event.status];
   const schedule: [string, string][] = [
     ["Data", formatLongDay(event.startsAt)],
@@ -110,7 +117,14 @@ export default async function EventPage({
           action={
             canManage ? (
               <span className="flex flex-wrap justify-end gap-2">
-                {editable && <EditEventButton event={event} venues={venues} />}
+                {editable && (
+                  <EditEventButton
+                    event={event}
+                    venues={venues}
+                    canBuildRoster={canBuildRoster}
+                    canPublishRoster={can(user, "ROSTERS_PUBLISH")}
+                  />
+                )}
                 <EventStatusActions event={event} />
               </span>
             ) : undefined
@@ -189,15 +203,10 @@ export default async function EventPage({
               roster || (canBuildRoster && open) ? (
                 <span className="flex flex-wrap justify-end gap-2">
                   {roster && (
-                    // A file download, not a page: plain anchor on purpose.
-                    <a
-                      href={`/api/events/${event.id}/roster/pdf`}
-                      download
-                      className={buttonClasses("ghost", "sm")}
-                    >
-                      <FileDown className="size-4" />
-                      PDF
-                    </a>
+                    <RosterPdfActions
+                      eventId={event.id}
+                      eventTitle={event.title}
+                    />
                   )}
                   {canBuildRoster && open && (
                     <Link

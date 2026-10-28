@@ -38,6 +38,7 @@ export const memberProfileInputSchema = z.object({
   instruments: z
     .array(z.object({ instrumentId: z.uuid(), primary: z.boolean() }))
     .max(10),
+  functionIds: z.array(z.uuid()).max(10).default([]),
 });
 
 export const instrumentInputSchema = z.object({

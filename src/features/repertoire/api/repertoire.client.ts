@@ -1,4 +1,7 @@
-import { ApiClientError, apiRequest } from "@/shared/lib/api-client";
+import { apiRequest } from "@/shared/lib/api-client";
+
+// Sends a file straight to storage with a signed form (shared helper).
+export { uploadToStorage } from "@/shared/lib/storage-upload";
 import type {
   AudioUploadTicket,
   LyricsResult,
@@ -58,49 +61,6 @@ export const repertoireClient = {
       json("POST", { durationSeconds }),
     ),
 };
-
-/**
- * Sends the file straight to storage with the signed form (never through
- * our servers). XHR rather than fetch, for upload progress.
- */
-export function uploadToStorage(
-  ticket: AudioUploadTicket,
-  file: File,
-  onProgress: (fraction: number) => void,
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const form = new FormData();
-    for (const [key, value] of Object.entries(ticket.upload.fields)) {
-      form.append(key, value);
-    }
-    form.append("file", file); // must be the last field
-
-    const request = new XMLHttpRequest();
-    request.open("POST", ticket.upload.url);
-    request.upload.onprogress = (event) => {
-      if (event.lengthComputable) onProgress(event.loaded / event.total);
-    };
-    request.onload = () =>
-      request.status >= 200 && request.status < 300
-        ? resolve()
-        : reject(
-            new ApiClientError(
-              request.status,
-              "STORAGE_UPLOAD_FAILED",
-              "O armazenamento recusou o arquivo. Tente novamente.",
-            ),
-          );
-    request.onerror = () =>
-      reject(
-        new ApiClientError(
-          0,
-          "STORAGE_UNREACHABLE",
-          "Falha de conexão ao enviar o arquivo.",
-        ),
-      );
-    request.send(form);
-  });
-}
 
 /** Duration read by the browser from the local file (null if unknown). */
 export function readAudioDuration(file: File): Promise<number | null> {

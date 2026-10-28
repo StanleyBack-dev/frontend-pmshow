@@ -102,6 +102,19 @@ export const formatDateTime = (iso: string) =>
 /** "sáb., 15 de nov.". */
 export const formatShortDay = (iso: string) =>
   shortDayFormat.format(new Date(iso));
+/** { weekday: "sáb", day: "15", month: "nov" }: a calendar-style date chip. */
+export function dateParts(iso: string) {
+  const parts = Object.fromEntries(
+    shortDayFormat
+      .formatToParts(new Date(iso))
+      .map((part) => [part.type, part.value.replace(".", "")]),
+  );
+  return {
+    weekday: parts.weekday ?? "",
+    day: parts.day ?? "",
+    month: parts.month ?? "",
+  };
+}
 /** "2026-11" → "novembro de 2026". */
 export const formatMonth = (month: string) =>
   monthFormat.format(new Date(`${month}-01T12:00:00Z`));

@@ -2,9 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Map, MapPin, Plus } from "lucide-react";
 import {
-  Alert,
+  Building2,
+  ExternalLink,
+  Map,
+  MapPin,
+  Plus,
+  Wand2,
+} from "lucide-react";
+import {
   Button,
   Drawer,
   Field,
@@ -15,6 +21,7 @@ import {
 } from "@/design-system";
 import { eventsClient } from "@/features/events/api/events.client";
 import { BR_STATES } from "@/features/events/model/event-labels";
+import { mapsSearchUrl } from "@/features/events/model/venue-map";
 import type { Venue, VenueInput } from "@/shared/contracts/events";
 import { ApiClientError } from "@/shared/lib/api-client";
 import {
@@ -24,6 +31,7 @@ import {
   urlError,
   zipCodeError,
 } from "@/shared/lib/masks";
+import { useToast } from "@/shared/toast/useToast";
 
 type Form = {
   name: string;
@@ -64,6 +72,8 @@ const toInput = (form: Form): VenueInput => ({
   notes: form.notes || null,
 });
 
+const NO_NUMBER = "S/N";
+
 // Create (no `venue`) or edit a venue: name, address in parts (the CEP
 // fills street, district, city and UF) and the map link.
 export function VenueFormDrawer({
@@ -77,17 +87,27 @@ export function VenueFormDrawer({
   onSaved: (venue: Venue) => void;
 }) {
   const [form, setForm] = useState<Form>(() => fromVenue(venue));
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
   const [lookup, setLookup] = useState<"idle" | "busy" | "missing">("idle");
   const [touched, setTouched] = useState(false);
+  // The map link follows the address until someone types their own link
+  // (a new venue, or one whose link was generated the same way).
+  const [autoMap, setAutoMap] = useState(() => {
+    const saved = venue?.mapsUrl;
+    return !saved || saved === mapsSearchUrl(fromVenue(venue));
+  });
   const set = <K extends keyof Form>(key: K, value: Form[K]) =>
     setForm((current) => ({ ...current, [key]: value }));
 
+  // "Sem número" is stored as S/N and locks the number field.
+  const noNumber = form.number === NO_NUMBER;
+  const generatedMap = mapsSearchUrl(form);
+  const mapsUrl = autoMap ? (generatedMap ?? "") : form.mapsUrl;
   const errors = {
     zipCode: zipCodeError(form.zipCode),
     number: addressNumberError(form.number),
-    mapsUrl: urlError(form.mapsUrl),
+    mapsUrl: urlError(mapsUrl),
     city: form.city.trim() ? null : "Informe a cidade.",
   };
   const invalid = Object.values(errors).some(Boolean);
@@ -116,19 +136,18 @@ export function VenueFormDrawer({
 
   async function submit() {
     setTouched(true);
-    if (invalid) return setError("Corrija os campos destacados.");
+    if (invalid) return showError("Corrija os campos destacados.");
     setPending(true);
-    setError(null);
     try {
       const saved = venue
         ? await eventsClient.updateVenue(venue.id, {
-            ...toInput(form),
+            ...toInput({ ...form, mapsUrl }),
             archived: venue.archived,
           })
-        : await eventsClient.createVenue(toInput(form));
+        : await eventsClient.createVenue(toInput({ ...form, mapsUrl }));
       onSaved(saved);
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar o local.",
@@ -166,8 +185,6 @@ export function VenueFormDrawer({
           void submit();
         }}
       >
-        {error && <Alert tone="danger">{error}</Alert>}
-
         <FormSection
           icon={<Building2 />}
           title="O local"
@@ -219,15 +236,30 @@ export function VenueFormDrawer({
             </p>
           )}
           <div className="grid gap-4 sm:grid-cols-[8rem_1fr_1fr]">
-            <Field
-              label="Número"
-              placeholder="123 ou S/N"
-              value={form.number}
-              onChange={(event) =>
-                set("number", maskAddressNumber(event.target.value))
-              }
-              error={errors.number ?? undefined}
-            />
+            <div className="space-y-2">
+              <Field
+                label="Número"
+                inputMode="numeric"
+                placeholder={noNumber ? "S/N" : "Ex.: 123"}
+                disabled={noNumber}
+                value={noNumber ? "" : form.number}
+                onChange={(event) =>
+                  set("number", maskAddressNumber(event.target.value))
+                }
+                error={errors.number ?? undefined}
+              />
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] text-muted">
+                <input
+                  type="checkbox"
+                  className="size-4 accent-[var(--accent)]"
+                  checked={noNumber}
+                  onChange={(event) =>
+                    set("number", event.target.checked ? NO_NUMBER : "")
+                  }
+                />
+                Sem número
+              </label>
+            </div>
             <Field
               label="Complemento"
               placeholder="Ex.: Bloco B, portão 2"
@@ -263,17 +295,58 @@ export function VenueFormDrawer({
         <FormSection
           icon={<Map />}
           title="Mapa e observações"
-          description="Opcional: o link abre o mapa no celular de quem vai ao evento."
+          description="O link do mapa sai do endereço; troque por outro se quiser."
         >
-          <Field
-            label="Link do mapa"
-            type="url"
-            inputMode="url"
-            placeholder="https://maps.app.goo.gl/…"
-            value={form.mapsUrl}
-            onChange={(event) => set("mapsUrl", event.target.value)}
-            error={errors.mapsUrl ?? undefined}
-          />
+          <div className="space-y-2">
+            <Field
+              label="Link do mapa"
+              type="url"
+              inputMode="url"
+              placeholder={
+                autoMap
+                  ? "Preencha o endereço para gerar o link"
+                  : "https://maps.app.goo.gl/…"
+              }
+              value={mapsUrl}
+              onChange={(event) => {
+                setAutoMap(false);
+                set("mapsUrl", event.target.value);
+              }}
+              error={errors.mapsUrl ?? undefined}
+              trailing={
+                mapsUrl && !errors.mapsUrl ? (
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Conferir no mapa"
+                    aria-label="Conferir no mapa"
+                    className="grid size-8 place-items-center rounded-md text-accent hover:bg-accent-soft"
+                  >
+                    <ExternalLink className="size-4" />
+                  </a>
+                ) : undefined
+              }
+            />
+            {autoMap ? (
+              <p className="text-xs text-soft">
+                {generatedMap
+                  ? "Gerado pelo endereço e atualizado sozinho. Confira no ícone ao lado; se o ponto não estiver certo, cole o link do lugar exato."
+                  : "Assim que houver rua (ou o nome do lugar) e cidade, o link é gerado."}
+              </p>
+            ) : (
+              generatedMap && (
+                <button
+                  type="button"
+                  onClick={() => setAutoMap(true)}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
+                >
+                  <Wand2 aria-hidden className="size-3.5" />
+                  Gerar pelo endereço
+                </button>
+              )
+            )}
+          </div>
           <TextArea
             label="Observações"
             rows={2}

@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, X } from "lucide-react";
-import { Alert, Button, Modal, TextArea } from "@/design-system";
+import { Ban, Check, Paperclip, X } from "lucide-react";
+import { Button, Modal, TextArea } from "@/design-system";
 import { absencesClient } from "@/features/availability/api/absences.client";
+import {
+  ABSENCE_TYPE_LABELS,
+  formatPeriod,
+} from "@/features/availability/model/absence-labels";
 import type { Absence } from "@/shared/contracts/absences";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 type Dialog = "approve" | "deny" | "cancel";
 
@@ -22,21 +27,23 @@ export function AbsenceActions({
   absence,
   canReview,
   canCancel,
+  fill = false,
 }: {
   absence: Absence;
   canReview: boolean;
   canCancel: boolean;
+  /** Phones' collapse: the buttons share the width, centered. */
+  fill?: boolean;
 }) {
   const router = useRouter();
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const [note, setNote] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function run() {
     if (!dialog) return;
     setPending(true);
-    setError(null);
     try {
       if (dialog === "cancel") await absencesClient.cancel(absence.id);
       else
@@ -48,7 +55,7 @@ export function AbsenceActions({
       setDialog(null);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError ? cause.message : "Não foi possível.",
       );
     }
@@ -57,7 +64,6 @@ export function AbsenceActions({
 
   const openDialog = (kind: Dialog) => {
     setNote("");
-    setError(null);
     setDialog(kind);
   };
 
@@ -66,7 +72,13 @@ export function AbsenceActions({
 
   return (
     <>
-      <div className="flex flex-wrap gap-2">
+      <div
+        className={
+          fill
+            ? "grid auto-cols-fr grid-flow-col gap-2 [&>button]:justify-center"
+            : "flex flex-wrap gap-2"
+        }
+      >
         {reviewable && (
           <>
             <Button
@@ -89,7 +101,7 @@ export function AbsenceActions({
         {canCancel && (
           <Button
             size="sm"
-            variant="ghost"
+            variant="danger"
             onClick={() => openDialog("cancel")}
           >
             Cancelar
@@ -100,6 +112,15 @@ export function AbsenceActions({
         open={dialog !== null}
         onClose={() => setDialog(null)}
         title={dialog ? DIALOGS[dialog].title : ""}
+        icon={
+          dialog === "approve" ? (
+            <Check className="size-5" />
+          ) : dialog === "deny" ? (
+            <X className="size-5" />
+          ) : (
+            <Ban className="size-5" />
+          )
+        }
         tone={dialog === "approve" ? "neutral" : "danger"}
         busy={pending}
         footer={
@@ -121,8 +142,8 @@ export function AbsenceActions({
           </>
         }
       >
-        <div className="space-y-3">
-          {error && <Alert tone="danger">{error}</Alert>}
+        <div className="space-y-4">
+          <AbsenceSummary absence={absence} />
           {dialog === "cancel" ? (
             <p>
               A indisponibilidade deixa de valer e a pessoa volta a poder ser
@@ -146,5 +167,48 @@ export function AbsenceActions({
         </div>
       </Modal>
     </>
+  );
+}
+
+// What the dialog is about: who, which kind and when.
+function AbsenceSummary({ absence }: { absence: Absence }) {
+  const files = absence.attachments.length;
+  return (
+    <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 rounded-lg border border-border bg-surface-muted px-4 py-3">
+      <dt className="text-soft">Integrante</dt>
+      <dd className="font-medium break-words text-fg">
+        {absence.userName}
+        {absence.warName && (
+          <span className="block text-xs font-normal text-soft">
+            {absence.warName}
+          </span>
+        )}
+      </dd>
+      <dt className="text-soft">Tipo</dt>
+      <dd className="break-words text-fg">
+        {ABSENCE_TYPE_LABELS[absence.type]}
+      </dd>
+      <dt className="text-soft">Período</dt>
+      <dd className="break-words text-fg">
+        {formatPeriod(absence.startsOn, absence.endsOn)}
+      </dd>
+      {absence.reason && (
+        <>
+          <dt className="text-soft">Motivo</dt>
+          <dd className="line-clamp-3 break-words whitespace-pre-line text-fg">
+            {absence.reason}
+          </dd>
+        </>
+      )}
+      {files > 0 && (
+        <>
+          <dt className="text-soft">Anexos</dt>
+          <dd className="inline-flex items-center gap-1 text-fg">
+            <Paperclip aria-hidden className="size-3.5 text-soft" />
+            {files} {files === 1 ? "arquivo" : "arquivos"}
+          </dd>
+        </>
+      )}
+    </dl>
   );
 }

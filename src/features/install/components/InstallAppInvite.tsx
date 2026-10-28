@@ -14,8 +14,9 @@ import { usePlayer } from "@/features/player/components/PlayerProvider";
 
 const noopSubscribe = () => () => {};
 
-// One-time invitation to install the app, shown as a small card in the
-// corner. Once the user installs or closes it, it never comes back on this
+// One-time invitation to install the app: on phones a card stuck to the
+// bottom that still takes its room in the page (nothing stays hidden under
+// it); on larger screens a small card floating in the corner. Once the user installs or closes it, it never comes back on this
 // browser; the option stays available in Minha conta. It steps aside while
 // the player is open, so it never covers the player controls.
 export function InstallAppInvite() {
@@ -50,7 +51,7 @@ export function InstallAppInvite() {
   return (
     <aside
       aria-label="Instalar o aplicativo"
-      className="fixed inset-x-4 bottom-4 z-40 rounded-lg border border-border bg-surface p-4 shadow-card sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-80"
+      className="sticky bottom-4 z-40 mx-4 mb-4 rounded-lg border border-border bg-surface p-4 shadow-card sm:fixed sm:right-6 sm:bottom-6 sm:mx-0 sm:mb-0 sm:w-80"
     >
       <div className="flex items-start gap-3">
         <span className="grid size-9 shrink-0 place-items-center rounded-md bg-accent-soft text-accent">

@@ -16,8 +16,11 @@ type ModalProps = {
   footer?: ReactNode;
   /** Blocks closing (Esc / backdrop) while an action is in flight. */
   busy?: boolean;
-  /** "lg" for dialogs that show a list (e.g. search results). */
-  size?: "md" | "lg";
+  /**
+   * "lg" for dialogs that show a list (e.g. search results); "xl" for a
+   * full workspace (e.g. building a roster).
+   */
+  size?: "md" | "lg" | "xl";
 };
 
 // Centered dialog for short, focused steps (confirmations, a reason to
@@ -63,9 +66,13 @@ export function Modal({
       onClick={(event) => {
         if (event.target === ref.current && !busy) onClose();
       }}
+      // The dialog renders where it's declared (often a table cell), so it
+      // resets the text styles it would inherit from there (nowrap,
+      // right-aligned…).
       className={cn(
-        "m-auto w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-border bg-surface p-0 text-fg shadow-pop backdrop:bg-black/55 backdrop:backdrop-blur-sm",
-        size === "lg" ? "max-w-2xl" : "max-w-md",
+        "m-auto w-[calc(100%-2rem)] overflow-hidden whitespace-normal text-left font-normal normal-case tracking-normal",
+        "rounded-lg border border-border bg-surface p-0 text-fg shadow-pop backdrop:bg-black/55 backdrop:backdrop-blur-sm",
+        size === "xl" ? "max-w-6xl" : size === "lg" ? "max-w-2xl" : "max-w-md",
       )}
     >
       <div className="flex items-center gap-3 border-b border-chrome-line bg-chrome px-5 py-4">
@@ -97,11 +104,12 @@ export function Modal({
           <X className="size-[18px]" />
         </button>
       </div>
-      <div className="px-5 py-5 text-[13px] leading-relaxed text-muted">
+      {/* Long content scrolls inside, header and footer stay put. */}
+      <div className="max-h-[calc(100dvh-11rem)] overflow-y-auto px-5 py-5 text-[13px] leading-relaxed text-muted">
         {children}
       </div>
       {footer && (
-        <div className="flex justify-end gap-2 border-t border-border bg-surface-muted px-5 py-3.5">
+        <div className="flex flex-wrap justify-end gap-2 border-t border-border bg-surface-muted px-5 py-3.5 max-sm:[&>*]:flex-1 max-sm:[&>*]:justify-center">
           {footer}
         </div>
       )}

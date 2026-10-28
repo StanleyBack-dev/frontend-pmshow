@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Archive, ArchiveRestore, Music, Pencil } from "lucide-react";
-import { Alert, Badge, DataTable, type DataTableColumn } from "@/design-system";
+import { Badge, DataTable, type DataTableColumn } from "@/design-system";
 import { artistsClient } from "@/features/artists/api/artists.client";
 import { ArtistFormDrawer } from "@/features/artists/components/ArtistFormDrawer";
 import { auditColumn } from "@/features/audit/components/RecordAudit";
 import { ArtistSongsDrawer } from "@/features/artists/components/ArtistSongsDrawer";
 import type { ArtistListItem } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 const iconButton =
   "grid size-8 place-items-center rounded-md text-soft transition-colors hover:bg-surface-muted hover:text-fg disabled:opacity-40";
@@ -20,12 +21,10 @@ const iconButton =
 export function ArtistsTable({
   artists,
   canManage,
-  canAudit,
 }: {
   artists: ArtistListItem[];
   canManage: boolean;
   /** Shows the audit column (desktop) / section (phones). */
-  canAudit: boolean;
 }) {
   const audit = auditColumn((artist: ArtistListItem) => ({
     entity: "artist" as const,
@@ -37,11 +36,10 @@ export function ArtistsTable({
   const [editing, setEditing] = useState<ArtistListItem | null>(null);
   const [listing, setListing] = useState<ArtistListItem | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
 
   async function toggleArchived(artist: ArtistListItem) {
     setBusyId(artist.id);
-    setError(null);
     try {
       await artistsClient.update(artist.id, {
         name: artist.name,
@@ -49,7 +47,7 @@ export function ArtistsTable({
       });
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível alterar.",
@@ -164,16 +162,11 @@ export function ArtistsTable({
 
   return (
     <>
-      {error && (
-        <div className="p-3">
-          <Alert tone="danger">{error}</Alert>
-        </div>
-      )}
       <DataTable
         rows={artists}
-        columns={canAudit ? [...columns, audit.column] : columns}
+        columns={[...columns, audit.column]}
         getId={(item) => item.id}
-        renderExpanded={canAudit ? audit.renderExpanded : undefined}
+        renderExpanded={audit.renderExpanded}
       />
       {/* Remounted on each open, so the form starts from the row. */}
       {listing && (

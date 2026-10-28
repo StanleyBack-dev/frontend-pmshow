@@ -12,7 +12,7 @@ export function createNonce(): string {
 export function contentSecurityPolicy(options: {
   nonce: string;
   isDev: boolean;
-  /** Origin of the audio storage (signed URLs, uploads); null = none yet. */
+  /** Origin of the storage (audio, photos: signed URLs); null = none yet. */
   mediaOrigin: string | null;
 }): string {
   const media = options.mediaOrigin ? ` ${options.mediaOrigin}` : "";
@@ -23,7 +23,7 @@ export function contentSecurityPolicy(options: {
     `style-src 'self' 'nonce-${options.nonce}'`,
     // style="" attributes (next/image, progress bars) can't carry a nonce.
     "style-src-attr 'unsafe-inline'",
-    "img-src 'self' blob: data:",
+    `img-src 'self' blob: data:${media}`,
     "font-src 'self'",
     `media-src 'self' blob:${media}`,
     `connect-src 'self'${media}`,

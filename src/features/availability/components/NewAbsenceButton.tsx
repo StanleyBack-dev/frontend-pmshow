@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import {
-  Alert,
   Button,
   Field,
   Drawer,
@@ -13,12 +12,15 @@ import {
   type ButtonVariant,
 } from "@/design-system";
 import { absencesClient } from "@/features/availability/api/absences.client";
+import { AttachmentPicker } from "@/features/availability/components/AttachmentPicker";
 import {
   ABSENCE_TYPES,
   ABSENCE_TYPE_LABELS,
 } from "@/features/availability/model/absence-labels";
 import type { AbsenceType } from "@/shared/contracts/absences";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { uploadToStorage } from "@/shared/lib/storage-upload";
+import { useToast } from "@/shared/toast/useToast";
 
 type Member = { userId: string; label: string };
 
@@ -42,7 +44,8 @@ export function NewAbsenceButton({
   const [startsOn, setStartsOn] = useState("");
   const [endsOn, setEndsOn] = useState("");
   const [reason, setReason] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const { showError, showSuccess } = useToast();
   const [pending, setPending] = useState(false);
 
   const forSomeone = members !== undefined;
@@ -58,21 +61,41 @@ export function NewAbsenceButton({
     setStartsOn("");
     setEndsOn("");
     setReason("");
-    setError(null);
+    setFiles([]);
     setOpen(true);
   }
 
   async function submit() {
     setPending(true);
-    setError(null);
     const input = { type, startsOn, endsOn, reason: reason.trim() || null };
     try {
-      if (forSomeone) await absencesClient.register(userId, input);
-      else await absencesClient.request(input);
+      if (forSomeone) {
+        await absencesClient.register(userId, input);
+      } else {
+        // The files go straight to storage first; the request then names them.
+        const uploads =
+          files.length > 0 ? await absencesClient.attachmentUploads(files) : [];
+        await Promise.all(
+          uploads.map((ticket, index) =>
+            uploadToStorage(ticket, files[index]!, () => {}),
+          ),
+        );
+        await absencesClient.request({
+          ...input,
+          attachments: uploads.map((ticket, index) => ({
+            storageKey: ticket.storageKey,
+            fileName: files[index]!.name,
+          })),
+        });
+      }
+      showSuccess(
+        forSomeone ? "Indisponibilidade lançada." : "Pedido enviado.",
+        forSomeone ? undefined : "Um gestor analisa e você recebe a resposta.",
+      );
       setOpen(false);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError ? cause.message : "Não foi possível.",
       );
     }
@@ -111,7 +134,6 @@ export function NewAbsenceButton({
         }
       >
         <div className="space-y-4">
-          {error && <Alert tone="danger">{error}</Alert>}
           {forSomeone ? (
             <p className="text-sm text-muted">
               Entra já aprovada e bloqueia a pessoa nas escalas do período.
@@ -175,6 +197,13 @@ export function NewAbsenceButton({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
+          {!forSomeone && (
+            <AttachmentPicker
+              files={files}
+              onChange={setFiles}
+              disabled={pending}
+            />
+          )}
         </div>
       </Drawer>
     </>

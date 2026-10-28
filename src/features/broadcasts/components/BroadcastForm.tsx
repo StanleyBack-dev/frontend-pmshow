@@ -16,6 +16,7 @@ import {
 import type { BroadcastAudience } from "@/shared/contracts/broadcasts";
 import type { Section } from "@/shared/contracts/members";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 type EventOption = { id: string; label: string };
 
@@ -31,7 +32,7 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
   const [sendEmail, setSendEmail] = useState(true);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [sent, setSent] = useState<string | null>(null);
 
   const target =
@@ -47,7 +48,6 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
 
   async function send() {
     setPending(true);
-    setError(null);
     try {
       const result = await broadcastsClient.send({
         title: title.trim(),
@@ -64,7 +64,7 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
       setBody("");
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível enviar.",
@@ -76,7 +76,6 @@ export function BroadcastForm({ events }: { events: EventOption[] }) {
 
   return (
     <div className="space-y-4">
-      {error && <Alert tone="danger">{error}</Alert>}
       {sent && <Alert tone="success">{sent}</Alert>}
       <div className="grid gap-4 sm:grid-cols-2">
         <Select

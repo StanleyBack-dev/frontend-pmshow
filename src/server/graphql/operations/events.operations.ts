@@ -88,6 +88,10 @@ export const eventsDocument = graphql(`
   query Events($filter: EventFilterInput) {
     events(filter: $filter) {
       ...EventFields
+      myAssignment {
+        functionName
+        instrumentName
+      }
     }
   }
 `);

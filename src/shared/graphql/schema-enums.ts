@@ -23,15 +23,6 @@ export type AckStatus =
   | 'PENDENTE'
   | 'TROCA_SOLICITADA';
 
-/** Função na escala. */
-export type AssignmentRole =
-  | 'APOIO'
-  | 'CHEFE_EQUIPE'
-  | 'MOTORISTA'
-  | 'MUSICO'
-  | 'REGENTE'
-  | 'SOM';
-
 /** Quem recebe o comunicado. */
 export type BroadcastAudience =
   | 'ESCALA_EVENTO'
@@ -48,6 +39,25 @@ export type CandidateBlocker =
   | 'INACTIVE'
   /** Sem cadastro ativo na banda. */
   | 'NO_PROFILE';
+
+/** Para quem é o expediente. */
+export type DutyAudienceKind =
+  /** Toda a banda (integrantes ativos). */
+  | 'ALL'
+  /** Os músicos escolhidos. */
+  | 'MEMBERS'
+  /** Os naipes escolhidos. */
+  | 'SECTIONS';
+
+export type DutyScheduleStatus =
+  | 'ATIVA'
+  | 'CANCELADA';
+
+/** Situação do cadastro enviado pelo link público. */
+export type EnrollmentStatus =
+  | 'APROVADA'
+  | 'PENDENTE'
+  | 'RECUSADA';
 
 /** Próximos (a partir de agora) ou passados. */
 export type EventPeriod =
@@ -66,6 +76,7 @@ export type EventType =
   | 'CULTO_MISSA'
   | 'DESFILE'
   | 'ENSAIO'
+  | 'EXPEDIENTE'
   | 'FORMATURA'
   | 'OUTRO'
   | 'SHOW'
@@ -94,14 +105,28 @@ export type MemberStatus =
   | 'ATIVO'
   | 'INATIVO';
 
+/** Aba de Minhas escalas. */
+export type MyAssignmentTab =
+  /** Eventos com ciência confirmada. */
+  | 'ACKNOWLEDGED'
+  /** Dias de expediente (sem ciência). */
+  | 'DUTY'
+  /** Eventos aguardando ciência (ou com troca pedida). */
+  | 'PENDING';
+
 export type NotificationType =
+  | 'ABSENCE_REQUESTED'
   | 'ABSENCE_REVIEWED'
   | 'BROADCAST'
+  | 'DUTY_CANCELLED'
+  | 'DUTY_SCHEDULED'
+  | 'ENROLLMENT_SUBMITTED'
   | 'EVENT_CANCELLED'
   | 'EVENT_REMINDER'
   | 'EVENT_RESCHEDULED'
   | 'ROSTER_PUBLISHED'
   | 'ROSTER_REMOVED'
+  | 'ROSTER_SWAP_DECLINED'
   | 'ROSTER_SWAP_REQUESTED'
   | 'ROSTER_UPDATED';
 
@@ -150,7 +175,6 @@ export type RosterStatus =
 
 /** Naipe da banda. */
 export type Section =
-  | 'APOIO'
   | 'CORDAS_BASE'
   | 'MADEIRAS'
   | 'METAIS'

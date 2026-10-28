@@ -3,26 +3,31 @@
 import { Badge, DataTable, type DataTableColumn } from "@/design-system";
 import { auditColumn } from "@/features/audit/components/RecordAudit";
 import { MemberProfileButton } from "@/features/members/components/MemberProfileButton";
+import { RankBadge } from "@/features/members/components/RankBadge";
 import {
-  RANK_LABELS,
   SECTION_LABELS,
   STATUS_LABELS,
   formatPhone,
 } from "@/features/members/model/member-labels";
-import type { Instrument, RosterEntry } from "@/shared/contracts/members";
+import type {
+  BandFunction,
+  Instrument,
+  RosterEntry,
+} from "@/shared/contracts/members";
 
-// The band's people (amoremio table): war name, section, instruments,
-// phone and status; managers edit the band profile at the end of the row.
+// The band's people (amoremio table): full name, war name, rank, section,
+// instruments, functions, phone and status; managers edit the band profile at the end
+// of the row. Phones: war name over the full name, the rest in the collapse.
 export function MembersTable({
   roster,
   instruments,
+  functions,
   canManage,
-  canAudit,
 }: {
   roster: RosterEntry[];
   instruments: Instrument[];
+  functions: BandFunction[];
   canManage: boolean;
-  canAudit: boolean;
 }) {
   const audit = auditColumn((entry: RosterEntry) => ({
     entity: "member" as const,
@@ -31,20 +36,8 @@ export function MembersTable({
   }));
   const columns: DataTableColumn<RosterEntry>[] = [
     {
-      key: "member",
-      label: "Integrante",
-      mobile: "title",
-      render: ({ profile, name }) => (
-        <span className="font-medium text-fg">
-          {profile
-            ? `${RANK_LABELS[profile.rank].short} ${profile.warName}`
-            : name}
-        </span>
-      ),
-    },
-    {
       key: "name",
-      label: "Nome",
+      label: "Nome completo",
       mobile: "subtitle",
       render: ({ profile, name, active }) => (
         <span className="text-muted">
@@ -52,6 +45,21 @@ export function MembersTable({
           {!active && " · acesso desativado"}
         </span>
       ),
+    },
+    {
+      key: "warName",
+      label: "Nome de guerra",
+      mobile: "title",
+      render: ({ profile, name }) => (
+        <span className="font-medium text-fg">{profile?.warName ?? name}</span>
+      ),
+    },
+    {
+      key: "rank",
+      label: "Posto/Graduação",
+      className: "whitespace-nowrap",
+      render: ({ profile }) =>
+        profile ? <RankBadge rank={profile.rank} /> : "—",
     },
     {
       key: "section",
@@ -67,6 +75,14 @@ export function MembersTable({
           ? profile.instruments
               .map((item) => (item.primary ? `${item.name} ★` : item.name))
               .join(", ")
+          : "—",
+    },
+    {
+      key: "functions",
+      label: "Funções",
+      render: ({ profile }) =>
+        profile?.functions.length
+          ? profile.functions.map((item) => item.name).join(", ")
           : "—",
     },
     {
@@ -108,6 +124,7 @@ export function MembersTable({
                 name={entry.name}
                 profile={entry.profile}
                 instruments={instruments}
+                functions={functions}
               />
             ),
           },
@@ -118,9 +135,9 @@ export function MembersTable({
   return (
     <DataTable
       rows={roster}
-      columns={canAudit ? [...columns, audit.column] : columns}
+      columns={[...columns, audit.column]}
       getId={(entry) => entry.userId}
-      renderExpanded={canAudit ? audit.renderExpanded : undefined}
+      renderExpanded={audit.renderExpanded}
     />
   );
 }

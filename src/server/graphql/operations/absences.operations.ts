@@ -13,7 +13,35 @@ export const absenceFieldsFragment = graphql(`
     status
     reviewNote
     reviewedAt
+    reviewedByName
+    cancelledAt
+    cancelledByName
+    registered
     createdAt
+    attachments {
+      id
+      fileName
+      mimeType
+      sizeBytes
+    }
+  }
+`);
+
+export const requestAbsenceAttachmentUploadsDocument = graphql(`
+  mutation RequestAbsenceAttachmentUploads($files: [AttachmentFileInput!]!) {
+    requestAbsenceAttachmentUploads(files: $files) {
+      storageKey
+      upload {
+        url
+        fields
+      }
+    }
+  }
+`);
+
+export const absenceAttachmentUrlDocument = graphql(`
+  query AbsenceAttachmentUrl($id: ID!, $download: Boolean!) {
+    absenceAttachmentUrl(id: $id, download: $download)
   }
 `);
 

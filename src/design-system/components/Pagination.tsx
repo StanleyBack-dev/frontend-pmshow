@@ -2,7 +2,10 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { buttonClasses } from "@/design-system/components/Button";
-import { LinkPending } from "@/design-system/components/LinkPending";
+import {
+  LinkPending,
+  LinkPendingSwap,
+} from "@/design-system/components/LinkPending";
 import { PageSizeSelect } from "@/design-system/components/PageSizeSelect";
 import { cn } from "@/design-system/utils/cn";
 
@@ -133,7 +136,7 @@ export function Pagination({
                 aria-label={`Página ${entry}`}
                 className="grid h-8 min-w-8 place-items-center rounded-md px-2 text-fg tabular-nums transition-colors hover:bg-surface-muted"
               >
-                {entry}
+                <LinkPendingSwap>{entry}</LinkPendingSwap>
               </Link>
             ),
           )}

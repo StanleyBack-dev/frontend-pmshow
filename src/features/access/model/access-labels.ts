@@ -7,9 +7,11 @@ export const GROUP_LABELS: Record<UserGroup, string> = {
 };
 
 export const GROUP_DESCRIPTIONS: Record<UserGroup, string> = {
-  USER: "Vê repertório, agenda e as próprias escalas.",
-  ADMIN: "Gerencia repertório, agenda, escalas e os músicos.",
-  ADMIN_MASTER: "Acesso total, inclusive permissões e auditoria.",
+  USER: "Cuida do repertório e dos cantores, vê a agenda, os eventos e as próprias escalas e informa indisponibilidades.",
+  ADMIN:
+    "Tudo do músico, mais eventos, locais, escalas, músicos, indisponibilidades e comunicados.",
+  ADMIN_MASTER:
+    "Acesso total: inclusive usuários, cadastros, permissões e histórico dos registros.",
 };
 
 /** Groups in rank order (lowest first). */
@@ -57,13 +59,19 @@ export const PERMISSION_INFO: Record<Permission, PermissionInfo> = {
     label: "Gerenciar permissões",
     area: "Administração",
   },
-  AUDIT_READ: { label: "Ver a auditoria", area: "Administração" },
+  AUDIT_READ: {
+    label: "Ver quem criou e alterou os registros",
+    area: "Administração",
+  },
 };
 
-/** Only granted by the ADMIN_MASTER group; never per user. */
+/** Only granted by the user's group; never per user. */
 export const LOCKED_PERMISSIONS: ReadonlySet<Permission> = new Set([
+  "USERS_MANAGE",
   "PERMISSIONS_MANAGE",
   "AUDIT_READ",
+  "MEMBERS_READ",
+  "MEMBERS_MANAGE",
 ]);
 
 export const PERMISSION_AREAS: PermissionArea[] = [
@@ -74,47 +82,3 @@ export const PERMISSION_AREAS: PermissionArea[] = [
   "Comunicação",
   "Administração",
 ];
-
-export const AUDIT_ACTION_LABELS: Record<string, string> = {
-  "user.created": "Criou usuário",
-  "user.updated": "Editou usuário",
-  "user.activated": "Ativou usuário",
-  "user.deactivated": "Desativou usuário",
-  "user.password_reset": "Redefiniu a senha",
-  "user.unlocked": "Desbloqueou usuário",
-  "user.sessions_revoked": "Encerrou as sessões",
-  "user.permissions_changed": "Alterou permissões",
-  "user.first_access_completed": "Concluiu o primeiro acesso",
-  "user.password_changed": "Trocou a própria senha",
-  "user.password_recovered": "Recuperou a senha",
-  "user.profile_updated": "Atualizou o perfil",
-  "member.created": "Cadastrou na banda",
-  "member.updated": "Editou o cadastro na banda",
-  "instrument.created": "Criou instrumento / função",
-  "instrument.updated": "Editou instrumento / função",
-  "song.created": "Cadastrou música",
-  "song.updated": "Editou música",
-  "song.archived": "Arquivou música",
-  "song.restored": "Restaurou música",
-  "artist.created": "Cadastrou cantor / banda",
-  "artist.updated": "Editou cantor / banda",
-  "media.video_added": "Adicionou vídeo",
-  "media.audio_uploaded": "Enviou áudio",
-  "media.renamed": "Renomeou mídia",
-  "media.removed": "Removeu mídia",
-  "event.created": "Criou evento",
-  "event.updated": "Editou evento",
-  "event.changed": "Alterou evento",
-  "event.status_changed": "Mudou a situação do evento",
-  "event.setlist_updated": "Alterou a lista de músicas",
-  "venue.created": "Cadastrou local",
-  "venue.updated": "Editou local",
-  "roster.created": "Criou escala",
-  "roster.updated": "Editou escala",
-  "roster.published": "Publicou escala",
-  "roster.acknowledged": "Respondeu à escala",
-  "absence.requested": "Pediu indisponibilidade",
-  "absence.registered": "Registrou indisponibilidade",
-  "absence.cancelled": "Cancelou indisponibilidade",
-  "broadcast.sent": "Enviou comunicado",
-};

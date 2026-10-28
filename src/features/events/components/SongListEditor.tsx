@@ -3,14 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, ListMusic, Save, X } from "lucide-react";
-import {
-  Alert,
-  Button,
-  Combobox,
-  Modal,
-  Select,
-  Spinner,
-} from "@/design-system";
+import { Button, Combobox, Modal, Select, Spinner } from "@/design-system";
 import { artistsClient } from "@/features/artists/api/artists.client";
 import {
   eventsClient,
@@ -23,6 +16,7 @@ import {
 import type { SetlistEntry } from "@/shared/contracts/events";
 import type { Artist, SongCategory } from "@/shared/contracts/repertoire";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 /** A song in an event's list of songs (as edited, before saving). */
 export type SongListRow = {
@@ -127,11 +121,11 @@ export function SongListEditor({
   }, [filter, filterValue, filterKey, query]);
 
   const inList = new Set(rows.map((row) => row.songId));
-  const options = songs.map((song) => ({
+  // Songs already in the list are not offered again.
+  const available = songs.filter((song) => !inList.has(song.id));
+  const options = available.map((song) => ({
     value: song.id,
-    label: inList.has(song.id)
-      ? `${song.title} (já está na lista)`
-      : song.title,
+    label: song.title,
     description: [song.artist, CATEGORY_LABELS[song.category], song.musicalKey]
       .filter(Boolean)
       .join(" · "),
@@ -209,7 +203,11 @@ export function SongListEditor({
         onSelect={add}
         onInputChange={setQuery}
         loading={loading}
-        emptyText="Nenhuma música encontrada"
+        emptyText={
+          songs.length > 0
+            ? "Todas as músicas encontradas já estão na lista"
+            : "Nenhuma música encontrada"
+        }
         footer={
           songs.length >= 100
             ? "Mostrando as 100 primeiras: refine a busca."
@@ -280,7 +278,8 @@ export function SongListEditor({
 /** Loads an event's list of songs (rows) on the client. */
 export function useEventSongList(eventId: string | undefined) {
   const [rows, setRows] = useState<SongListRow[] | null>(eventId ? null : []);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const { showError } = useToast();
 
   useEffect(() => {
     if (!eventId) return;
@@ -291,7 +290,8 @@ export function useEventSongList(eventId: string | undefined) {
       },
       (cause: unknown) => {
         if (!active) return;
-        setError(
+        setFailed(true);
+        showError(
           cause instanceof ApiClientError
             ? cause.message
             : "Não foi possível carregar a lista de músicas.",
@@ -301,9 +301,9 @@ export function useEventSongList(eventId: string | undefined) {
     return () => {
       active = false;
     };
-  }, [eventId]);
+  }, [eventId, showError]);
 
-  return { rows, setRows, error };
+  return { rows, setRows, failed };
 }
 
 // Opened from the events table: only the event's list of songs, saved here.
@@ -317,20 +317,19 @@ export function SongListModal({
   onClose: () => void;
 }) {
   const router = useRouter();
-  const { rows, setRows, error: loadError } = useEventSongList(eventId);
-  const [error, setError] = useState<string | null>(null);
+  const { rows, setRows, failed } = useEventSongList(eventId);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function save() {
     if (!rows) return;
     setPending(true);
-    setError(null);
     try {
       await eventsClient.setSetlist(eventId, toSongListItems(rows));
       router.refresh();
       onClose();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar a lista de músicas.",
@@ -358,13 +357,10 @@ export function SongListModal({
       }
     >
       <div className="space-y-3">
-        {(loadError || error) && (
-          <Alert tone="danger">{loadError ?? error}</Alert>
-        )}
         {rows ? (
           <SongListEditor rows={rows} onChange={setRows} />
         ) : (
-          !loadError && (
+          !failed && (
             <div className="grid place-items-center py-6">
               <Spinner />
             </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Badge, Card, CardBody, CardHeader, PageHeader } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
+import { RecordAuditButton } from "@/features/audit/components/RecordAudit";
 import { BroadcastForm } from "@/features/broadcasts/components/BroadcastForm";
 import { AUDIENCE_LABELS } from "@/features/broadcasts/model/broadcast-labels";
 import { SECTION_LABELS } from "@/features/members/model/member-labels";
@@ -66,6 +67,12 @@ export default async function BroadcastsPage() {
                               AUDIENCE_LABELS.ESCALA_EVENTO)
                             : AUDIENCE_LABELS[item.audience]}
                       </Badge>
+                      <RecordAuditButton
+                        entity="broadcast"
+                        id={item.id}
+                        label={item.title}
+                        createdAt={item.createdAt}
+                      />
                     </div>
                     <p className="line-clamp-3 whitespace-pre-line text-muted">
                       {item.body}

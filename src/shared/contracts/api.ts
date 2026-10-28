@@ -28,6 +28,8 @@ export type SessionUser = {
   group: UserGroup;
   mustChangePassword: boolean;
   permissions: Permission[];
+  /** Short-lived link to the profile photo (null: none). */
+  photoUrl: string | null;
 };
 
 export type UserAccount = {
@@ -74,18 +76,22 @@ export const AUDITED_ENTITIES = [
   "member",
   "event",
   "venue",
+  "instrument",
+  "band_function",
+  "duty_schedule",
+  "absence",
+  "roster",
+  "enrollment_invite",
+  "enrollment_request",
+  "broadcast",
+  "media",
 ] as const;
 export type AuditedEntity = (typeof AUDITED_ENTITIES)[number];
 
-export type AuditEntry = {
-  id: string;
-  actorId: string | null;
-  actorName: string | null;
-  action: string;
-  entity: string;
-  entityId: string | null;
-  before: Record<string, unknown> | null;
-  after: Record<string, unknown> | null;
-  ip: string | null;
+/** Who created a record and who changed it last (its own columns). */
+export type RecordStamp = {
   createdAt: string;
+  createdByName: string | null;
+  updatedAt: string;
+  updatedByName: string | null;
 };

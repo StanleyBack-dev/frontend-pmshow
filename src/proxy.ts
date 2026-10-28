@@ -11,7 +11,7 @@ import { authService } from "@/server/services/auth.service";
 // Pages reachable without a session. Someone already signed in is sent home.
 const PUBLIC_PAGES = new Set(["/entrar", "/recuperar-senha"]);
 // Open to everyone, signed in or not.
-const OPEN_PAGES = new Set(["/termos"]);
+const OPEN_PAGES = new Set(["/termos", "/cadastro"]);
 
 // Keeps the session usable before anything renders. The access cookie
 // expires just before its token; when it is gone but the refresh cookie is
@@ -100,7 +100,7 @@ function loginUrl(request: NextRequest, expired: boolean): URL {
 export const config = {
   matcher: [
     // Everything except static assets, generated icons, the service worker
-    // and the public auth endpoints (login, logout, password recovery).
-    "/((?!_next/static|_next/image|icon.svg|apple-icon|pwa-icon|manifest.webmanifest|robots.txt|sw.js|api/auth/).*)",
+    // and the public endpoints (login, logout, password recovery, sign-up).
+    "/((?!_next/static|_next/image|icon.svg|apple-icon|pwa-icon|manifest.webmanifest|robots.txt|sw.js|api/auth/|api/public/).*)",
   ],
 };

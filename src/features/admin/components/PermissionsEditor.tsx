@@ -12,6 +12,7 @@ import {
 import { adminClient } from "@/features/admin/api/admin.client";
 import type { Permission, PermissionMatrix } from "@/shared/contracts/api";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 const ALL = Object.keys(PERMISSION_INFO) as Permission[];
 
@@ -31,7 +32,7 @@ export function PermissionsEditor({
   const router = useRouter();
   const defaults = useMemo(() => new Set(matrix.defaults), [matrix.defaults]);
   const [selected, setSelected] = useState(() => new Set(matrix.effective));
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [saved, setSaved] = useState(false);
   const [pending, setPending] = useState(false);
 
@@ -54,7 +55,6 @@ export function PermissionsEditor({
 
   async function save(useDefaults: boolean) {
     setPending(true);
-    setError(null);
     setSaved(false);
     try {
       const result = await adminClient.setPermissions(
@@ -67,7 +67,7 @@ export function PermissionsEditor({
       setSaved(true);
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível salvar as permissões.",
@@ -81,7 +81,6 @@ export function PermissionsEditor({
       {!editable && (
         <Alert tone="info">Você não pode alterar as próprias permissões.</Alert>
       )}
-      {error && <Alert tone="danger">{error}</Alert>}
       {saved && (
         <Alert tone="success">Permissões salvas. Valem imediatamente.</Alert>
       )}
@@ -155,8 +154,9 @@ export function PermissionsEditor({
       )}
       <p className="text-xs text-soft">
         <Lock className="mr-1 inline size-3" />
-        Gerenciar permissões e ver a auditoria só podem ser concedidos pelo
-        grupo Administrador geral.
+        As permissões com cadeado vêm só do grupo: dados dos músicos ficam com
+        Gestor e Administrador geral; usuários, permissões e histórico dos
+        registros, só com o Administrador geral.
       </p>
     </div>
   );

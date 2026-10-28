@@ -3,7 +3,8 @@ import { graphql } from "@/server/graphql/generated";
 export const assignmentFieldsFragment = graphql(`
   fragment AssignmentFields on Assignment {
     userId
-    role
+    functionId
+    functionName
     instrumentId
     instrumentName
     notes
@@ -15,6 +16,8 @@ export const assignmentFieldsFragment = graphql(`
       name
       warName
       rank
+      registration
+      phone
       section
     }
   }
@@ -48,12 +51,18 @@ export const rosterCandidatesDocument = graphql(`
       name
       warName
       rank
+      registration
+      phone
       section
       memberStatus
       instruments {
         instrumentId
         name
         primary
+      }
+      functions {
+        functionId
+        name
       }
       blocker
       absence {
@@ -69,28 +78,85 @@ export const rosterCandidatesDocument = graphql(`
   }
 `);
 
-export const myAssignmentsDocument = graphql(`
-  query MyAssignments {
-    myAssignments {
-      eventId
-      role
-      instrumentId
-      instrumentName
-      ackStatus
-      ackNote
-      event {
+export const myAssignmentFieldsFragment = graphql(`
+  fragment MyAssignmentFields on MyAssignment {
+    eventId
+    functionId
+    functionName
+    instrumentId
+    instrumentName
+    ackStatus
+    ackNote
+    event {
+      id
+      title
+      type
+      status
+      callTime
+      startsAt
+      endsAt
+      venue {
         id
-        title
-        type
-        status
-        callTime
-        startsAt
-        endsAt
-        venue {
-          id
+        name
+      }
+    }
+  }
+`);
+
+export const myAssignmentsDocument = graphql(`
+  query MyAssignments($acknowledged: Boolean) {
+    myAssignments(acknowledged: $acknowledged) {
+      ...MyAssignmentFields
+    }
+  }
+`);
+
+export const myAssignmentsPageDocument = graphql(`
+  query MyAssignmentsPage($tab: MyAssignmentTab!, $page: PageInput) {
+    myAssignmentsPage(tab: $tab, page: $page) {
+      items {
+        ...MyAssignmentFields
+      }
+      total
+      page
+      limit
+      totalPages
+    }
+    myAssignmentCounts {
+      acknowledged
+      pending
+      duty
+    }
+  }
+`);
+
+export const swapRequestsDocument = graphql(`
+  query SwapRequests($page: PageInput) {
+    swapRequests(page: $page) {
+      items {
+        ...MyAssignmentFields
+        userId
+        ackAt
+        person {
           name
+          warName
+          rank
+          section
         }
       }
+      total
+      page
+      limit
+      totalPages
+    }
+  }
+`);
+
+export const keepOnRosterDocument = graphql(`
+  mutation KeepOnRoster($eventId: ID!, $userId: ID!, $note: String) {
+    keepOnRoster(eventId: $eventId, userId: $userId, note: $note) {
+      userId
+      ackStatus
     }
   }
 `);

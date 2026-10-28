@@ -8,6 +8,7 @@ import { authClient } from "@/features/auth/api/auth.client";
 import { NewPasswordFields } from "@/features/auth/components/NewPasswordFields";
 import { passwordProblem } from "@/features/auth/model/password-rules";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 type Step = "request" | "code" | "password" | "done";
 
@@ -21,16 +22,15 @@ export function PasswordRecoveryFlow() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   async function run(action: () => Promise<void>, fallback: string) {
     setPending(true);
-    setError(null);
     try {
       await action();
     } catch (cause) {
-      setError(message(cause, fallback));
+      showError(message(cause, fallback));
     }
     setPending(false);
   }
@@ -54,7 +54,7 @@ export function PasswordRecoveryFlow() {
   const resetPassword = (event: FormEvent) => {
     event.preventDefault();
     const problem = passwordProblem(password, confirmation);
-    if (problem) return setError(problem);
+    if (problem) return showError(problem);
     void run(async () => {
       await authClient.resetPassword(password);
       setStep("done");
@@ -76,8 +76,6 @@ export function PasswordRecoveryFlow() {
 
   return (
     <div className="space-y-4">
-      {error && <Alert tone="danger">{error}</Alert>}
-
       {step === "request" && (
         <form onSubmit={requestCode} className="space-y-4" noValidate>
           <p className="text-sm text-muted">

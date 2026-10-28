@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { CalendarCheck, ListMusic, Smartphone } from "lucide-react";
+import { cn } from "@/design-system";
 import { LogoMark } from "@/features/layout/components/LogoMark";
 
 const HIGHLIGHTS = [
@@ -40,10 +41,14 @@ export function AuthLayout({
   title,
   description,
   children,
+  wide = false,
 }: {
-  title: string;
+  /** Omit when the content draws its own heading (e.g. a flow by steps). */
+  title?: string;
   description?: ReactNode;
   children: ReactNode;
+  /** Room for a longer form (e.g. the public sign-up). */
+  wide?: boolean;
 }) {
   return (
     <main className="grid min-h-dvh bg-bg lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
@@ -101,7 +106,7 @@ export function AuthLayout({
       </section>
 
       <section className="flex flex-col items-center justify-center px-5 py-10 sm:px-8">
-        <div className="w-full max-w-sm">
+        <div className={cn("w-full", wide ? "max-w-xl" : "max-w-sm")}>
           <div className="mb-8 flex flex-col items-center text-center lg:hidden">
             <span className="mb-3 grid size-16 place-items-center rounded-full bg-linear-to-br from-chrome-top to-chrome-bottom shadow-pop">
               <LogoMark className="size-10 text-chrome-fg" />
@@ -114,11 +119,11 @@ export function AuthLayout({
             </p>
           </div>
 
-          <h1 className="text-2xl font-semibold text-fg">{title}</h1>
+          {title && <h1 className="text-2xl font-semibold text-fg">{title}</h1>}
           {description && (
             <p className="mt-1.5 text-sm text-muted">{description}</p>
           )}
-          <div className="mt-7">{children}</div>
+          <div className={title ? "mt-7" : undefined}>{children}</div>
 
           <p className="mt-10 text-center text-xs text-soft">
             <Link href="/termos" className="hover:text-fg hover:underline">

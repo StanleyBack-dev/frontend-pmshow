@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
-import { Alert, Button, Drawer } from "@/design-system";
+import { Button, Drawer } from "@/design-system";
 import { adminClient } from "@/features/admin/api/admin.client";
 import { TemporaryAccessPanel } from "@/features/admin/components/TemporaryAccessPanel";
 import { UserFormFields } from "@/features/admin/components/UserFormFields";
@@ -13,6 +13,7 @@ import type {
   UserInput,
 } from "@/shared/contracts/api";
 import { ApiClientError } from "@/shared/lib/api-client";
+import { useToast } from "@/shared/toast/useToast";
 
 const EMPTY: UserInput = { name: "", email: "", username: "", group: "USER" };
 
@@ -25,24 +26,22 @@ export function CreateUserButton({
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<UserInput>(EMPTY);
   const [created, setCreated] = useState<TemporaryAccess | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useToast();
   const [pending, setPending] = useState(false);
 
   function close() {
     setOpen(false);
     setForm(EMPTY);
     setCreated(null);
-    setError(null);
   }
 
   async function submit() {
     setPending(true);
-    setError(null);
     try {
       setCreated(await adminClient.createUser(form));
       router.refresh();
     } catch (cause) {
-      setError(
+      showError(
         cause instanceof ApiClientError
           ? cause.message
           : "Não foi possível criar o usuário.",
@@ -85,7 +84,6 @@ export function CreateUserButton({
           <TemporaryAccessPanel access={created} />
         ) : (
           <div className="space-y-4">
-            {error && <Alert tone="danger">{error}</Alert>}
             <UserFormFields
               value={form}
               onChange={setForm}
