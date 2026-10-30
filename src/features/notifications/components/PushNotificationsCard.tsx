@@ -1,46 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BellOff, BellRing, Send } from "lucide-react";
 import { Alert, Button, Card, CardBody, CardHeader } from "@/design-system";
 import { IosInstallSteps } from "@/features/install/components/IosInstallSteps";
-import { useInstallState } from "@/features/install/model/install-store";
-import {
-  pushClient,
-  pushSupport,
-} from "@/features/notifications/api/push.client";
+import { pushClient } from "@/features/notifications/api/push.client";
+import { usePushStatus } from "@/features/notifications/model/push-status";
 import { ApiClientError } from "@/shared/lib/api-client";
-
-type Status = "loading" | "on" | "off" | "denied";
 
 // Notifications on this device (Web Push). Each phone or computer is turned
 // on separately; the same notices still arrive in the app and by e-mail.
 export function PushNotificationsCard() {
-  const { ready, installed, ios } = useInstallState();
-  const [status, setStatus] = useState<Status>("loading");
+  const { support, status, setStatus } = usePushStatus();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{
     tone: "success" | "danger" | "info";
     text: string;
   } | null>(null);
-
-  const support = ready ? pushSupport(installed, ios) : null;
-
-  useEffect(() => {
-    if (support !== "supported") return;
-    let cancelled = false;
-    pushClient
-      .current()
-      .then((subscription) => {
-        if (cancelled) return;
-        if (Notification.permission === "denied") setStatus("denied");
-        else setStatus(subscription ? "on" : "off");
-      })
-      .catch(() => !cancelled && setStatus("off"));
-    return () => {
-      cancelled = true;
-    };
-  }, [support]);
 
   async function run(action: () => Promise<void>) {
     setBusy(true);

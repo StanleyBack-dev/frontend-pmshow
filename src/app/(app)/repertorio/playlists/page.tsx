@@ -55,6 +55,7 @@ export default async function PlaylistsPage({
         playlists={band ? shared : mine}
         viewerId={user.id}
         tab={band ? "band" : "mine"}
+        canSearchYoutube={can(user, "REPERTOIRE_MANAGE")}
       />
     </>
   );

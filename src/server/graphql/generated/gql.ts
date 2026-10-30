@@ -118,9 +118,9 @@ type Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": typeof types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": typeof types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": typeof types.SendTestPushDocument,
-    "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    songCount\n    updatedAt\n  }\n": typeof types.PlaylistFieldsFragmentDoc,
+    "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    itemCount\n    updatedAt\n  }\n": typeof types.PlaylistFieldsFragmentDoc,
     "\n  query Playlists {\n    playlists {\n      ...PlaylistFields\n    }\n  }\n": typeof types.PlaylistsDocument,
-    "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      songs {\n        position\n        songId\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n": typeof types.PlaylistDocument,
+    "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      items {\n        position\n        songId\n        video {\n          videoId\n          title\n          channelTitle\n        }\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          artist {\n            name\n          }\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n": typeof types.PlaylistDocument,
     "\n  mutation CreatePlaylist($input: PlaylistInput!) {\n    createPlaylist(input: $input) {\n      ...PlaylistFields\n    }\n  }\n": typeof types.CreatePlaylistDocument,
     "\n  mutation UpdatePlaylist($id: ID!, $input: PlaylistInput!) {\n    updatePlaylist(id: $id, input: $input) {\n      ...PlaylistFields\n    }\n  }\n": typeof types.UpdatePlaylistDocument,
     "\n  mutation DeletePlaylist($id: ID!) {\n    deletePlaylist(id: $id)\n  }\n": typeof types.DeletePlaylistDocument,
@@ -266,9 +266,9 @@ const documents: Documents = {
     "\n  mutation SubscribePush($input: PushSubscriptionInput!) {\n    subscribePush(input: $input)\n  }\n": types.SubscribePushDocument,
     "\n  mutation UnsubscribePush($endpoint: String!) {\n    unsubscribePush(endpoint: $endpoint)\n  }\n": types.UnsubscribePushDocument,
     "\n  mutation SendTestPush {\n    sendTestPush\n  }\n": types.SendTestPushDocument,
-    "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    songCount\n    updatedAt\n  }\n": types.PlaylistFieldsFragmentDoc,
+    "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    itemCount\n    updatedAt\n  }\n": types.PlaylistFieldsFragmentDoc,
     "\n  query Playlists {\n    playlists {\n      ...PlaylistFields\n    }\n  }\n": types.PlaylistsDocument,
-    "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      songs {\n        position\n        songId\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n": types.PlaylistDocument,
+    "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      items {\n        position\n        songId\n        video {\n          videoId\n          title\n          channelTitle\n        }\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          artist {\n            name\n          }\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n": types.PlaylistDocument,
     "\n  mutation CreatePlaylist($input: PlaylistInput!) {\n    createPlaylist(input: $input) {\n      ...PlaylistFields\n    }\n  }\n": types.CreatePlaylistDocument,
     "\n  mutation UpdatePlaylist($id: ID!, $input: PlaylistInput!) {\n    updatePlaylist(id: $id, input: $input) {\n      ...PlaylistFields\n    }\n  }\n": types.UpdatePlaylistDocument,
     "\n  mutation DeletePlaylist($id: ID!) {\n    deletePlaylist(id: $id)\n  }\n": types.DeletePlaylistDocument,
@@ -726,7 +726,7 @@ export function graphql(source: "\n  mutation SendTestPush {\n    sendTestPush\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    songCount\n    updatedAt\n  }\n"): typeof import('./graphql').PlaylistFieldsFragmentDoc;
+export function graphql(source: "\n  fragment PlaylistFields on Playlist {\n    id\n    name\n    description\n    shared\n    ownerId\n    ownerName\n    itemCount\n    updatedAt\n  }\n"): typeof import('./graphql').PlaylistFieldsFragmentDoc;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -734,7 +734,7 @@ export function graphql(source: "\n  query Playlists {\n    playlists {\n      .
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      songs {\n        position\n        songId\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').PlaylistDocument;
+export function graphql(source: "\n  query Playlist($id: ID!) {\n    playlist(id: $id) {\n      ...PlaylistFields\n      items {\n        position\n        songId\n        video {\n          videoId\n          title\n          channelTitle\n        }\n        song {\n          id\n          title\n          musicalKey\n          durationSeconds\n          lyrics\n          archivedAt\n          artist {\n            name\n          }\n          media {\n            id\n            kind\n            title\n            youtubeVideoId\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').PlaylistDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

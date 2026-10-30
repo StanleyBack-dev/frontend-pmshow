@@ -407,10 +407,22 @@ export type Permission =
 
 export type PlaylistInput = {
   description?: string | null | undefined;
+  /** Na ordem em que tocam. */
+  items: Array<PlaylistItemInput>;
   name: string;
   shared: boolean;
-  /** Músicas na ordem em que tocam. */
-  songIds: Array<string | number>;
+};
+
+/** Uma música do repertório ou um vídeo. */
+export type PlaylistItemInput = {
+  songId?: string | number | null | undefined;
+  video?: PlaylistVideoInput | null | undefined;
+};
+
+export type PlaylistVideoInput = {
+  channelTitle?: string | null | undefined;
+  title: string;
+  videoId: string;
 };
 
 /** PushSubscription do navegador (PushManager). */
@@ -1320,26 +1332,26 @@ export type SendTestPushMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type SendTestPushMutation = { sendTestPush: number };
 
-export type PlaylistFieldsFragment = { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string };
+export type PlaylistFieldsFragment = { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, itemCount: number, updatedAt: string };
 
 export type PlaylistsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PlaylistsQuery = { playlists: Array<{ id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string }> };
+export type PlaylistsQuery = { playlists: Array<{ id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, itemCount: number, updatedAt: string }> };
 
 export type PlaylistQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type PlaylistQuery = { playlist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string, songs: Array<{ position: number, songId: string, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, lyrics: string | null, archivedAt: string | null, media: Array<{ id: string, kind: MediaKind, title: string, youtubeVideoId: string | null }> } | null }> } };
+export type PlaylistQuery = { playlist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, itemCount: number, updatedAt: string, items: Array<{ position: number, songId: string | null, video: { videoId: string, title: string, channelTitle: string | null } | null, song: { id: string, title: string, musicalKey: string | null, durationSeconds: number | null, lyrics: string | null, archivedAt: string | null, artist: { name: string } | null, media: Array<{ id: string, kind: MediaKind, title: string, youtubeVideoId: string | null }> } | null }> } };
 
 export type CreatePlaylistMutationVariables = Exact<{
   input: PlaylistInput;
 }>;
 
 
-export type CreatePlaylistMutation = { createPlaylist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string } };
+export type CreatePlaylistMutation = { createPlaylist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, itemCount: number, updatedAt: string } };
 
 export type UpdatePlaylistMutationVariables = Exact<{
   id: string | number;
@@ -1347,7 +1359,7 @@ export type UpdatePlaylistMutationVariables = Exact<{
 }>;
 
 
-export type UpdatePlaylistMutation = { updatePlaylist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, songCount: number, updatedAt: string } };
+export type UpdatePlaylistMutation = { updatePlaylist: { id: string, name: string, description: string | null, shared: boolean, ownerId: string, ownerName: string, itemCount: number, updatedAt: string } };
 
 export type DeletePlaylistMutationVariables = Exact<{
   id: string | number;
@@ -1818,7 +1830,7 @@ export const PlaylistFieldsFragmentDoc = new TypedDocumentString(`
   shared
   ownerId
   ownerName
-  songCount
+  itemCount
   updatedAt
 }
     `, {"fragmentName":"PlaylistFields"}) as unknown as TypedDocumentString<PlaylistFieldsFragment, unknown>;
@@ -3626,16 +3638,21 @@ export const PlaylistsDocument = new TypedDocumentString(`
   shared
   ownerId
   ownerName
-  songCount
+  itemCount
   updatedAt
 }`) as unknown as TypedDocumentString<PlaylistsQuery, PlaylistsQueryVariables>;
 export const PlaylistDocument = new TypedDocumentString(`
     query Playlist($id: ID!) {
   playlist(id: $id) {
     ...PlaylistFields
-    songs {
+    items {
       position
       songId
+      video {
+        videoId
+        title
+        channelTitle
+      }
       song {
         id
         title
@@ -3643,6 +3660,9 @@ export const PlaylistDocument = new TypedDocumentString(`
         durationSeconds
         lyrics
         archivedAt
+        artist {
+          name
+        }
         media {
           id
           kind
@@ -3660,7 +3680,7 @@ export const PlaylistDocument = new TypedDocumentString(`
   shared
   ownerId
   ownerName
-  songCount
+  itemCount
   updatedAt
 }`) as unknown as TypedDocumentString<PlaylistQuery, PlaylistQueryVariables>;
 export const CreatePlaylistDocument = new TypedDocumentString(`
@@ -3676,7 +3696,7 @@ export const CreatePlaylistDocument = new TypedDocumentString(`
   shared
   ownerId
   ownerName
-  songCount
+  itemCount
   updatedAt
 }`) as unknown as TypedDocumentString<CreatePlaylistMutation, CreatePlaylistMutationVariables>;
 export const UpdatePlaylistDocument = new TypedDocumentString(`
@@ -3692,7 +3712,7 @@ export const UpdatePlaylistDocument = new TypedDocumentString(`
   shared
   ownerId
   ownerName
-  songCount
+  itemCount
   updatedAt
 }`) as unknown as TypedDocumentString<UpdatePlaylistMutation, UpdatePlaylistMutationVariables>;
 export const DeletePlaylistDocument = new TypedDocumentString(`

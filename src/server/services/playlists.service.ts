@@ -10,7 +10,7 @@ import {
 import type {
   Playlist,
   PlaylistInput,
-  PlaylistWithSongs,
+  PlaylistWithItems,
 } from "@/shared/contracts/playlists";
 
 export const playlistsService = {
@@ -19,7 +19,7 @@ export const playlistsService = {
     return playlists;
   },
 
-  async get(token: string, id: string): Promise<PlaylistWithSongs> {
+  async get(token: string, id: string): Promise<PlaylistWithItems> {
     const { playlist } = await backendGraphql(playlistDocument, {
       token,
       variables: { id },

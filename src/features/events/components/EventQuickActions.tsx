@@ -16,6 +16,7 @@ import {
   SongListViewModal,
 } from "@/features/events/components/EventViewModals";
 import { venueMapUrl } from "@/features/events/model/venue-map";
+import { songTracks } from "@/features/player/model/song-tracks";
 import { usePlaySongs } from "@/features/playlists/components/usePlaySongs";
 import type { EventListItem } from "@/shared/contracts/events";
 import { useToast } from "@/shared/toast/useToast";
@@ -109,8 +110,10 @@ export function EventQuickActions({
             disabled={rehearsal.pending !== null}
             onClick={() =>
               void rehearsal.play(event.id, async () =>
-                (await eventsClient.setlist(event.id)).map(
-                  (entry) => entry.song,
+                songTracks(
+                  (await eventsClient.setlist(event.id)).map(
+                    (entry) => entry.song,
+                  ),
                 ),
               )
             }

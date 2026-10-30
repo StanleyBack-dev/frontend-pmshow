@@ -23,6 +23,8 @@ export type Track = {
   assetId: string;
   title: string;
   songTitle: string;
+  /** Singer / band (or the video's channel), shown under the title. */
+  artist?: string | null;
   /** Set for YouTube videos: played by the embedded YouTube player. */
   youtubeVideoId?: string | null;
   /** The song's lyrics, readable from the player while it plays. */
@@ -59,6 +61,7 @@ type PlayerApi = PlayerState & {
   close: () => void;
   /** Cycles off → all → one. */
   cycleRepeat: () => void;
+  setRepeat: (mode: RepeatMode) => void;
   setRate: (rate: number) => void;
   /** A PlayerPanel (e.g. in a drawer) shows the player: the page bar hides. */
   embedded: boolean;
@@ -116,6 +119,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const slotsRef = useRef<HTMLElement[]>([]);
   const nextRef = useRef<() => void>(() => undefined);
   const endedRef = useRef<() => void>(() => undefined);
+  // Moves past a video YouTube refused to play, when the list goes on.
+  const skipFailedRef = useRef<() => void>(() => undefined);
+  // Whether the current track is the YouTube one. While an audio plays the
+  // YouTube player stays (paused): browsers on phones only let a player
+  // that already played go on by itself, so the next video of the list
+  // reuses it. Its events are ignored meanwhile.
+  const youtubeActiveRef = useRef(false);
   // Read by the players' callbacks, created before the state changes.
   const rateRef = useRef(1);
   const [state, setState] = useState<PlayerState>(INITIAL);
@@ -168,6 +178,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             youtubeReadyRef.current = true;
             const youtube = event.target;
             youtube.setPlaybackRate(rateRef.current);
+            // An audio of the list took over while it loaded: wait paused.
+            if (!youtubeActiveRef.current) return;
             if (!autoplay) {
               setState((s) => ({ ...s, loading: false, playing: false }));
               return;
@@ -177,7 +189,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             // tap: then the video just waits, so leave the spinner and show
             // the play button for the user to start it.
             window.setTimeout(() => {
-              if (youtubeRef.current !== youtube) return;
+              if (youtubeRef.current !== youtube || !youtubeActiveRef.current)
+                return;
               const now = youtube.getPlayerState();
               if (now !== YT_STATE.PLAYING && now !== YT_STATE.BUFFERING) {
                 setState((s) => ({ ...s, loading: false, playing: false }));
@@ -185,6 +198,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
             }, 2500);
           },
           onStateChange: ({ data }) => {
+            if (!youtubeActiveRef.current) return;
             if (data === YT_STATE.PLAYING) {
               setState((s) => ({ ...s, loading: false, playing: true }));
             } else if (data === YT_STATE.PAUSED) {
@@ -196,13 +210,25 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
               endedRef.current();
             }
           },
-          onError: ({ data }) =>
+          onError: ({ data }) => {
+            if (!youtubeActiveRef.current) return;
             setState((s) => ({
               ...s,
               loading: false,
               playing: false,
               error: youtubeErrorMessage(data),
-            })),
+            }));
+            // In a list, show why for a moment and go on to the next one.
+            const failed = youtubeVideoIdRef.current;
+            window.setTimeout(() => {
+              if (
+                youtubeActiveRef.current &&
+                youtubeVideoIdRef.current === failed
+              ) {
+                skipFailedRef.current();
+              }
+            }, 2500);
+          },
         },
       });
     },
@@ -278,6 +304,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         duration: 0,
         error: null,
       }));
+      youtubeActiveRef.current = Boolean(track.youtubeVideoId);
 
       if (track.youtubeVideoId) {
         stopAudio();
@@ -294,7 +321,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      stopYoutube();
+      // Kept for the next video of the list (see youtubeActiveRef).
+      (youtubeReadyRef.current ? youtubeRef.current : null)?.pauseVideo();
       try {
         const { url } = await apiRequest<{ url: string }>(
           `/media/${track.assetId}/play`,
@@ -319,7 +347,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         }));
       }
     },
-    [playYoutube, stopAudio, stopYoutube],
+    [playYoutube, stopAudio],
   );
 
   const play = useCallback(
@@ -344,7 +372,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     nextRef.current = next;
-  }, [next]);
+    // A single track would just fail again.
+    skipFailedRef.current = () => {
+      if (state.queue.length > 1) next();
+    };
+  }, [next, state.queue.length]);
 
   const seek = useCallback(
     (seconds: number) => {
@@ -413,6 +445,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const setRepeat = useCallback(
+    (repeat: RepeatMode) => setState((s) => ({ ...s, repeat })),
+    [],
+  );
+
   const setRate = useCallback((rate: number) => {
     rateRef.current = rate;
     if (audioRef.current) {
@@ -426,6 +463,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const close = useCallback(() => {
+    youtubeActiveRef.current = false;
     stopAudio();
     stopYoutube();
     // The practice settings stay for the next time.
@@ -536,6 +574,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       seek,
       close,
       cycleRepeat,
+      setRepeat,
       setRate,
       embedded: slotActive,
     }),
@@ -549,6 +588,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       seek,
       close,
       cycleRepeat,
+      setRepeat,
       setRate,
       slotActive,
     ],

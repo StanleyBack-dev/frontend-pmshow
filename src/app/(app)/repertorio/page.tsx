@@ -8,6 +8,7 @@ import {
   FilterPanel,
   PageHeader,
   Pagination,
+  SegmentedNav,
   Select,
 } from "@/design-system";
 import { AccessDenied } from "@/features/access/components/AccessDenied";
@@ -94,7 +95,35 @@ export default async function RepertoirePage({
         description="Músicas da banda com áudios para ouvir e vídeos para assistir."
         actions={canManage ? <NewSongButton artists={artists} /> : undefined}
       />
-      <RepertoireTabs active="songs" />
+      <RepertoireTabs
+        active="songs"
+        aside={
+          // Shortcut to the "Situação" filter (also in the filter panel):
+          // the songs to learn and the ones the band already plays.
+          <SegmentedNav
+            label="Situação"
+            fill
+            className="max-sm:w-full"
+            items={[
+              {
+                label: "Todas",
+                href: hrefWith({ situacao: undefined, page: undefined }),
+                active: !stage,
+              },
+              {
+                label: "Para pegar",
+                href: hrefWith({ situacao: "NOVA", page: undefined }),
+                active: stage === "NOVA",
+              },
+              {
+                label: "Já tocamos",
+                href: hrefWith({ situacao: "CONHECIDA", page: undefined }),
+                active: stage === "CONHECIDA",
+              },
+            ]}
+          />
+        }
+      />
 
       <FilterPanel hasActiveFilters={filtersActive}>
         <form

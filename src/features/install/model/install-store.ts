@@ -123,4 +123,20 @@ export function dismissInvite() {
   } catch {
     // Nothing to remember it with.
   }
+  // The invites waiting for this one (useInstallInviteOpen) may show now.
+  listeners.forEach((listener) => listener());
+}
+
+/**
+ * Whether InstallAppInvite is on screen: the other sign-in invites
+ * (notifications, agenda) wait for it, one card at a time.
+ */
+export function useInstallInviteOpen(): boolean {
+  const { ready, installed, canPrompt, ios } = useInstallState();
+  const dismissed = useSyncExternalStore(
+    subscribe,
+    wasInviteDismissed,
+    () => true,
+  );
+  return ready && !installed && (canPrompt || ios) && !dismissed;
 }

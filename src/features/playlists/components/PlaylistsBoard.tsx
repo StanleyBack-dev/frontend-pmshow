@@ -13,6 +13,7 @@ import {
 } from "@/design-system";
 import { RecordAuditButton } from "@/features/audit/components/RecordAudit";
 import { playlistsClient } from "@/features/playlists/api/playlists.client";
+import { playlistTracks } from "@/features/player/model/song-tracks";
 import { PlaylistFormDrawer } from "@/features/playlists/components/PlaylistFormDrawer";
 import { usePlaySongs } from "@/features/playlists/components/usePlaySongs";
 import type { Playlist } from "@/shared/contracts/playlists";
@@ -21,15 +22,18 @@ import { formatDateTime } from "@/shared/lib/datetime";
 import { useToast } from "@/shared/toast/useToast";
 
 // The repertoire's playlists (rehearsal mode): yours and the ones shared with
-// the band. "Tocar" plays every song in order in the app's player, where the
-// speed and repeat can be set.
+// the band. "Tocar" plays every song and video in order in the app's player,
+// over and over (repeat can be changed there), with the speed control.
 export function PlaylistsBoard({
   playlists,
   viewerId,
   tab,
+  canSearchYoutube,
 }: {
   playlists: Playlist[];
   viewerId: string;
+  /** May add YouTube videos (the search spends the daily quota). */
+  canSearchYoutube: boolean;
   /** "Minhas" or "Da banda" (shared with everyone). */
   tab: "mine" | "band";
 }) {
@@ -41,9 +45,13 @@ export function PlaylistsBoard({
   const [deleting, setDeleting] = useState(false);
   const close = useCallback(() => setEditing(null), []);
 
+  // Every song and video in order, then from the start again.
   const playPlaylist = (playlist: Playlist) =>
-    play(playlist.id, async () =>
-      (await playlistsClient.get(playlist.id)).songs.map((item) => item.song),
+    play(
+      playlist.id,
+      async () =>
+        playlistTracks((await playlistsClient.get(playlist.id)).items),
+      { repeatList: true },
     );
 
   async function remove() {
@@ -108,8 +116,8 @@ export function PlaylistsBoard({
                         {playlist.name}
                       </p>
                       <p className="text-xs text-soft">
-                        {playlist.songCount}{" "}
-                        {playlist.songCount === 1 ? "música" : "músicas"}
+                        {playlist.itemCount}{" "}
+                        {playlist.itemCount === 1 ? "música" : "músicas"}
                         {mine ? "" : ` · de ${playlist.ownerName}`}
                       </p>
                     </div>
@@ -144,7 +152,7 @@ export function PlaylistsBoard({
                           <Play className="size-4" />
                         )
                       }
-                      disabled={pending !== null || playlist.songCount === 0}
+                      disabled={pending !== null || playlist.itemCount === 0}
                       onClick={() => void playPlaylist(playlist)}
                     >
                       Tocar
@@ -181,6 +189,7 @@ export function PlaylistsBoard({
       {editing && (
         <PlaylistFormDrawer
           playlist={editing === "new" ? undefined : editing}
+          canSearchYoutube={canSearchYoutube}
           onClose={close}
           onSaved={() => {
             setEditing(null);

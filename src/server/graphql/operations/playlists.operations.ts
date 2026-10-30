@@ -8,7 +8,7 @@ export const playlistFieldsFragment = graphql(`
     shared
     ownerId
     ownerName
-    songCount
+    itemCount
     updatedAt
   }
 `);
@@ -25,9 +25,14 @@ export const playlistDocument = graphql(`
   query Playlist($id: ID!) {
     playlist(id: $id) {
       ...PlaylistFields
-      songs {
+      items {
         position
         songId
+        video {
+          videoId
+          title
+          channelTitle
+        }
         song {
           id
           title
@@ -35,6 +40,9 @@ export const playlistDocument = graphql(`
           durationSeconds
           lyrics
           archivedAt
+          artist {
+            name
+          }
           media {
             id
             kind

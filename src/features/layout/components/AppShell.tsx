@@ -47,7 +47,10 @@ import {
   type NavItem,
 } from "@/features/layout/model/navigation";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
+import { PushNotificationsInvite } from "@/features/notifications/components/PushNotificationsInvite";
+import { CalendarSyncInvite } from "@/features/settings/components/CalendarSyncInvite";
 import type { SessionUser } from "@/shared/contracts/api";
+import { can } from "@/shared/lib/access";
 import { apiRequest } from "@/shared/lib/api-client";
 
 // The collapsed state is a per-browser preference. It lives in localStorage
@@ -197,6 +200,8 @@ export function AppShell({
   );
 
   const primary = PRIMARY_NAV.filter((item) => canSee(item, user.permissions));
+  // The agenda link only carries the person's rosters and working days.
+  const canSyncCalendar = can(user, "ROSTERS_READ_OWN");
   const account = showAdmin ? [...ACCOUNT_NAV, ADMIN_NAV] : ACCOUNT_NAV;
   const accountActive = account.some((item) => isActive(pathname, item));
 
@@ -453,6 +458,8 @@ export function AppShell({
             {/* Inside the column: on phones it takes room at the end of the page
             instead of covering the last items. */}
             <InstallAppInvite />
+            <PushNotificationsInvite hidden={tourOpen} />
+            {canSyncCalendar && <CalendarSyncInvite hidden={tourOpen} />}
           </div>
 
           <Modal
