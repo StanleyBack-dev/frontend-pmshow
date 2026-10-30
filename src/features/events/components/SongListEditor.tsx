@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, ListMusic, Save, X } from "lucide-react";
 import { Button, Combobox, Modal, Select, Spinner } from "@/design-system";
@@ -56,6 +56,44 @@ export function SongListEditor({
 }: {
   rows: SongListRow[];
   onChange: (rows: SongListRow[]) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <SongPicker
+        exclude={new Set(rows.map((row) => row.songId))}
+        onPick={(song) =>
+          onChange([
+            ...rows,
+            { songId: song.id, title: song.title, detail: song.musicalKey },
+          ])
+        }
+      />
+      <OrderedList
+        items={rows.map((row) => ({ ...row, key: row.songId }))}
+        emptyText="Nenhuma música na lista. Escolha acima para adicionar."
+        onMove={(index, delta) => onChange(moveRow(rows, index, delta))}
+        onRemove={(index) => onChange(rows.filter((_, i) => i !== index))}
+      />
+    </div>
+  );
+}
+
+/** `rows` with the one at `index` moved by `delta` places. */
+export function moveRow<T>(rows: readonly T[], index: number, delta: number) {
+  const next = [...rows];
+  const [row] = next.splice(index, 1);
+  next.splice(index + delta, 0, row);
+  return next;
+}
+
+// Searchable select of the repertoire, narrowed by title, category or
+// singer / band. Songs in `exclude` (already in the list) are not offered.
+export function SongPicker({
+  exclude,
+  onPick,
+}: {
+  exclude: ReadonlySet<string>;
+  onPick: (song: SongOption) => void;
 }) {
   const [filter, setFilter] = useState<PickerFilter>("title");
   const [filterValue, setFilterValue] = useState("");
@@ -120,9 +158,8 @@ export function SongListEditor({
     };
   }, [filter, filterValue, filterKey, query]);
 
-  const inList = new Set(rows.map((row) => row.songId));
   // Songs already in the list are not offered again.
-  const available = songs.filter((song) => !inList.has(song.id));
+  const available = songs.filter((song) => !exclude.has(song.id));
   const options = available.map((song) => ({
     value: song.id,
     label: song.title,
@@ -133,22 +170,11 @@ export function SongListEditor({
 
   function add(songId: string | null) {
     const song = songs.find((item) => item.id === songId);
-    if (!song || inList.has(song.id)) return;
-    onChange([
-      ...rows,
-      { songId: song.id, title: song.title, detail: song.musicalKey },
-    ]);
-  }
-
-  function move(index: number, delta: number) {
-    const next = [...rows];
-    const [row] = next.splice(index, 1);
-    next.splice(index + delta, 0, row);
-    onChange(next);
+    if (song && !exclude.has(song.id)) onPick(song);
   }
 
   return (
-    <div className="space-y-3">
+    <>
       <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
         <Select
           label="Filtrar por"
@@ -214,64 +240,86 @@ export function SongListEditor({
             : undefined
         }
       />
+    </>
+  );
+}
 
-      {rows.length === 0 ? (
-        <p className="flex items-center gap-2 rounded-md border border-dashed border-border px-3 py-4 text-[13px] text-soft">
-          <ListMusic aria-hidden className="size-4" />
-          Nenhuma música na lista. Escolha acima para adicionar.
-        </p>
-      ) : (
-        <ol className="divide-y divide-border rounded-md border border-border">
-          {rows.map((row, index) => (
-            <li
-              key={row.songId}
-              className="flex items-center gap-1 px-2 py-1.5 text-[13px]"
-            >
-              <span className="w-6 shrink-0 text-right text-soft tabular-nums">
-                {index + 1}
-              </span>
-              <span className="min-w-0 flex-1 truncate pl-1 text-fg">
-                {row.title}
-                {row.detail && (
-                  <span className="text-soft"> · {row.detail}</span>
-                )}
-              </span>
-              <button
-                type="button"
-                aria-label={`Subir ${row.title}`}
-                title="Subir"
-                disabled={index === 0}
-                onClick={() => move(index, -1)}
-                className={rowButton}
-              >
-                <ArrowUp className="size-4" />
-              </button>
-              <button
-                type="button"
-                aria-label={`Descer ${row.title}`}
-                title="Descer"
-                disabled={index === rows.length - 1}
-                onClick={() => move(index, 1)}
-                className={rowButton}
-              >
-                <ArrowDown className="size-4" />
-              </button>
-              <button
-                type="button"
-                aria-label={`Retirar ${row.title}`}
-                title="Retirar da lista"
-                onClick={() =>
-                  onChange(rows.filter((item) => item.songId !== row.songId))
-                }
-                className={`${rowButton} hover:bg-danger-soft hover:text-danger`}
-              >
-                <X className="size-4" />
-              </button>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
+/** A line of OrderedList. */
+export type OrderedListItem = {
+  key: string;
+  title: string;
+  detail: string | null;
+  /** Marks a different kind of line (e.g. a YouTube video). */
+  icon?: ReactNode;
+};
+
+// The numbered list being built: move up / down and remove.
+export function OrderedList({
+  items,
+  emptyText,
+  onMove,
+  onRemove,
+}: {
+  items: OrderedListItem[];
+  emptyText: string;
+  onMove: (index: number, delta: number) => void;
+  onRemove: (index: number) => void;
+}) {
+  if (items.length === 0) {
+    return (
+      <p className="flex items-center gap-2 rounded-md border border-dashed border-border px-3 py-4 text-[13px] text-soft">
+        <ListMusic aria-hidden className="size-4" />
+        {emptyText}
+      </p>
+    );
+  }
+  return (
+    <ol className="divide-y divide-border rounded-md border border-border">
+      {items.map((item, index) => (
+        <li
+          key={item.key}
+          className="flex items-center gap-1 px-2 py-1.5 text-[13px]"
+        >
+          <span className="w-6 shrink-0 text-right text-soft tabular-nums">
+            {index + 1}
+          </span>
+          {item.icon}
+          <span className="min-w-0 flex-1 truncate pl-1 text-fg">
+            {item.title}
+            {item.detail && <span className="text-soft"> · {item.detail}</span>}
+          </span>
+          <button
+            type="button"
+            aria-label={`Subir ${item.title}`}
+            title="Subir"
+            disabled={index === 0}
+            onClick={() => onMove(index, -1)}
+            className={rowButton}
+          >
+            <ArrowUp className="size-4" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Descer ${item.title}`}
+            title="Descer"
+            disabled={index === items.length - 1}
+            onClick={() => onMove(index, 1)}
+            className={rowButton}
+          >
+            <ArrowDown className="size-4" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Retirar ${item.title}`}
+            title="Retirar da lista"
+            onClick={() => onRemove(index)}
+            className={`${rowButton} hover:bg-danger-soft hover:text-danger`}
+          >
+            <X className="size-4" />
+          </button>
+        </li>
+      ))}
+    </ol>
   );
 }
 

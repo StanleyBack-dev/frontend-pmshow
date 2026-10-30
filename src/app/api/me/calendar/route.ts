@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { bffRoute, requireToken } from "@/server/http/route-handler";
 import { calendarService } from "@/server/services/calendar.service";
 
-// The signed-in person's agenda link: create a new one (the old one stops
-// working) or turn it off.
+// The signed-in person's agenda link: read it (null = none yet), create a new
+// one (the old one stops working) or turn it off.
+export const GET = bffRoute(async () =>
+  NextResponse.json(await calendarService.mine(await requireToken())),
+);
+
 export const POST = bffRoute(async () =>
   NextResponse.json(await calendarService.renew(await requireToken())),
 );

@@ -2,7 +2,7 @@ import { apiRequest } from "@/shared/lib/api-client";
 import type {
   Playlist,
   PlaylistInput,
-  PlaylistWithSongs,
+  PlaylistWithItems,
 } from "@/shared/contracts/playlists";
 
 const json = (method: string, body?: unknown): RequestInit => ({
@@ -11,7 +11,7 @@ const json = (method: string, body?: unknown): RequestInit => ({
 });
 
 export const playlistsClient = {
-  get: (id: string) => apiRequest<PlaylistWithSongs>(`/playlists/${id}`),
+  get: (id: string) => apiRequest<PlaylistWithItems>(`/playlists/${id}`),
 
   create: (input: PlaylistInput) =>
     apiRequest<Playlist>("/playlists", json("POST", input)),

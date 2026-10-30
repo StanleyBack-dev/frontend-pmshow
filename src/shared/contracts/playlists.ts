@@ -9,22 +9,42 @@ export type Playlist = {
   shared: boolean;
   ownerId: string;
   ownerName: string;
-  songCount: number;
+  /** Songs and videos. */
+  itemCount: number;
   updatedAt: string;
 };
 
-/** The playlist with its songs, in play order. */
-export type PlaylistWithSongs = Playlist & {
-  songs: {
-    position: number;
-    songId: string;
-    song: SetlistEntry["song"];
-  }[];
+/**
+ * A YouTube video kept in the playlist only: not a song of the repertoire,
+ * so events and the repertoire never show it.
+ */
+export type PlaylistVideo = {
+  videoId: string;
+  title: string;
+  channelTitle: string | null;
 };
+
+/** A song of the repertoire as a playlist plays it. */
+export type PlaylistSong = NonNullable<SetlistEntry["song"]> & {
+  artist: { name: string } | null;
+};
+
+/** One line, in play order: a song of the repertoire or a video. */
+export type PlaylistItem = {
+  position: number;
+  songId: string | null;
+  song: PlaylistSong | null;
+  video: PlaylistVideo | null;
+};
+
+/** The playlist with its items, in play order. */
+export type PlaylistWithItems = Playlist & { items: PlaylistItem[] };
+
+export type PlaylistItemInput = { songId: string } | { video: PlaylistVideo };
 
 export type PlaylistInput = {
   name: string;
   description: string | null;
   shared: boolean;
-  songIds: string[];
+  items: PlaylistItemInput[];
 };

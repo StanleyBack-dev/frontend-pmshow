@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Badge, DataTable, type DataTableColumn } from "@/design-system";
+import { ChevronRight } from "lucide-react";
+import {
+  Badge,
+  DataTable,
+  LinkPendingSwap,
+  type DataTableColumn,
+} from "@/design-system";
 import { auditColumn } from "@/features/audit/components/RecordAudit";
 import { LyricsButton } from "@/features/repertoire/components/LyricsViewer";
 import { EditSongIconButton } from "@/features/repertoire/components/SongButtons";
@@ -14,8 +20,9 @@ import {
 import type { Artist, SongListItem } from "@/shared/contracts/repertoire";
 
 // The repertoire list (amoremio table): edit, lyrics (full screen) and play
-// are explicit buttons at the start of the row; the title opens the song page (audio, video,
-// lyrics). On phones the chevron shows the remaining columns.
+// are explicit buttons at the start of the row; the title opens the song page
+// (audio, video, lyrics), and so does the "Abrir" button next to it. On
+// phones the chevron shows the remaining columns.
 export function SongsTable({
   songs,
   artists,
@@ -76,9 +83,45 @@ export function SongsTable({
       ),
     },
     {
+      // The song page (audios, videos, lyrics) behind a visible button, not
+      // only the title.
+      key: "open",
+      label: "",
+      className: "w-24 px-0",
+      mobile: "control",
+      render: (song) => (
+        <Link
+          href={`/repertorio/${song.id}`}
+          aria-label={`Abrir ${song.title}: áudios, vídeos e letra`}
+          className="inline-flex h-8 items-center gap-1 rounded-full border border-accent-border bg-accent-soft pr-1.5 pl-2.5 text-xs font-semibold text-accent transition-colors hover:bg-accent hover:text-accent-fg"
+        >
+          Abrir
+          <LinkPendingSwap>
+            <ChevronRight aria-hidden className="size-3.5" />
+          </LinkPendingSwap>
+        </Link>
+      ),
+    },
+    {
       key: "artist",
       label: "Cantor / banda",
       mobile: "subtitle",
+      render: (song) => song.artist?.name ?? "—",
+    },
+    // Phones: the card header cuts long names, so the details repeat them
+    // whole, each on its own line.
+    {
+      key: "title-detail",
+      label: "Música",
+      mobile: "detail",
+      desktop: "hidden",
+      render: (song) => song.title,
+    },
+    {
+      key: "artist-detail",
+      label: "Cantor / banda",
+      mobile: "detail",
+      desktop: "hidden",
       render: (song) => song.artist?.name ?? "—",
     },
     {

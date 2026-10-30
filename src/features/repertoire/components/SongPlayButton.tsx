@@ -47,6 +47,7 @@ export function SongPlayButton({ song }: { song: SongListItem }) {
               assetId: media.id,
               title: media.title,
               songTitle: song.title,
+              artist: song.artist?.name ?? null,
               youtubeVideoId: media.youtubeVideoId,
               lyrics: { title: song.title, text: song.lyrics },
             })
