@@ -2,19 +2,22 @@ import { BRAND_MARK } from "@/features/layout/model/brand-mark";
 
 // Link preview (1200×630) for ImageResponse: what WhatsApp, Instagram,
 // Facebook and X show when someone shares an address of the app. Dark chrome
-// with faint staff lines, the mark in a gold ring, the name and a headline.
+// with faint staff lines, the logo in a gold ring, the name and a headline.
 export const SHARE_CARD_SIZE = { width: 1200, height: 630 };
 
 export function ShareCard({
   headline,
   note,
+  logoSrc,
 }: {
   /** Big line under the name (e.g. "Cadastro de integrante"). */
   headline: string;
   /** Small line at the bottom. */
   note: string;
+  /** From brandLogoSrc(). */
+  logoSrc: string;
 }) {
-  const { shield, noteStem, noteFlag, noteHead, colors } = BRAND_MARK;
+  const { colors } = BRAND_MARK;
   return (
     <div
       style={{
@@ -70,36 +73,8 @@ export function ShareCard({
             flexShrink: 0,
           }}
         >
-          <svg width="190" height="190" viewBox={BRAND_MARK.viewBox}>
-            <path
-              d={shield}
-              fill="none"
-              stroke={colors.white}
-              strokeWidth="2.2"
-              strokeLinejoin="round"
-            />
-            <path
-              d={noteStem}
-              stroke={colors.gold}
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <path
-              d={noteFlag}
-              fill="none"
-              stroke={colors.gold}
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <ellipse
-              cx={noteHead.cx}
-              cy={noteHead.cy}
-              rx={noteHead.rx}
-              ry={noteHead.ry}
-              transform={`rotate(${noteHead.rotate} ${noteHead.cx} ${noteHead.cy})`}
-              fill={colors.gold}
-            />
-          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse */}
+          <img src={logoSrc} width={276} height={276} alt="" />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>

@@ -1,35 +1,20 @@
-import { BRAND_MARK } from "@/features/layout/model/brand-mark";
+import Image from "next/image";
+import { cn } from "@/design-system";
+import logo from "@/features/layout/assets/pm-show-logo.png";
 
-// The shield follows currentColor and the note uses the brand-gold token, so
-// the same mark works on the dark chrome and on light pages.
+// The band's round medallion (transparent outside the circle), so the same
+// mark works on the dark chrome and on light pages. The size comes from
+// className; 128px covers the largest one (the opening splash) on 1x screens.
 export function LogoMark({ className }: { className?: string }) {
-  const { shield, noteStem, noteFlag, noteHead } = BRAND_MARK;
   return (
-    <svg
-      viewBox={BRAND_MARK.viewBox}
-      fill="none"
-      role="img"
-      aria-label="PM SHOW"
-      className={className}
-    >
-      <path
-        d={shield}
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinejoin="round"
-      />
-      <g stroke="var(--brand-gold)" strokeWidth="2" strokeLinecap="round">
-        <path d={noteStem} />
-        <path d={noteFlag} />
-      </g>
-      <ellipse
-        cx={noteHead.cx}
-        cy={noteHead.cy}
-        rx={noteHead.rx}
-        ry={noteHead.ry}
-        transform={`rotate(${noteHead.rotate} ${noteHead.cx} ${noteHead.cy})`}
-        fill="var(--brand-gold)"
-      />
-    </svg>
+    <Image
+      src={logo}
+      alt="PM SHOW"
+      width={128}
+      height={128}
+      // Always above the fold (splash, menu, sign-in): no lazy loading.
+      loading="eager"
+      className={cn("shrink-0 rounded-full", className)}
+    />
   );
 }

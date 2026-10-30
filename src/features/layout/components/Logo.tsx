@@ -6,7 +6,7 @@ export function Logo({ size = "md" }: { size?: "md" | "lg" }) {
   const text = size === "lg" ? "text-lg" : "text-[15px]";
   return (
     <span className="inline-flex items-center gap-2">
-      <LogoMark className={`${mark} text-accent`} />
+      <LogoMark className={mark} />
       <span className={`${text} font-semibold tracking-tight text-fg`}>
         PM <span className="text-brand-gold-ink">SHOW</span>
       </span>

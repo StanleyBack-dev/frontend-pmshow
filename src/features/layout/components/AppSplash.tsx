@@ -41,7 +41,7 @@ export function AppSplash() {
       <div className="flex flex-col items-center gap-10">
         <div className="flex flex-col items-center gap-6">
           <span className="grid size-28 place-items-center rounded-full border border-brand-gold/40 bg-chrome-hover">
-            <LogoMark className="size-16 text-chrome-fg" />
+            <LogoMark className="size-full" />
           </span>
           <div className="text-center">
             <p className="text-4xl font-semibold tracking-wide">

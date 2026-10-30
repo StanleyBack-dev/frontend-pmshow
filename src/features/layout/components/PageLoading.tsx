@@ -16,7 +16,7 @@ export function PageLoading({ label = "Carregando…" }: { label?: string }) {
           aria-hidden
           className="absolute inset-0 animate-spin rounded-full border-[3px] border-brand-gold-soft border-t-brand-gold"
         />
-        <LogoMark className="size-8 text-accent" />
+        <LogoMark className="size-12" />
       </span>
       <p className="text-sm font-medium text-muted">{label}</p>
     </div>

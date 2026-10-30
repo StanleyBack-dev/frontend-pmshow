@@ -1,13 +1,15 @@
 import { ImageResponse } from "next/og";
 import { BrandIcon } from "@/features/layout/components/BrandIcon";
+import { brandLogoSrc } from "@/features/layout/model/brand-logo";
 
-// PNG icons referenced by the web manifest, rendered from the brand mark
-// instead of committed image files.
+// PNG icons referenced by the web manifest, rendered from the brand logo on
+// the chrome tile.
 const VARIANTS = {
-  "192": { size: 192, padding: 0.14 },
-  "512": { size: 512, padding: 0.14 },
-  // Maskable: launchers crop up to the outer 10%, so the mark sits deeper.
-  "maskable-512": { size: 512, padding: 0.24 },
+  "192": { size: 192, padding: 0.06 },
+  "512": { size: 512, padding: 0.06 },
+  // Maskable: launchers keep only the central circle (80% wide), so the
+  // round logo shrinks to fit inside it.
+  "maskable-512": { size: 512, padding: 0.12 },
 } as const;
 
 export const dynamicParams = false;
@@ -24,7 +26,11 @@ export async function GET(
   const spec = VARIANTS[variant as keyof typeof VARIANTS];
   if (!spec) return new Response("Not found", { status: 404 });
   return new ImageResponse(
-    <BrandIcon size={spec.size} padding={spec.padding} />,
+    <BrandIcon
+      size={spec.size}
+      padding={spec.padding}
+      logoSrc={await brandLogoSrc()}
+    />,
     { width: spec.size, height: spec.size },
   );
 }
