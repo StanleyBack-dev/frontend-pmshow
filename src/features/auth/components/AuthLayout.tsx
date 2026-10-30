@@ -58,7 +58,7 @@ export function AuthLayout({
 
         <div className="relative flex items-center gap-3">
           <span className="grid size-12 place-items-center rounded-full border border-brand-gold/40 bg-chrome-hover">
-            <LogoMark className="size-8 text-chrome-fg" />
+            <LogoMark className="size-full" />
           </span>
           <span>
             <span className="block text-xl font-semibold tracking-wide">
@@ -109,7 +109,7 @@ export function AuthLayout({
         <div className={cn("w-full", wide ? "max-w-xl" : "max-w-sm")}>
           <div className="mb-8 flex flex-col items-center text-center lg:hidden">
             <span className="mb-3 grid size-16 place-items-center rounded-full bg-linear-to-br from-chrome-top to-chrome-bottom shadow-pop">
-              <LogoMark className="size-10 text-chrome-fg" />
+              <LogoMark className="size-full" />
             </span>
             <p className="text-2xl font-semibold tracking-wide text-fg">
               PM <span className="text-brand-gold-ink">SHOW</span>

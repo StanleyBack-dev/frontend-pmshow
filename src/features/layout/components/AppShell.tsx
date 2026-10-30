@@ -274,7 +274,7 @@ export function AppShell({
                 aria-label="PM SHOW, início"
               >
                 <span className="grid size-10 shrink-0 place-items-center rounded-full border border-brand-gold/40 bg-chrome-hover">
-                  <LogoMark className="size-7 text-chrome-fg" />
+                  <LogoMark className="size-full" />
                 </span>
                 <span className={cn("min-w-0", collapsed && "lg:hidden")}>
                   <span className="block text-[17px] leading-tight font-semibold tracking-wide text-chrome-fg">
